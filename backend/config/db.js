@@ -6,19 +6,14 @@ const connectDB = async () => {
     process.exit(1);
   }
 
-  const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  };
-
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, options);
+    const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(
       `Successfully connected to MongoDB: ${conn.connection.name} 👍`
     );
   } catch (error) {
     console.error(`ERROR: ${error.message}`);
-    console.error(error.stack); // Affiche la pile d'erreur pour plus de détails
+    console.error(error.stack);
     process.exit(1);
   }
 };

@@ -21,6 +21,7 @@ dist-ssr
 # Environment variables
 /frontend/.env
 /backend/.env
+.env
 
 # Editor directories and files
 .vscode/*
@@ -32,8 +33,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
 
 # Backend uploads and logs
 /backend/logs
 /backend/uploads
+/uploads
