@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/Loader";
-import { useLoginMutation } from "../../redux/api/usersApiSlice";
-import { setCredentials } from "../../redux/features/auth/authSlice";
+import { setCredentials } from "../../redux/features/auth/authSlice.js";
 import { toast } from "react-toastify";
+import { useLoginUserMutation } from "../../redux/features/usersApiSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +13,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginUserMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
 

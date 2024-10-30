@@ -2,8 +2,8 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query/react";
-import { apiSlice } from "./api/apiSlice"; // Importation de la slice API principale
-import authReducer from "./features/auth/authSlice"; // Reducer pour l'authentification
+import { apiSlice } from "./features/apiSlice"; // Importation de la slice API principale
+import authReducer from "./features/auth/authSlice.js"; // Reducer pour l'authentification
 // import favoritesReducer from "./features/favorites/favoriteSlice"; // Reducer pour les favoris
 // import cartSliceReducer from "./features/cart/cartSlice"; // Reducer pour le panier
 // import shopReducer from "./features/shop/shopSlice"; // Reducer pour la boutique

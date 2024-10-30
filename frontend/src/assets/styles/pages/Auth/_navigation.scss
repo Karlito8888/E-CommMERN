@@ -19,53 +19,109 @@ aside {
     align-items: center;
     height: 100%;
     padding: 20px 0;
-  }
+    .main-nav {
+      list-style: none; // Suppression des puces
+      padding: 0; // Suppression du padding
+      margin-bottom: 1rem; // Espace en bas
 
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
+      .nav-item {
+        margin: 0.5rem 0; // Espacement entre les éléments
 
-    li {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1); // Couleur au survol
-      }
-
-      .nav-link {
-        display: flex;
-        align-items: center;
-        color: #fff; // Couleur du texte
-        text-decoration: none;
-
-        img {
-          width: 40px;
-          height: 40px;
-          transition: transform 0.3s ease; 
+        .nav-link {
+          display: flex; // Utilisation de flexbox pour aligner les icônes et le texte
+          align-items: center; // Centre verticalement
+          text-decoration: none; // Suppression du soulignement
+          color: $text-color; // Couleur du texte
+          padding: 0.5rem; // Padding autour du lien
+          border-radius: 4px; // Coins arrondis
 
           &:hover {
-            transform: scale(1.1); // Effet de zoom au survol
+            background-color: $primary-color; // Changement de fond au survol
+            color: white; // Changement de couleur du texte
+          }
+
+          img {
+            margin-right: 0.5rem; // Espace entre l'icône et le texte
+            width: 24px; // Taille de l'icône
+            height: 24px; // Taille de l'icône
           }
         }
+      }
+    }
 
-        span {
-          margin-left: 10px;
-          opacity: 0; // Initialement caché
-          white-space: nowrap; // Évite le retour à la ligne pour le texte
-          transition: opacity 0.3s ease; // Animation d'apparition du texte
-          display: flex;
+    .user-nav {
+      margin-top: auto; // Pousse la section utilisateur vers le bas
+      margin-top: 1rem;
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+
+        .user-name {
+          height: 20px;
+          width: 100%;
+          color: white;
+          font-weight: bold; // Texte en gras pour le nom de l'utilisateur
+          margin-bottom: 0.5rem; // Espace en bas
+        }
+
+        .user-menu {
+          list-style: none; // Suppression des puces
+          padding: 0; // Suppression du padding
+          margin: 0; // Suppression de la marge
+
+          .user-menu-item {
+            display: block; // Affichage en bloc
+            padding: 0.5rem; // Padding autour de chaque élément
+            color: $text-color; // Couleur du texte
+            text-decoration: none; // Suppression du soulignement
+            border-radius: 4px; // Coins arrondis
+
+            &:hover {
+              background-color: $secondary-color; // Changement de fond au survol
+              color: white; // Changement de couleur du texte
+            }
+          }
+
+          .logout-button {
+            background: none; // Aucune couleur de fond
+            border: none; // Suppression de la bordure
+            color: $text-color; // Couleur du texte
+            cursor: pointer; // Curseur en forme de main
+            text-align: left; // Alignement à gauche
+
+            &:hover {
+              background-color: $secondary-color; // Changement de fond au survol
+              color: white; // Changement de couleur du texte
+            }
+          }
         }
       }
 
-      &:hover span {
-        opacity: 1; // Affiche le texte au survol
+      .guest-nav {
+        list-style: none; // Suppression des puces
+        padding: 0; // Suppression du padding
+        margin: 0; // Suppression de la marge
+
+        .nav-link {
+          display: flex; // Utilisation de flexbox pour aligner les icônes et le texte
+          align-items: center; // Centre verticalement
+          text-decoration: none; // Suppression du soulignement
+          color: $text-color; // Couleur du texte
+          padding: 0.5rem; // Padding autour du lien
+          border-radius: 4px; // Coins arrondis
+
+          &:hover {
+            background-color: $primary-color; // Changement de fond au survol
+            color: white; // Changement de couleur du texte
+          }
+
+          img {
+            margin-right: 0.5rem; // Espace entre l'icône et le texte
+            width: 24px; // Taille de l'icône
+            height: 24px; // Taille de l'icône
+          }
+        }
       }
     }
   }

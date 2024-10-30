@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/Loader";
-import { useRegisterMutation } from "../../redux/api/usersApiSlice";
-import { setCredentials } from "../../redux/features/auth/authSlice";
+import { setCredentials } from "../../redux/features/auth/authSlice.js";
 import { toast } from "react-toastify";
+import { useCreateUserMutation } from "../../redux/features/usersApiSlice";
 
 const Register = () => {
   const [username, setName] = useState("");
@@ -15,7 +15,7 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [register, { isLoading }] = useRegisterMutation();
+  const [register, { isLoading }] = useCreateUserMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
 

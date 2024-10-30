@@ -237,46 +237,94 @@ aside nav {
   height: 100%;
   padding: 20px 0;
 }
-aside ul {
+aside nav .main-nav {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+aside nav .main-nav .nav-item {
+  margin: 0.5rem 0;
+}
+aside nav .main-nav .nav-item .nav-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+aside nav .main-nav .nav-item .nav-link:hover {
+  background-color: #3498db;
+  color: white;
+}
+aside nav .main-nav .nav-item .nav-link img {
+  margin-right: 0.5rem;
+  width: 24px;
+  height: 24px;
+}
+aside nav .user-nav {
+  margin-top: auto;
+  margin-top: 1rem;
+}
+aside nav .user-nav .user-info {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+}
+aside nav .user-nav .user-info .user-name {
+  height: 20px;
   width: 100%;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
-aside ul li {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  transition: background-color 0.3s ease;
+aside nav .user-nav .user-info .user-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
-aside ul li:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-aside ul li .nav-link {
-  display: flex;
-  align-items: center;
-  color: #fff;
+aside nav .user-nav .user-info .user-menu .user-menu-item {
+  display: block;
+  padding: 0.5rem;
+  color: #ffffff;
   text-decoration: none;
+  border-radius: 4px;
 }
-aside ul li .nav-link img {
-  width: 40px;
-  height: 40px;
-  transition: transform 0.3s ease;
+aside nav .user-nav .user-info .user-menu .user-menu-item:hover {
+  background-color: #2ecc71;
+  color: white;
 }
-aside ul li .nav-link img:hover {
-  transform: scale(1.1);
+aside nav .user-nav .user-info .user-menu .logout-button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: left;
 }
-aside ul li .nav-link span {
-  margin-left: 10px;
-  opacity: 0;
-  white-space: nowrap;
-  transition: opacity 0.3s ease;
+aside nav .user-nav .user-info .user-menu .logout-button:hover {
+  background-color: #2ecc71;
+  color: white;
+}
+aside nav .user-nav .guest-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+aside nav .user-nav .guest-nav .nav-link {
   display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 4px;
 }
-aside ul li:hover span {
-  opacity: 1;
+aside nav .user-nav .guest-nav .nav-link:hover {
+  background-color: #3498db;
+  color: white;
+}
+aside nav .user-nav .guest-nav .nav-link img {
+  margin-right: 0.5rem;
+  width: 24px;
+  height: 24px;
 }
 
 .signin-container {
