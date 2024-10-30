@@ -1,0 +1,72 @@
+aside {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 60px; // Largeur initiale pour montrer uniquement les images
+  height: 100vh;
+  background-color: #333; // Gris foncé
+  transition: width 0.3s ease; // Transition pour l'animation de largeur
+  overflow: hidden;
+  z-index: 1000;
+
+  &:hover {
+    width: 200px; // Largeur du aside lorsqu'il est en survol
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 20px 0;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+
+    li {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1); // Couleur au survol
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        color: #fff; // Couleur du texte
+        text-decoration: none;
+
+        img {
+          width: 40px;
+          height: 40px;
+          transition: transform 0.3s ease; 
+
+          &:hover {
+            transform: scale(1.1); // Effet de zoom au survol
+          }
+        }
+
+        span {
+          margin-left: 10px;
+          opacity: 0; // Initialement caché
+          white-space: nowrap; // Évite le retour à la ligne pour le texte
+          transition: opacity 0.3s ease; // Animation d'apparition du texte
+          display: flex;
+        }
+      }
+
+      &:hover span {
+        opacity: 1; // Affiche le texte au survol
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+.register-section {
+  padding-left: 10rem;
+  display: flex;
+  //   flex-wrap: wrap;
+
+  .register-container {
+    margin-right: 4rem;
+    margin-top: 5rem;
+
+    .register-title {
+      font-size: 2rem; // text-2xl
+      font-weight: 600; // font-semibold
+      margin-bottom: 1rem; // mb-4
+    }
+
+    .register-form {
+      width: 40rem; // w-[40rem]
+      container: true; // Optionnel, à enlever si non applicable
+    }
+
+    .form-group {
+      margin: 2rem 0; // my-[2rem]
+
+      .form-label {
+        display: block;
+        font-size: 0.875rem; // text-sm
+        font-weight: 500; // font-medium
+        color: white; // text-white
+      }
+
+      .form-input {
+        margin-top: 0.25rem; // mt-1
+        padding: 0.5rem; // p-2
+        border: 1px solid; // border
+        border-radius: 0.25rem; // rounded
+        width: 100%; // w-full
+      }
+    }
+
+    .register-button {
+      background-color: #ff69b4; // bg-pink-500
+      color: white; // text-white
+      padding: 0.5rem 1rem; // px-4 py-2
+      border-radius: 0.25rem; // rounded
+      cursor: pointer;
+      margin: 1rem 0; // my-[1rem]
+
+      &:disabled {
+        cursor: not-allowed; // Modifier le style si désactivé
+      }
+    }
+
+    .login-link {
+      margin-top: 1rem; // mt-4
+
+      .login-link-text {
+        color: #ff69b4; // text-pink-500
+        text-decoration: underline; // hover:underline
+      }
+    }
+  }
+
+  .register-image {
+    height: 100vh; // h-[65rem]
+    width: 59%; // w-[59%]
+    border-radius: 0.5rem; // rounded-lg
+    display: block; // xl:block md:hidden sm:hidden (ajouter des media queries si nécessaire)
+  }
+}

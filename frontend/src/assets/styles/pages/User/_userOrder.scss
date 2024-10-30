@@ -1,0 +1,60 @@
+.user-order-container {
+  margin: 0 auto;
+  padding: 1rem;
+  max-width: 1200px;
+}
+
+.user-order-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.user-order-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    font-weight: bold;
+  }
+
+  td {
+    padding: 0.5rem;
+    text-align: center;
+  }
+}
+
+.order-image {
+  width: 6rem;
+  margin-bottom: 1rem;
+}
+
+.status-completed {
+  padding: 0.5rem;
+  text-align: center;
+  background-color: #68d391; // Couleur verte
+  border-radius: 50px;
+  width: 6rem;
+  margin: 0 auto;
+}
+
+.status-pending {
+  padding: 0.5rem;
+  text-align: center;
+  background-color: #fc8181; // Couleur rouge
+  border-radius: 50px;
+  width: 6rem;
+  margin: 0 auto;
+}
+
+.details-button {
+  background-color: #ed64a6; // Couleur rose
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #d53f8c; // Couleur rose foncée au survol
+  }
+}

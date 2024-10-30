@@ -1,0 +1,60 @@
+.category-form-container {
+  padding: 1rem; // p-3
+}
+
+.category-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; // space-y-3
+}
+
+.category-input {
+  padding: 0.75rem 1rem; // py-3 px-4
+  border: 1px solid; // border
+  border-radius: 0.5rem; // rounded-lg
+  width: 100%; // w-full
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+
+  .submit-button,
+  .delete-button {
+    padding: 0.5rem 1rem; // py-2 px-4
+    border-radius: 0.5rem; // rounded-lg
+    color: white;
+    outline: none; // focus:outline-none
+    border: none;
+    cursor: pointer;
+
+    &:focus {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
+  }
+
+  .submit-button {
+    background-color: #ff69b4; // bg-pink-500
+
+    &:hover {
+      background-color: #d457a5; // hover:bg-pink-600
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.5); // focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50
+    }
+  }
+
+  .delete-button {
+    background-color: #ff6347; // bg-red-500
+
+    &:hover {
+      background-color: #d9433a; // hover:bg-red-600
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(255, 99, 71, 0.5); // focus:ring-2 focus:ring-red-500 focus:ring-opacity-50
+    }
+  }
+}

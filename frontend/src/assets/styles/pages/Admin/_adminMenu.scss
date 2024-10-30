@@ -1,0 +1,56 @@
+.menu-toggle {
+  position: fixed;
+  top: 5rem;
+  right: 7rem;
+  background-color: #151515;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  z-index: 100;
+
+  &.menu-open {
+    top: 2rem;
+    right: 2rem;
+  }
+
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    div {
+      width: 1.5rem;
+      height: 0.1rem;
+      background-color: #ccc;
+    }
+  }
+}
+
+.menu {
+  position: fixed;
+  top: 5rem;
+  right: 7rem;
+  background-color: #151515;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  z-index: 50;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.menu-item {
+  display: block;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+  color: white;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #2e2d2d;
+  }
+}

@@ -1,0 +1,48 @@
+// frontend/src/redux/features/auth/authSlice.js
+
+// Importation de la fonction createSlice depuis Redux Toolkit
+import { createSlice } from "@reduxjs/toolkit";
+
+// Définition de l'état initial pour le slice d'authentification
+const initialState = {
+  userInfo: localStorage.getItem("userInfo") // Vérifie si des informations utilisateur sont stockées
+    ? JSON.parse(localStorage.getItem("userInfo")) // Parse les données stockées si elles existent
+    : null, // Si aucune donnée n'est trouvée, initialise userInfo à null
+  error: null,
+};
+
+// Création du slice d'authentification
+const authSlice = createSlice({
+  name: "auth", // Nom du slice
+  initialState, // État initial défini ci-dessus
+  reducers: {
+    // Réducteur pour définir les informations d'identification
+    setCredentials: (state, action) => {
+      state.userInfo = action.payload; // Met à jour userInfo avec les données fournies
+      localStorage.setItem("userInfo", JSON.stringify(action.payload)); // Stocke les données dans le localStorage
+
+      const expirationTime = new Date().getTime() + 30 * 24 * 60 * 60 * 1000; // Calcule le temps d'expiration pour 30 jours
+      localStorage.setItem("expirationTime", expirationTime); // Stocke le temps d'expiration dans le localStorage
+    },
+    // Réducteur pour déconnexion
+    logout: (state) => {
+      state.userInfo = null; // Réinitialise userInfo à null
+      state.error = null;
+      localStorage.clear(); // Efface toutes les données du localStorage
+    },
+    // Réducteur pour gérer les erreurs d'authentification
+    setAuthError: (state, action) => {
+      state.error = action.payload; // Met à jour l'état d'erreur avec le message d'erreur fourni
+    },
+    // Réducteur pour réinitialiser les erreurs
+    clearAuthError: (state) => {
+      state.error = null; // Réinitialise l'état d'erreur
+    },
+  },
+});
+
+// Exportation des actions générées par le slice
+export const { setCredentials, logout, setAuthError, clearAuthError } = authSlice.actions;
+
+// Exportation du réducteur pour être utilisé dans le store
+export default authSlice.reducer;

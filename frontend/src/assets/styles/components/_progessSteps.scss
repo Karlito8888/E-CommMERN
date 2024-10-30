@@ -1,0 +1,35 @@
+.progress-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  .step-label {
+    margin-left: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .step-icon {
+    margin-top: 0.5rem;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .step-line {
+    height: 2px;
+    width: 10rem;
+    background-color: #22c55e; // Vert pour l'étape complétée
+  }
+
+  .active-step {
+    color: #22c55e;
+  }
+
+  .inactive-step {
+    color: #d1d5db;
+  }
+
+  .step-summary-offset {
+    margin-left: 10rem;
+  }
+}

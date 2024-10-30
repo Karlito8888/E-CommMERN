@@ -1,6 +1,8 @@
+// backend/utils/createToken.js
+
 import jwt from "jsonwebtoken";
 
-const generateAndSetToken = (res, userId) => {
+const generateToken = (res, userId) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined.");
   }
@@ -8,7 +10,7 @@ const generateAndSetToken = (res, userId) => {
   let token;
   try {
     token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
   } catch (error) {
     console.error(`Token generation error: ${error.message}`);
@@ -20,10 +22,11 @@ const generateAndSetToken = (res, userId) => {
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",
     sameSite: "strict",
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 jours
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+    // maxAge: 30 * 24 * 60 * 60 * 1000, // 30 jours
   });
 
   return token;
 };
 
-export default generateAndSetToken;
+export default generateToken;

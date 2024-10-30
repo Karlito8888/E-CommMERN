@@ -1,0 +1,17 @@
+@import "./settings";
+@import "./components/loader";
+@import "./components/categoryForm";
+@import "./components/header";
+@import "./components/message";
+@import "./components/modal";
+@import "./pages/Auth/navigation";
+@import "./pages/Auth/login";
+@import "./pages/Auth/register";
+@import "./pages/User/profile";
+@import "./pages/User/userOrder";
+@import "./pages/Admin/userList";
+@import "./pages/Admin/categoryList";
+@import "./pages/Admin/adminMenu";
+@import "./pages/Admin/productList";
+@import "./pages/Admin/productUpdate";
+@import "./pages/Admin/allProducts";

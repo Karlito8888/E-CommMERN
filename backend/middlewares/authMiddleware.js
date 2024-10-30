@@ -1,3 +1,5 @@
+// backend/middlewares/authMiddleware.js
+
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import asyncHandler from "./asyncHandler.js";
@@ -21,6 +23,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
       req.user = user; // Assigner l'utilisateur validé à req.user
       next();
     } catch (error) {
+      console.error(error);
       res.status(401).json({ message: "Not authorized, token failed." });
     }
   } else {
@@ -37,3 +40,4 @@ const authorizeAdmin = (req, res, next) => {
 };
 
 export { authenticate, authorizeAdmin };
+

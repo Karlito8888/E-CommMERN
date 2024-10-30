@@ -1,0 +1,108 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  max-width: 1920px;
+  margin-inline: auto;
+//   padding-inline: clamp(0.75rem, -0.0417rem + 3.1667vw, 3.125rem);
+  font-size: 16px;
+  font-family: "Nimbus Mono PS", "Courier New", monospace;
+  letter-spacing: 1px;
+//   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  overflow-x: clip;
+
+//   &::before {
+//     position: fixed;
+//     width: 400px;
+//     height: auto;
+//     aspect-ratio: 1/1;
+//     content: "";
+//     background-image: linear-gradient(to right, transparent, #70d7f7);
+//     z-index: -1;
+//     top: -100px;
+//     left: calc(50% - 100px);
+//     border-radius: 50% 50% 0 0;
+//     pointer-events: none;
+//     filter: blur(250px);
+//   }
+}
+
+// [data-theme="dark"] {
+//   background-color: var(--color-bg-dark);
+//   color: var(--color-text-dark);
+// }
+
+// [data-theme="light"] {
+//   background-color: var(--color-bg-light);
+//   color: var(--color-text-light);
+// }
+
+#root {
+  height: 100%;
+}
+
+main {
+  width: 100%;
+}
+
+ul {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+// [data-theme="dark"] a,
+// [data-theme="dark"] .menu-icon {
+//   color: var(--color-link-dark);
+// }
+
+// [data-theme="light"] a,
+// [data-theme="light"] .menu-icon {
+//   color: var(--color-link-light);
+// }
+
+// [data-theme="dark"] .logo-github,
+// [data-theme="dark"] .logo-linkedin,
+// [data-theme="dark"] .logo-cv {
+//   filter: invert(68%) sepia(44%) saturate(535%) hue-rotate(165deg) brightness(100%) contrast(101%);
+// }
+
+
+// [data-theme="light"] .logo-github,
+// [data-theme="light"] .logo-linkedin,
+// [data-theme="light"] .logo-cv {
+//   filter: invert(14%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(92%) contrast(90%);
+// }
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

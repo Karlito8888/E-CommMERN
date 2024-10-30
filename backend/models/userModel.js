@@ -1,3 +1,5 @@
+// backend/models/userModel.js
+
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema(
@@ -5,19 +7,35 @@ const userSchema = mongoose.Schema(
     username: {
       type: String,
       required: true,
+      minlength: 2,
+      trim: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
-      match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, // Validation de l'e-mail
+      match: /.+\@.+\..+/,
+      trim: true,
     },
+
     password: {
       type: String,
       required: true,
-      minlength: 6, // Longueur minimale du mot de passe
-      select: false, // Ne pas retourner le mot de passe par défaut
+      minlength: 6,
+      trim: true,
+      validate: {
+        validator: function (value) {
+          // Vérifier si le mot de passe contient au moins une majuscule et un caractère spécial
+          return /[A-Z]/.test(value) && /[!@#$%^&*(),.?":{}|<>]/.test(value);
+        },
+        message: (props) =>
+          `${props.value} n'est pas un mot de passe valide ! Il doit contenir au moins une majuscule et un caractère spécial.`,
+      },
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+
     isAdmin: {
       type: Boolean,
       required: true,
@@ -30,3 +48,4 @@ const userSchema = mongoose.Schema(
 const User = mongoose.model("User", userSchema);
 
 export default User;
+
