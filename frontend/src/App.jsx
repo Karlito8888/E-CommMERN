@@ -6,9 +6,9 @@ import "react-toastify/dist/ReactToastify.css";
 export default function App() {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       <Navigation />
-      <main className="py-3">
+      <main className="main">
         <Outlet />
       </main>
     </>

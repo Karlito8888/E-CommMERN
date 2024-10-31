@@ -1,5 +1,5 @@
 // Variables de couleurs
-$primary-color: #3498db; // Couleur primaire
+$primary-color: #ffffff34;// Couleur primaire
 $secondary-color: #2ecc71; // Couleur secondaire
 $background-color: #f4f4f4; // Couleur d'arrière-plan
 $text-color: #ffffff; // Couleur du texte
@@ -71,6 +71,11 @@ ul {
 a {
   text-decoration: none;
   transition: color 0.3s ease;
+  color: white;
+}
+
+span {
+  color: white;
 }
 
 // [data-theme="dark"] a,
@@ -100,6 +105,9 @@ button {
   border: none;
   background: none;
   cursor: pointer;
+  font-size: 16px;
+  font-family: "Nimbus Mono PS", "Courier New", monospace;
+  letter-spacing: 1px;
 }
 
 .sr-only {

@@ -2,7 +2,7 @@ aside {
   position: fixed;
   top: 0;
   left: 0;
-  width: 60px; // Largeur initiale pour montrer uniquement les images
+  width: 160px; // Largeur initiale pour afficher uniquement les images
   height: 100vh;
   background-color: #333; // Gris foncé
   transition: width 0.3s ease; // Transition pour l'animation de largeur
@@ -10,7 +10,7 @@ aside {
   z-index: 1000;
 
   &:hover {
-    width: 200px; // Largeur du aside lorsqu'il est en survol
+    width: 200px; // Largeur lors du survol
   }
 
   nav {
@@ -19,107 +19,126 @@ aside {
     align-items: center;
     height: 100%;
     padding: 20px 0;
-    .main-nav {
-      list-style: none; // Suppression des puces
-      padding: 0; // Suppression du padding
-      margin-bottom: 1rem; // Espace en bas
+
+    .main-nav,
+    .user-nav .guest-nav {
+      list-style: none;
+      flex: 1;
 
       .nav-item {
-        margin: 0.5rem 0; // Espacement entre les éléments
+        margin: 0.5rem 0;
 
         .nav-link {
-          display: flex; // Utilisation de flexbox pour aligner les icônes et le texte
-          align-items: center; // Centre verticalement
-          text-decoration: none; // Suppression du soulignement
-          color: $text-color; // Couleur du texte
-          padding: 0.5rem; // Padding autour du lien
-          border-radius: 4px; // Coins arrondis
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: $text-color;
+          padding: 0.5rem;
+          border-radius: 4px;
+          transition: background-color 0.1s ease;
 
           &:hover {
-            background-color: $primary-color; // Changement de fond au survol
-            color: white; // Changement de couleur du texte
+            background-color: $primary-color;
+            color: white;
           }
 
           img {
-            margin-right: 0.5rem; // Espace entre l'icône et le texte
-            width: 24px; // Taille de l'icône
-            height: 24px; // Taille de l'icône
+            margin-right: 0.5rem;
           }
+
+           span {
+                margin-top: 7px;
+              }
         }
       }
     }
 
     .user-nav {
-      margin-top: auto; // Pousse la section utilisateur vers le bas
+      margin-top: auto; // Place les éléments de navigation utilisateur en bas
       margin-top: 1rem;
 
       .user-info {
         display: flex;
         flex-direction: column;
+        align-items: center;
 
         .user-name {
-          height: 20px;
-          width: 100%;
           color: white;
-          font-weight: bold; // Texte en gras pour le nom de l'utilisateur
-          margin-bottom: 0.5rem; // Espace en bas
+          font-weight: bold;
+          margin-bottom: 0.5rem;
+          font-size: 1.1rem;
         }
 
         .user-menu {
-          list-style: none; // Suppression des puces
-          padding: 0; // Suppression du padding
-          margin: 0; // Suppression de la marge
+          list-style: none;
+          display: flex;
+          flex-direction: column;
 
-          .user-menu-item {
-            display: block; // Affichage en bloc
-            padding: 0.5rem; // Padding autour de chaque élément
-            color: $text-color; // Couleur du texte
-            text-decoration: none; // Suppression du soulignement
-            border-radius: 4px; // Coins arrondis
+          .nav-item {
+            display: flex;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.1s ease;
 
             &:hover {
-              background-color: $secondary-color; // Changement de fond au survol
-              color: white; // Changement de couleur du texte
+              background-color: $primary-color;
+              color: white;
+            }
+
+            .nav-link {
+              display: flex;
+              align-items: center;
+              padding: 0.5rem;
+
+              img {
+                margin-right: 0.5rem;
+              }
+
+              span {
+                margin-top: 7px;
+              }
             }
           }
 
+          .nav-item a[href="/profile"] {
+            margin-top: 50px;
+          }
+
           .logout-button {
-            background: none; // Aucune couleur de fond
-            border: none; // Suppression de la bordure
-            color: $text-color; // Couleur du texte
-            cursor: pointer; // Curseur en forme de main
-            text-align: left; // Alignement à gauche
+            background: none;
+            border: none;
+            color: $text-color;
+            cursor: pointer;
+            text-align: left;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.1s ease;
 
             &:hover {
-              background-color: $secondary-color; // Changement de fond au survol
-              color: white; // Changement de couleur du texte
+              background-color: $primary-color;
+              color: white;
             }
           }
         }
       }
 
       .guest-nav {
-        list-style: none; // Suppression des puces
-        padding: 0; // Suppression du padding
-        margin: 0; // Suppression de la marge
-
         .nav-link {
-          display: flex; // Utilisation de flexbox pour aligner les icônes et le texte
-          align-items: center; // Centre verticalement
-          text-decoration: none; // Suppression du soulignement
-          color: $text-color; // Couleur du texte
-          padding: 0.5rem; // Padding autour du lien
-          border-radius: 4px; // Coins arrondis
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: $text-color;
+          padding: 0.5rem;
+          border-radius: 4px;
+          transition: background-color 0.1s ease;
 
           &:hover {
-            background-color: $primary-color; // Changement de fond au survol
-            color: white; // Changement de couleur du texte
+            background-color: $primary-color;
+            color: white;
           }
 
           img {
-            margin-right: 0.5rem; // Espace entre l'icône et le texte
-            width: 24px; // Taille de l'icône
-            height: 24px; // Taille de l'icône
+            margin-right: 0.5rem;
           }
         }
       }

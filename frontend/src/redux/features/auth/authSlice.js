@@ -1,3 +1,5 @@
+// frontend/src/redux/features/auth/authSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -40,3 +42,4 @@ const authSlice = createSlice({
 export const { setCredentials, logout, checkExpiration } = authSlice.actions;
 
 export default authSlice.reducer;
+

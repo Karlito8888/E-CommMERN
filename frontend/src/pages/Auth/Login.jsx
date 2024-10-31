@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/Loader";
-import { setCredentials } from "../../redux/features/auth/authSlice.js";
+import { checkExpiration, setCredentials } from "../../redux/features/auth/authSlice.js";
 import { toast } from "react-toastify";
 import { useLoginUserMutation } from "../../redux/features/usersApiSlice";
 
@@ -15,17 +15,21 @@ const Login = () => {
 
   const [login, { isLoading }] = useLoginUserMutation();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo, expirationTime } = useSelector((state) => state.auth);
 
   const { search } = useLocation();
   const sp = new URLSearchParams(search);
   const redirect = sp.get("redirect") || "/";
 
   useEffect(() => {
+    // Vérifie si la session de l'utilisateur est expirée
+    dispatch(checkExpiration());
+
+    // Si l'utilisateur est connecté, redirige vers la page spécifiée
     if (userInfo) {
       navigate(redirect);
     }
-  }, [navigate, redirect, userInfo]);
+  }, [navigate, redirect, userInfo, dispatch]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -33,6 +37,7 @@ const Login = () => {
       const res = await login({ email, password }).unwrap();
       console.log(res);
       dispatch(setCredentials({ ...res }));
+      toast.success("Connexion réussie !"); 
       navigate(redirect);
     } catch (err) {
       toast.error(err?.data?.message || err.error);
@@ -45,7 +50,7 @@ const Login = () => {
         <div className="signin-form">
           <h1 className="title">Sign In</h1>
 
-          <form onSubmit={submitHandler} className="form">
+          <form onSubmit={submitHandler} className="form" noValidate>
             <div className="form-group">
               <label htmlFor="email" className="label">
                 Email Address
@@ -57,6 +62,9 @@ const Login = () => {
                 placeholder="Enter email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                aria-required="true"
+                aria-invalid={isLoading ? "false" : "true"}
+                required
               />
             </div>
 
@@ -71,6 +79,8 @@ const Login = () => {
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                aria-required="true"
+                required
               />
             </div>
 
@@ -78,6 +88,8 @@ const Login = () => {
               disabled={isLoading}
               type="submit"
               className="submit-button"
+              aria-live="polite"
+              aria-busy={isLoading ? "true" : "false"}
             >
               {isLoading ? "Signing In..." : "Sign In"}
             </button>
@@ -101,6 +113,7 @@ const Login = () => {
           src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80"
           alt="Sign In"
           className="signin-image"
+          aria-hidden="true"
         />
       </section>
     </>

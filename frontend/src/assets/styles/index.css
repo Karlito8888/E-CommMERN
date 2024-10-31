@@ -39,12 +39,20 @@ ul {
 a {
   text-decoration: none;
   transition: color 0.3s ease;
+  color: white;
+}
+
+span {
+  color: white;
 }
 
 button {
   border: none;
   background: none;
   cursor: pointer;
+  font-size: 16px;
+  font-family: "Nimbus Mono PS", "Courier New", monospace;
+  letter-spacing: 1px;
 }
 
 .sr-only {
@@ -220,7 +228,7 @@ aside {
   position: fixed;
   top: 0;
   left: 0;
-  width: 60px;
+  width: 160px;
   height: 100vh;
   background-color: #333;
   transition: width 0.3s ease;
@@ -237,30 +245,37 @@ aside nav {
   height: 100%;
   padding: 20px 0;
 }
-aside nav .main-nav {
+aside nav .main-nav,
+aside nav .user-nav .guest-nav {
   list-style: none;
-  padding: 0;
-  margin-bottom: 1rem;
+  flex: 1;
 }
-aside nav .main-nav .nav-item {
+aside nav .main-nav .nav-item,
+aside nav .user-nav .guest-nav .nav-item {
   margin: 0.5rem 0;
 }
-aside nav .main-nav .nav-item .nav-link {
+aside nav .main-nav .nav-item .nav-link,
+aside nav .user-nav .guest-nav .nav-item .nav-link {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: #ffffff;
   padding: 0.5rem;
   border-radius: 4px;
+  transition: background-color 0.1s ease;
 }
-aside nav .main-nav .nav-item .nav-link:hover {
-  background-color: #3498db;
+aside nav .main-nav .nav-item .nav-link:hover,
+aside nav .user-nav .guest-nav .nav-item .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2039215686);
   color: white;
 }
-aside nav .main-nav .nav-item .nav-link img {
+aside nav .main-nav .nav-item .nav-link img,
+aside nav .user-nav .guest-nav .nav-item .nav-link img {
   margin-right: 0.5rem;
-  width: 24px;
-  height: 24px;
+}
+aside nav .main-nav .nav-item .nav-link span,
+aside nav .user-nav .guest-nav .nav-item .nav-link span {
+  margin-top: 7px;
 }
 aside nav .user-nav {
   margin-top: auto;
@@ -269,29 +284,42 @@ aside nav .user-nav {
 aside nav .user-nav .user-info {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 aside nav .user-nav .user-info .user-name {
-  height: 20px;
-  width: 100%;
   color: white;
   font-weight: bold;
   margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 aside nav .user-nav .user-info .user-menu {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
-aside nav .user-nav .user-info .user-menu .user-menu-item {
-  display: block;
-  padding: 0.5rem;
-  color: #ffffff;
-  text-decoration: none;
+aside nav .user-nav .user-info .user-menu .nav-item {
+  display: flex;
   border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.1s ease;
 }
-aside nav .user-nav .user-info .user-menu .user-menu-item:hover {
-  background-color: #2ecc71;
+aside nav .user-nav .user-info .user-menu .nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.2039215686);
   color: white;
+}
+aside nav .user-nav .user-info .user-menu .nav-item .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+}
+aside nav .user-nav .user-info .user-menu .nav-item .nav-link img {
+  margin-right: 0.5rem;
+}
+aside nav .user-nav .user-info .user-menu .nav-item .nav-link span {
+  margin-top: 7px;
+}
+aside nav .user-nav .user-info .user-menu .nav-item a[href="/profile"] {
+  margin-top: 50px;
 }
 aside nav .user-nav .user-info .user-menu .logout-button {
   background: none;
@@ -299,15 +327,13 @@ aside nav .user-nav .user-info .user-menu .logout-button {
   color: #ffffff;
   cursor: pointer;
   text-align: left;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
 }
 aside nav .user-nav .user-info .user-menu .logout-button:hover {
-  background-color: #2ecc71;
+  background-color: rgba(255, 255, 255, 0.2039215686);
   color: white;
-}
-aside nav .user-nav .guest-nav {
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 aside nav .user-nav .guest-nav .nav-link {
   display: flex;
@@ -316,15 +342,14 @@ aside nav .user-nav .guest-nav .nav-link {
   color: #ffffff;
   padding: 0.5rem;
   border-radius: 4px;
+  transition: background-color 0.1s ease;
 }
 aside nav .user-nav .guest-nav .nav-link:hover {
-  background-color: #3498db;
+  background-color: rgba(255, 255, 255, 0.2039215686);
   color: white;
 }
 aside nav .user-nav .guest-nav .nav-link img {
   margin-right: 0.5rem;
-  width: 24px;
-  height: 24px;
 }
 
 .signin-container {
