@@ -40,3 +40,4 @@ router.post('/password/reset/request', requestPasswordReset); // Demander une r√
 router.post('/password/reset', resetPassword); // R√©initialiser le mot de passe
 
 export default router;
+

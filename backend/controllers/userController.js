@@ -100,14 +100,19 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
       .status(404)
       .json({ success: false, message: "Utilisateur non trouvé." });
 
+  // Vérifiez le mot de passe actuel pour autoriser la mise à jour
+  if (
+    !req.body.password ||
+    !(await bcrypt.compare(req.body.password, user.password))
+  ) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Mot de passe actuel incorrect." });
+  }
+
+  // Mettez à jour les informations de l'utilisateur
   user.username = req.body.username || user.username;
   user.email = req.body.email || user.email;
-
-  if (req.body.password) {
-    const { isValid, message } = isValidPassword(req.body.password);
-    if (!isValid) return res.status(400).json({ success: false, message });
-    user.password = await bcrypt.hash(req.body.password, 10);
-  }
 
   const updatedUser = await user.save();
   res.json({ success: true, user: formatUserResponse(updatedUser) });

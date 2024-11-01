@@ -5,30 +5,26 @@ import Loader from "../../components/Loader";
 import { checkExpiration, setCredentials } from "../../redux/features/auth/authSlice.js";
 import { toast } from "react-toastify";
 import { useLoginUserMutation } from "../../redux/features/usersApiSlice";
+import InputField from "../../components/auth/InputField.jsx";
+import SubmitButton from "../../components/auth/SubmitButton.jsx";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [login, { isLoading }] = useLoginUserMutation();
-
-  const { userInfo, expirationTime } = useSelector((state) => state.auth);
-
+  const { userInfo } = useSelector((state) => state.auth);
   const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get("redirect") || "/";
+  // const sp = new URLSearchParams(search);
+  // const redirect = sp.get("redirect") || "/";
+  const redirect = new URLSearchParams(search).get("redirect") || "/";
 
   useEffect(() => {
     // Vérifie si la session de l'utilisateur est expirée
     dispatch(checkExpiration());
 
-    // Si l'utilisateur est connecté, redirige vers la page spécifiée
-    if (userInfo) {
-      navigate(redirect);
-    }
+    if (userInfo) navigate(redirect);
   }, [navigate, redirect, userInfo, dispatch]);
 
   const submitHandler = async (e) => {
@@ -37,7 +33,7 @@ const Login = () => {
       const res = await login({ email, password }).unwrap();
       console.log(res);
       dispatch(setCredentials({ ...res }));
-      toast.success("Connexion réussie !"); 
+      toast.success("Connexion réussie! 👌"); 
       navigate(redirect);
     } catch (err) {
       toast.error(err?.data?.message || err.error);
@@ -48,63 +44,39 @@ const Login = () => {
     <>
       <section className="signin-container">
         <div className="signin-form">
-          <h1 className="title">Sign In</h1>
-
+          <h1 className="title">Connectez-vous</h1>
           <form onSubmit={submitHandler} className="form" noValidate>
-            <div className="form-group">
-              <label htmlFor="email" className="label">
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                className="input"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                aria-required="true"
-                aria-invalid={isLoading ? "false" : "true"}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password" className="label">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="input"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                aria-required="true"
-                required
-              />
-            </div>
-
-            <button
-              disabled={isLoading}
-              type="submit"
-              className="submit-button"
-              aria-live="polite"
-              aria-busy={isLoading ? "true" : "false"}
-            >
-              {isLoading ? "Signing In..." : "Sign In"}
-            </button>
-
+            <InputField
+              id="email"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Votre adresse email"
+              ariaRequired="true"
+              ariaInvalid={isLoading ? "false" : "true"}
+            />
+            <InputField
+              id="password"
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Votre mot de passe"
+              ariaRequired="true"
+            />
+            <SubmitButton isLoading={isLoading} text="Ok!" />
             {isLoading && <Loader />}
           </form>
 
           <div className="register-link">
             <p>
-              New Customer?{" "}
+              Pas de compte ?{" "}
               <a
                 href={redirect ? `/register?redirect=${redirect}` : "/register"}
                 className="link"
               >
-                Register
+                Créer un compte...
               </a>
             </p>
           </div>
@@ -121,3 +93,4 @@ const Login = () => {
 };
 
 export default Login;
+

@@ -1,46 +1,52 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-
 import Loader from "../../components/Loader";
-import { useProfileMutation } from "../../redux/api/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice";
+import {
+  useGetCurrentUserProfileQuery,
+  useUpdateCurrentUserProfileMutation,
+} from "../../redux/features/usersApiSlice";
+import InputField from "../../components/auth/InputField";
+import SubmitButton from "../../components/auth/SubmitButton";
 
 const Profile = () => {
-  const [username, setUserName] = useState("");
-  const [email, setEmail] = useState("");
+  const { data: userProfile, isLoading: loadingProfile } =
+    useGetCurrentUserProfileQuery();
+  console.log("userProfile:", userProfile);
+  const [username, setUserName] = useState(userProfile?.user?.username || "");
+  const [email, setEmail] = useState(userProfile?.user?.email || "");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const { userInfo } = useSelector((state) => state.auth);
-
   const [updateProfile, { isLoading: loadingUpdateProfile }] =
-    useProfileMutation();
-
-  useEffect(() => {
-    setUserName(userInfo.username);
-    setEmail(userInfo.email);
-  }, [userInfo.email, userInfo.username]);
+    useUpdateCurrentUserProfileMutation();
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (userProfile?.user) {
+      setUserName(userProfile.user.username);
+      setEmail(userProfile.user.email);
+    }
+  }, [userProfile]);
+
   const submitHandler = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-    } else {
-      try {
-        const res = await updateProfile({
-          _id: userInfo._id,
-          username,
-          email,
-          password,
-        }).unwrap();
-        dispatch(setCredentials({ ...res }));
-        toast.success("Profile updated successfully");
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
-      }
+
+    try {
+      // Mettez à jour uniquement le nom d'utilisateur et l'email en vérifiant le mot de passe
+      const res = await updateProfile({
+        username,
+        email,
+        password, // Passer le mot de passe pour vérification
+      }).unwrap();
+
+      dispatch(setCredentials({ ...res }));
+      toast.success("Données mises à jour 👌");
+
+      // Réinitialisez le mot de passe après une mise à jour réussie
+      setPassword("");
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
     }
   };
 
@@ -48,63 +54,56 @@ const Profile = () => {
     <div className="profil-container">
       <div className="form-wrapper">
         <div className="form-container">
-          <h2 className="form-title">Update Profile</h2>
-          <form onSubmit={submitHandler}>
-            <div className="form-group">
-              <label className="form-label">Name</label>
-              <input
+          <h2 className="form-title">Mettre à jour vos infos personnelles</h2>
+          {loadingProfile ? (
+            <Loader />
+          ) : (
+            <form onSubmit={submitHandler}>
+              <InputField
+                id="username"
+                label="Nom"
                 type="text"
-                placeholder="Enter name"
-                className="form-input"
+                placeholder="Votre nom"
                 value={username}
                 onChange={(e) => setUserName(e.target.value)}
+                ariaRequired="true"
+                ariaInvalid="false"
               />
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Email Address</label>
-              <input
+              <InputField
+                id="email"
+                label="Adresse e-mail"
                 type="email"
-                placeholder="Enter email"
-                className="form-input"
+                placeholder="Votre email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                ariaRequired="true"
+                ariaInvalid="false"
               />
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <input
+              <InputField
+                id="password"
+                label="Mot de passe"
                 type="password"
-                placeholder="Enter password"
-                className="form-input"
+                placeholder="Entrez votre mot de passe pour valider"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                ariaRequired="true"
+                ariaInvalid="false"
               />
-            </div>
+              <p className="password-note">
+                Le mot de passe ne peut pas être mis à jour ici.
+              </p>
 
-            <div className="form-group">
-              <label className="form-label">Confirm Password</label>
-              <input
-                type="password"
-                placeholder="Confirm password"
-                className="form-input"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" className="btn-update">
-                Update
-              </button>
-
-              <a href="/user-orders" className="btn-orders">
-                My Orders
-              </a>
-            </div>
-            {loadingUpdateProfile && <Loader />}
-          </form>
+              <div className="form-actions">
+                <SubmitButton isLoading={loadingUpdateProfile} text="Ok!" />
+                {/* <a href="/user-orders" className="btn-orders">
+                  Mes commandes
+                </a> */}
+              </div>
+              {loadingUpdateProfile && <Loader />}
+            </form>
+          )}
         </div>
       </div>
     </div>
@@ -112,3 +111,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

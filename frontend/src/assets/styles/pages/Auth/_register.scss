@@ -34,6 +34,13 @@
         border: 1px solid; // border
         border-radius: 0.25rem; // rounded
         width: 100%; // w-full
+        transition: border-color 0.1s ease-in-out;
+      }
+      .form-input:hover {
+        border-color: aqua;
+      }
+      .form-input:focus {
+        border-color: aqua;
       }
     }
 
@@ -54,8 +61,7 @@
       margin-top: 1rem; // mt-4
 
       .login-link-text {
-        color: #ff69b4; // text-pink-500
-        text-decoration: underline; // hover:underline
+        color: #ff69b4;
       }
     }
   }

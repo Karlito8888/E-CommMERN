@@ -8,7 +8,9 @@ export const adminApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Obtenir tous les utilisateurs
     getUsers: builder.query({
-      query: () => USERS_URL,
+      query: () => ({
+        url: USERS_URL,
+      }),
       providesTags: ["User"],
     }),
     // Supprimer un utilisateur par ID
@@ -43,3 +45,4 @@ export const {
   useGetUserByIdQuery,
   useUpdateUserByIdMutation,
 } = adminApiSlice;
+

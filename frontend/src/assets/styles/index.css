@@ -403,7 +403,6 @@ aside nav .user-nav .guest-nav .nav-link img {
 }
 .signin-container .signin-form .register-link .link {
   color: #d53f8c;
-  text-decoration: underline;
 }
 .signin-container .signin-form .register-link .link:hover {
   text-decoration: none;
@@ -447,6 +446,13 @@ aside nav .user-nav .guest-nav .nav-link img {
   border: 1px solid;
   border-radius: 0.25rem;
   width: 100%;
+  transition: border-color 0.1s ease-in-out;
+}
+.register-section .register-container .form-group .form-input:hover {
+  border-color: aqua;
+}
+.register-section .register-container .form-group .form-input:focus {
+  border-color: aqua;
 }
 .register-section .register-container .register-button {
   background-color: #ff69b4;
@@ -464,7 +470,6 @@ aside nav .user-nav .guest-nav .nav-link img {
 }
 .register-section .register-container .login-link .login-link-text {
   color: #ff69b4;
-  text-decoration: underline;
 }
 .register-section .register-image {
   height: 100vh;

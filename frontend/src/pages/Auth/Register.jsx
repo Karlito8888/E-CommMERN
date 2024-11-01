@@ -5,41 +5,37 @@ import Loader from "../../components/Loader";
 import { setCredentials } from "../../redux/features/auth/authSlice.js";
 import { toast } from "react-toastify";
 import { useCreateUserMutation } from "../../redux/features/usersApiSlice";
+import InputField from "../../components/auth/InputField.jsx";
+import SubmitButton from "../../components/auth/SubmitButton.jsx";
 
 const Register = () => {
   const [username, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [register, { isLoading }] = useCreateUserMutation();
-
   const { userInfo } = useSelector((state) => state.auth);
-
   const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get("redirect") || "/";
+  // const sp = new URLSearchParams(search);
+  // const redirect = sp.get("redirect") || "/";
+  const redirect = new URLSearchParams(search).get("redirect") || "/";
 
   useEffect(() => {
-    if (userInfo) {
-      navigate(redirect);
-    }
+    if (userInfo) navigate(redirect); 
   }, [navigate, redirect, userInfo]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Les mots de passe ne correspondent pas ⛔️");
     } else {
       try {
         const res = await register({ username, email, password }).unwrap();
         dispatch(setCredentials({ ...res }));
+        toast.success("Nouveau compte créé! 👌");
         navigate(redirect);
-        toast.success("User successfully registered");
       } catch (err) {
         console.log(err);
         toast.error(err.data.message);
@@ -50,84 +46,52 @@ const Register = () => {
   return (
     <section className="register-section">
       <div className="register-container">
-        <h1 className="register-title">Register</h1>
-
+        <h1 className="register-title">Créez un compte</h1>
         <form onSubmit={submitHandler} className="register-form">
-          <div className="form-group">
-            <label htmlFor="name" className="form-label">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              className="form-input"
-              placeholder="Enter name"
-              value={username}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="form-input"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="form-input"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword" className="form-label">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              className="form-input"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-
-          <button
-            disabled={isLoading}
-            type="submit"
-            className="register-button"
-          >
-            {isLoading ? "Registering..." : "Register"}
-          </button>
-
+          <InputField
+            id="name"
+            label="Name"
+            type="text"
+            value={username}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Votre nom"
+          />
+          <InputField
+            id="email"
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Votre email"
+          />
+          <InputField
+            id="password"
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Choisissez un mot de passe"
+          />
+          <InputField
+            id="confirmPassword"
+            label="Confirm Password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirmez votre mot de passe"
+          />
+          <SubmitButton isLoading={isLoading} text="Ok!" />
           {isLoading && <Loader />}
         </form>
 
         <div className="login-link">
           <p>
-            Already have an account?{" "}
+            Déjà un compte ?{" "}
             <a
               href={redirect ? `/login?redirect=${redirect}` : "/login"}
               className="login-link-text"
             >
-              Login
+              Connectez-vous...
             </a>
           </p>
         </div>
