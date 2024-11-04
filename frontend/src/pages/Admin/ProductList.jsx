@@ -1,188 +1,87 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  useCreateProductMutation,
-  useUploadProductImageMutation,
-} from "../../redux/api/productApiSlice";
-import { useFetchCategoriesQuery } from "../../redux/api/categoryApiSlice";
-import { toast } from "react-toastify";
+// frontend/src/pages/ProductList.jsx
+
+import moment from "moment";
+import { useGetProductsQuery } from "../../redux/features/productApiSlice";
 import AdminMenu from "./AdminMenu";
 
 const ProductList = () => {
-  const [image, setImage] = useState(null);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [brand, setBrand] = useState("");
-  const [stock, setStock] = useState(0);
-  const [imageUrl, setImageUrl] = useState(null);
-  const navigate = useNavigate();
+  const { data, isLoading, isError } = useGetProductsQuery();
+  const products = data?.products || [];
 
-  const [uploadProductImage] = useUploadProductImageMutation();
-  const [createProduct] = useCreateProductMutation();
-  const { data: categories } = useFetchCategoriesQuery();
+  if (isLoading) {
+    return <div className="loading">Loading...</div>;
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  if (isError) {
+    return <div className="error">Error loading products</div>;
+  }
 
-    // Validation des données d'entrée
-    if (!name || !price || !quantity || !category) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
-    try {
-      const productData = new FormData();
-      productData.append("image", image);
-      productData.append("name", name);
-      productData.append("description", description);
-      productData.append("price", price);
-      productData.append("category", category);
-      productData.append("quantity", quantity);
-      productData.append("brand", brand);
-      productData.append("countInStock", stock);
-
-      const { data } = await createProduct(productData);
-
-      if (data.error) {
-        toast.error("Product creation failed. Try again.");
-      } else {
-        toast.success(`${data.name} has been created`);
-        // Réinitialiser le formulaire après la création
-        setName("");
-        setDescription("");
-        setPrice("");
-        setCategory("");
-        setQuantity("");
-        setBrand("");
-        setStock(0);
-        setImage(null);
-        setImageUrl(null);
-        navigate("/");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Product creation failed. Try again.");
-    }
-  };
-
-  const uploadFileHandler = async (e) => {
-    const formData = new FormData();
-    formData.append("image", e.target.files[0]);
-
-    try {
-      const res = await uploadProductImage(formData).unwrap();
-      toast.success(res.message);
-      setImage(res.image);
-      setImageUrl(res.image);
-    } catch (error) {
-      toast.error(error?.data?.message || error.error);
-    }
-  };
+  if (!Array.isArray(products)) {
+    return <div className="error">Unexpected data format</div>;
+  }
 
   return (
-    <div className="product-list-container">
-      <div className="product-list-content">
-        <AdminMenu />
-        <div className="form-section">
-          <h2>Create Product</h2>
-
-          {imageUrl && (
-            <div className="image-preview">
-              <img src={imageUrl} alt="product" className="product-image" />
-            </div>
-          )}
-
-          <div className="upload-image">
-            <label className="upload-label">
-              {image ? image.name : "Upload Image"}
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={uploadFileHandler}
-                className="upload-input"
-              />
-            </label>
-          </div>
-
-          <div className="form-fields">
-            <div className="input-group">
-              <label htmlFor="name">Name</label>
-              <input
-                type="text"
-                className="input-field"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="price">Price</label>
-              <input
-                type="number"
-                className="input-field"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="quantity">Quantity</label>
-              <input
-                type="number"
-                className="input-field"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="brand">Brand</label>
-              <input
-                type="text"
-                className="input-field"
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-              />
-            </div>
-            <label htmlFor="description">Description</label>
-            <textarea
-              className="textarea-field"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            ></textarea>
-            <div className="input-group">
-              <label htmlFor="stock">Count In Stock</label>
-              <input
-                type="text"
-                className="input-field"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="category">Category</label>
-              <select
-                className="input-field"
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="" disabled>
-                  Select a category
-                </option>
-                {categories?.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button onClick={handleSubmit} className="submit-button">
-              Submit
-            </button>
-          </div>
+    <>
+      <section className="products-content">
+        <div className="products-header">
+          <h1>All Products ({products.length})</h1>
         </div>
-      </div>
-    </div>
+        <AdminMenu />
+        <ul className="product-list">
+          {products.map((product) => (
+            <li key={product._id} className="product-card">
+              <article className="product-details">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="product-image"
+                />
+                <div className="product-info">
+                  <div className="product-header">
+                    <h2 className="product-name">{product.name}</h2>
+                    <time className="product-date" dateTime={product.createdAt}>
+                      {moment(product.createdAt).format("MMMM Do YYYY")}
+                    </time>
+                  </div>
+                  <p className="product-description">
+                    {product.description
+                      ? product.description.substring(0, 160)
+                      : "No description available"}
+                    ...
+                  </p>
+                  <footer className="product-footer">
+                    <button
+                      className="update-button"
+                      onClick={() =>
+                        (window.location.href = `/admin/product/update/${product._id}`)
+                      }
+                    >
+                      Update Product
+                      <svg
+                        className="update-icon"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 14 10"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M1 5h12m0 0L9 1m4 4L9 9"
+                        />
+                      </svg>
+                    </button>
+                    <p className="product-price">${product.price.toFixed(2)}</p>
+                  </footer>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
   );
 };
 

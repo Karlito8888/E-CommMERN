@@ -1,19 +1,22 @@
+// frontend/src/pages/ProductUpdate.jsx
+
 import { useState, useEffect } from "react";
 import AdminMenu from "./AdminMenu";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
-  useUpdateProductMutation,
   useDeleteProductMutation,
   useGetProductByIdQuery,
+  useUpdateProductMutation,
   useUploadProductImageMutation,
-} from "../../redux/api/productApiSlice";
-import { useFetchCategoriesQuery } from "../../redux/api/categoryApiSlice";
-import { toast } from "react-toastify";
+} from "../../redux/features/productApiSlice";
+import { useFetchCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 
-const AdminProductUpdate = () => {
-  const params = useParams();
-  const { data: productData } = useGetProductByIdQuery(params._id);
-  console.log(productData);
+const ProductUpdate = () => {
+  const { _id: productId } = useParams();
+  const navigate = useNavigate();
+  const { data: productData } = useGetProductByIdQuery(productId);
+  const { data: categories = [] } = useFetchCategoriesQuery();
 
   const [product, setProduct] = useState({
     image: "",
@@ -23,85 +26,90 @@ const AdminProductUpdate = () => {
     category: "",
     quantity: "",
     brand: "",
-    stock: "",
+    stock: 0,
   });
 
-  const navigate = useNavigate();
-  const { data: categories = [] } = useFetchCategoriesQuery();
   const [uploadProductImage] = useUploadProductImageMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
   useEffect(() => {
-    if (productData) {
+    if (productData && productData.data) {
+      // Vérification additionnelle
       setProduct({
-        image: productData.image,
-        name: productData.name,
-        description: productData.description,
-        price: productData.price,
-        category: productData.category?._id,
-        quantity: productData.quantity,
-        brand: productData.brand,
-        stock: productData.countInStock,
+        image: productData.data.image || "",
+        name: productData.data.name || "",
+        description: productData.data.description || "",
+        price: productData.data.price || "",
+        category: productData.data.category || "",
+        quantity: productData.data.quantity || "",
+        brand: productData.data.brand || "",
+        stock: productData.data.stock || 0,
       });
     }
   }, [productData]);
 
-  const uploadFileHandler = async (e) => {
+
+  const handleInputChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image" && files) {
+      const file = files[0];
+      setProduct((prev) => ({ ...prev, image: file }));
+      uploadFileHandler(file);
+    } else {
+      setProduct((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const uploadFileHandler = async (file) => {
     const formData = new FormData();
-    formData.append("image", e.target.files[0]);
+    formData.append("image", file);
+
     try {
       const res = await uploadProductImage(formData).unwrap();
       toast.success("Image uploaded successfully");
       setProduct((prev) => ({ ...prev, image: res.image }));
-    } catch (err) {
+    } catch {
       toast.error("Image upload failed. Try again.");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting product update:", product);
+
+    if (!product.name || !product.price || !product.category) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    const formData = new FormData();
+    Object.entries(product).forEach(([key, value]) => {
+      if (value !== "") formData.append(key, value);
+    });
 
     try {
-      if (!product.name || !product.price || !product.category) {
-        toast.error("Please fill in all required fields.");
-        return;
-      }
-
-      const data = await updateProduct({
-        productId: params._id,
-        formData: product,
-      }).unwrap();
-      console.log("Update response:", data);
+      const data = await updateProduct({ productId, formData });
 
       if (data?.error) {
         toast.error(data.error);
       } else {
         toast.success("Product successfully updated");
-        navigate("/admin/allproductslist");
+        navigate("/admin/productlist");
       }
-    } catch (err) {
-      console.error("Update error:", err); 
-      toast.error(err?.data?.message || "Product update failed. Try again.");
+    } catch {
+      toast.error("Product update failed. Try again.");
     }
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
 
     try {
-      const { data } = await deleteProduct(params._id).unwrap();
-      if (data && data.name) {
-        toast.success(`"${data.name}" is deleted`); // Utilisez le nom du produit s'il est disponible
-      } else {
-        toast.success("Product deleted successfully.");
-      }
-      navigate("/admin/allproductslist");
-    } catch (err) {
+      await deleteProduct(productId).unwrap();
+      toast.success("Product deleted successfully.");
+      navigate("/admin/productlist");
+    } catch {
       toast.error("Delete failed. Try again.");
     }
   };
@@ -119,97 +127,72 @@ const AdminProductUpdate = () => {
         )}
 
         <label className="upload-button">
-          {product.image.name || "Upload image"}
+          {product.image?.name || "Upload image"}
           <input
             type="file"
             name="image"
             accept="image/*"
-            onChange={uploadFileHandler}
+            onChange={handleInputChange}
           />
         </label>
 
-        <div className="form-group half-width">
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            value={product.name}
-            onChange={(e) => setProduct({ ...product, name: e.target.value })}
-          />
-        </div>
+        {["name", "price", "quantity", "brand", "description", "stock"].map(
+          (field) => (
+            <div className="form-group" key={field}>
+              <label htmlFor={field}>
+                {field.charAt(0).toUpperCase() + field.slice(1)}
+              </label>
+              {field === "description" ? (
+                <textarea
+                  name={field}
+                  value={product[field]}
+                  onChange={handleInputChange}
+                />
+              ) : (
+                <input
+                  type={
+                    field === "price" ||
+                    field === "quantity" ||
+                    field === "stock"
+                      ? "number"
+                      : "text"
+                  }
+                  name={field}
+                  value={product[field]}
+                  onChange={handleInputChange}
+                />
+              )}
+            </div>
+          )
+        )}
 
-        <div className="form-group half-width">
-          <label htmlFor="price">Price</label>
-          <input
-            type="number"
-            value={product.price}
-            onChange={(e) => setProduct({ ...product, price: e.target.value })}
-          />
-        </div>
-
-        <div className="form-group half-width">
-          <label htmlFor="quantity">Quantity</label>
-          <input
-            type="number"
-            min="1"
-            value={product.quantity}
-            onChange={(e) =>
-              setProduct({ ...product, quantity: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="form-group half-width">
-          <label htmlFor="brand">Brand</label>
-          <input
-            type="text"
-            value={product.brand}
-            onChange={(e) => setProduct({ ...product, brand: e.target.value })}
-          />
-        </div>
-
-        <label htmlFor="">Description</label>
-        <textarea
-          value={product.description}
-          onChange={(e) =>
-            setProduct({ ...product, description: e.target.value })
-          }
-        />
-
-        <div className="form-group half-width">
-          <label htmlFor="stock">Count In Stock</label>
-          <input
-            type="text"
-            value={product.stock}
-            onChange={(e) => setProduct({ ...product, stock: e.target.value })}
-          />
-        </div>
-
-        <div className="form-group half-width">
-          <label htmlFor="">Category</label>
+        <div className="form-group">
           <select
-            onChange={(e) =>
-              setProduct({ ...product, category: e.target.value })
-            }
+            name="category"
+            value={product.category}
+            onChange={handleInputChange}
           >
-            {categories?.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categories.map(({ _id, name }) => (
+              <option key={_id} value={_id}>
+                {name}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="buttons">
-          <button onClick={handleSubmit} className="update">
-            Update
-          </button>
-          <button onClick={handleDelete} className="delete">
-            Delete
-          </button>
-        </div>
+        <button onClick={handleSubmit} className="submit-button">
+          Update Product
+        </button>
+        <button onClick={handleDelete} className="delete-button">
+          Delete Product
+        </button>
       </div>
     </div>
   );
 };
 
-export default AdminProductUpdate;
+export default ProductUpdate;
+

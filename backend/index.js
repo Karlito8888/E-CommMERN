@@ -1,4 +1,4 @@
-// packages
+// backend/index.js
 import path from "path";
 import express from "express";
 import dotenv from "dotenv";
@@ -9,8 +9,8 @@ import helmet from "helmet";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
-// import productRoutes from "./routes/productRoutes.js";
-// import uploadRoutes from "./middlewares/upload.js";
+import productRoutes from "./routes/productRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 // import orderRoutes from "./routes/orderRoutes.js";
 
 dotenv.config();
@@ -27,8 +27,8 @@ app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
-// app.use("/api/products", productRoutes);
-// app.use("/api/upload", uploadRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/upload", uploadRoutes);
 // app.use("/api/orders", orderRoutes);
 
 // app.get("/api/config/paypal", (req, res) => {
@@ -38,15 +38,15 @@ app.use("/api/categories", categoryRoutes);
 //   res.send({ clientId: process.env.PAYPAL_CLIENT_ID });
 // });
 
-// const __dirname = path.resolve();
-// app.use(
-//   "/uploads",
-//   express.static(path.join(__dirname, "uploads"), {
-//     setHeaders: (res) => {
-//       res.set("Cache-Control", "public, max-age=86400"); // Cache pendant 1 jour
-//     },
-//   })
-// );
+const __dirname = path.resolve();
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "/uploads"), {
+    setHeaders: (res) => {
+      res.set("Cache-Control", "public, max-age=86400"); // Cache pendant 1 jour
+    },
+  })
+);
 
 // Gestion des routes inconnues
 app.use((req, res, next) => {

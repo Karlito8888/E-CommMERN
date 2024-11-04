@@ -1,3 +1,5 @@
+// frontend/src/main.jsx
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Route, RouterProvider, createRoutesFromElements } from "react-router";
@@ -16,6 +18,11 @@ import Profile from './pages/User/Profile.jsx';
 import AdminRoute from './pages/Admin/AdminRoute.jsx';
 import UserList from './pages/Admin/UserList.jsx';
 import CategoryList from './pages/Admin/CategoryList.jsx';
+import ProductList from './pages/Admin/ProductList.jsx';
+import ProductUpdate from './pages/Admin/ProductUpdate.jsx';
+import ProductCreate from './pages/Admin/ProductCreate.jsx';
+// import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,10 +41,9 @@ const router = createBrowserRouter(
       <Route path="/admin" element={<AdminRoute />}>
         <Route path="userlist" element={<UserList />} />
         <Route path="categorylist" element={<CategoryList />} />
-        {/* <Route path="productlist" element={<ProductList />} /> */}
-        {/* <Route path="allproductslist" element={<AllProducts />} /> */}
-        {/* <Route path="productlist/:pageNumber" element={<ProductList />} /> */}
-        {/* <Route path="product/update/:_id" element={<ProductUpdate />} /> */}
+        <Route path="productlist" element={<ProductList />} />
+        <Route path="product/create" element={<ProductCreate />} />
+        <Route path="product/update/:_id" element={<ProductUpdate />} />
         {/* <Route path="orderlist" element={<OrderList />} /> */}
         {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
       </Route>
@@ -52,3 +58,4 @@ createRoot(document.getElementById('root')).render(
     </Provider>
   </StrictMode>
 )
+

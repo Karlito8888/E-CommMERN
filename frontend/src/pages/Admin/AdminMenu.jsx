@@ -14,8 +14,8 @@ const AdminMenu = () => {
   const menuItems = [
     { to: "/admin/dashboard", label: "Admin Dashboard" },
     { to: "/admin/categorylist", label: "Create Category" },
-    { to: "/admin/productlist", label: "Create Product" },
-    { to: "/admin/allproductslist", label: "All Products" },
+    { to: "/admin/product/create", label: "Create Product" },
+    { to: "/admin/productlist", label: "All Products" },
     { to: "/admin/userlist", label: "Manage Users" },
     { to: "/admin/orderlist", label: "Manage Orders" },
   ];
