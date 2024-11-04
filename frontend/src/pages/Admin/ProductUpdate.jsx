@@ -13,8 +13,8 @@ import {
 import { useFetchCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 
 const ProductUpdate = () => {
-  const { _id: productId } = useParams();
   const navigate = useNavigate();
+  const { _id: productId } = useParams();
   const { data: productData } = useGetProductByIdQuery(productId);
   const { data: categories = [] } = useFetchCategoriesQuery();
 
@@ -35,7 +35,6 @@ const ProductUpdate = () => {
 
   useEffect(() => {
     if (productData && productData.data) {
-      // Vérification additionnelle
       setProduct({
         image: productData.data.image || "",
         name: productData.data.name || "",
@@ -48,7 +47,6 @@ const ProductUpdate = () => {
       });
     }
   }, [productData]);
-
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
@@ -67,10 +65,10 @@ const ProductUpdate = () => {
 
     try {
       const res = await uploadProductImage(formData).unwrap();
-      toast.success("Image uploaded successfully");
+      toast.success("Image téléchargée avec succès");
       setProduct((prev) => ({ ...prev, image: res.image }));
     } catch {
-      toast.error("Image upload failed. Try again.");
+      toast.error("Échec du téléchargement de l'image. Veuillez réessayer.");
     }
   };
 
@@ -78,7 +76,7 @@ const ProductUpdate = () => {
     e.preventDefault();
 
     if (!product.name || !product.price || !product.category) {
-      toast.error("Please fill in all required fields.");
+      toast.error("Veuillez remplir tous les champs requis.");
       return;
     }
 
@@ -93,24 +91,24 @@ const ProductUpdate = () => {
       if (data?.error) {
         toast.error(data.error);
       } else {
-        toast.success("Product successfully updated");
+        toast.success("Produit mis à jour avec succès");
         navigate("/admin/productlist");
       }
     } catch {
-      toast.error("Product update failed. Try again.");
+      toast.error("Échec de la mise à jour du produit. Veuillez réessayer.");
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?"))
       return;
 
     try {
-      await deleteProduct(productId).unwrap();
-      toast.success("Product deleted successfully.");
+      deleteProduct(productId).unwrap();
+      toast.success("Produit supprimé avec succès.");
       navigate("/admin/productlist");
     } catch {
-      toast.error("Delete failed. Try again.");
+      toast.error("Échec de la suppression. Veuillez réessayer.");
     }
   };
 
@@ -118,16 +116,14 @@ const ProductUpdate = () => {
     <div className="product-update-container admin-product-update">
       <AdminMenu />
       <div className="update-delete">
-        <div className="header">Update / Delete Product</div>
-
+        <div className="header">Mettre à jour / Supprimer le produit</div>
         {product.image && (
           <div className="image-container">
-            <img src={product.image} alt="product" />
+            <img src={product.image} alt="produit" />
           </div>
         )}
-
         <label className="upload-button">
-          {product.image?.name || "Upload image"}
+          {product.image?.name || "Télécharger une image"}
           <input
             type="file"
             name="image"
@@ -135,12 +131,21 @@ const ProductUpdate = () => {
             onChange={handleInputChange}
           />
         </label>
-
         {["name", "price", "quantity", "brand", "description", "stock"].map(
           (field) => (
             <div className="form-group" key={field}>
               <label htmlFor={field}>
-                {field.charAt(0).toUpperCase() + field.slice(1)}
+                {field === "name"
+                  ? "Nom"
+                  : field === "price"
+                  ? "Prix"
+                  : field === "quantity"
+                  ? "Quantité"
+                  : field === "brand"
+                  ? "Marque"
+                  : field === "description"
+                  ? "Description"
+                  : "Stock"}
               </label>
               {field === "description" ? (
                 <textarea
@@ -165,7 +170,6 @@ const ProductUpdate = () => {
             </div>
           )
         )}
-
         <div className="form-group">
           <select
             name="category"
@@ -173,7 +177,7 @@ const ProductUpdate = () => {
             onChange={handleInputChange}
           >
             <option value="" disabled>
-              Select a category
+              Sélectionner une catégorie
             </option>
             {categories.map(({ _id, name }) => (
               <option key={_id} value={_id}>
@@ -182,12 +186,11 @@ const ProductUpdate = () => {
             ))}
           </select>
         </div>
-
         <button onClick={handleSubmit} className="submit-button">
-          Update Product
+          Mettre à jour
         </button>
         <button onClick={handleDelete} className="delete-button">
-          Delete Product
+          Supprimer
         </button>
       </div>
     </div>
@@ -195,4 +198,3 @@ const ProductUpdate = () => {
 };
 
 export default ProductUpdate;
-

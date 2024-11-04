@@ -41,18 +41,16 @@ const ProductCreate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formValues) {
-      toast.error("Form values are undefined.");
+      toast.error("Les valeurs du formulaire sont indéfinies.");
       return;
     }
-    console.log("Form Values before submit:", formValues);
+    console.log("Valeurs du formulaire avant soumission :", formValues);
 
     const { name, price, quantity, category, image } = formValues;
 
-    console.log("Form Values before submit:", formValues);
-
     // Validation des données d'entrée
     if (!name || !price || !quantity || !category || !image) {
-      toast.error("Please fill in all required fields.");
+      toast.error("Veuillez remplir tous les champs obligatoires.");
       return;
     }
 
@@ -60,16 +58,11 @@ const ProductCreate = () => {
       const productData = new FormData();
       Object.entries(formValues).forEach(([key, value]) => {
         productData.append(key, value);
-        console.log(`Appending ${key}:`, value);
+        console.log(`Ajout de ${key} :`, value);
       });
-      // console.log("Product Data before submit:", productData);
 
       const { data } = await createProduct(productData).unwrap();
-      // console.log("Response data:", data);
-      // if (data) {
-      //   console.log("Product Name:", data.name);
-      // }
-      toast.success(`${data.name} a bien été créé!`);
+      toast.success(`${data.name} a bien été créé !`);
 
       // Réinitialisation du formulaire
       setFormValues({
@@ -85,10 +78,10 @@ const ProductCreate = () => {
       setImageUrl(null);
       navigate("/");
     } catch (error) {
-      console.error("Error creating product:", error);
-      toast.error("Product creation failed. Try again.");
+      console.error("Erreur lors de la création du produit :", error);
+      toast.error("Échec de la création du produit. Veuillez réessayer.");
       if (error.data) {
-        console.error("Error details:", error.data);
+        console.error("Détails de l'erreur :", error.data);
       }
     }
   };
@@ -99,11 +92,11 @@ const ProductCreate = () => {
 
     try {
       const res = await uploadProductImage(formData).unwrap();
-      console.log("Image upload response:", res); // Log de la réponse de téléchargement de l'image
+      console.log("Réponse de téléchargement de l'image :", res);
       toast.success(res.message);
       setImageUrl(res.image);
     } catch (error) {
-      console.error("Error uploading image:", error); // Log de l'erreur
+      console.error("Erreur lors du téléchargement de l'image :", error);
       toast.error(error?.data?.message || error.error);
     }
   };
@@ -113,17 +106,17 @@ const ProductCreate = () => {
       <div className="product-list-content">
         <AdminMenu />
         <div className="form-section">
-          <h2>Create Product</h2>
+          <h2>Créer un produit</h2>
 
           {imageUrl && (
             <div className="image-preview">
-              <img src={imageUrl} alt="product" className="product-image" />
+              <img src={imageUrl} alt="produit" className="product-image" />
             </div>
           )}
 
           <div className="upload-image">
             <label className="upload-label">
-              {formValues.image ? formValues.image.name : "Upload Image"}
+              {formValues.image ? formValues.image.name : "Télécharger une image"}
               <input
                 type="file"
                 name="image"
@@ -136,7 +129,7 @@ const ProductCreate = () => {
 
           <div className="form-fields">
             <div className="input-group">
-              <label htmlFor="name">Name</label>
+              <label htmlFor="name">Nom</label>
               <input
                 type="text"
                 name="name"
@@ -146,7 +139,7 @@ const ProductCreate = () => {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="price">Price</label>
+              <label htmlFor="price">Prix</label>
               <input
                 type="number"
                 name="price"
@@ -156,7 +149,7 @@ const ProductCreate = () => {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="quantity">Quantity</label>
+              <label htmlFor="quantity">Quantité</label>
               <input
                 type="number"
                 name="quantity"
@@ -166,7 +159,7 @@ const ProductCreate = () => {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="brand">Brand</label>
+              <label htmlFor="brand">Marque</label>
               <input
                 type="text"
                 name="brand"
@@ -193,7 +186,7 @@ const ProductCreate = () => {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="category">Category</label>
+              <label htmlFor="category">Catégorie</label>
               <select
                 name="category"
                 className="input-field"
@@ -201,7 +194,7 @@ const ProductCreate = () => {
                 onChange={handleInputChange}
               >
                 <option value="" disabled>
-                  Select a category
+                  Sélectionner une catégorie
                 </option>
                 {categories?.map((c) => (
                   <option key={c._id} value={c._id}>
@@ -211,7 +204,7 @@ const ProductCreate = () => {
               </select>
             </div>
             <button onClick={handleSubmit} className="submit-button">
-              Submit
+              Soumettre
             </button>
           </div>
         </div>
