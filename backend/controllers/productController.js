@@ -1,3 +1,5 @@
+// backend/controllers/productController.js
+
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
 import fs from "fs";
@@ -24,7 +26,6 @@ const addProduct = asyncHandler(async (req, res) => {
   if (req.file) productData.image = `/uploads/${req.file.filename}`;
 
   const product = new Product(productData);
-
   await product.save();
   res.status(201).json({ success: true, data: product });
 });

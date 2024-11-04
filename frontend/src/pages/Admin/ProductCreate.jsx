@@ -1,6 +1,4 @@
-// frontend/src/pages/ProductCreate.jsx
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AdminMenu from "./AdminMenu";
@@ -11,7 +9,7 @@ import {
 import { useFetchCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 
 const ProductCreate = () => {
-  const [formValues, setFormValues] = useState({
+  const initialFormValues = {
     image: null,
     name: "",
     description: "",
@@ -20,84 +18,76 @@ const ProductCreate = () => {
     quantity: "",
     brand: "",
     stock: 0,
-  });
+  };
+
+  const [formValues, setFormValues] = useState(initialFormValues);
   const [imageUrl, setImageUrl] = useState(null);
   const navigate = useNavigate();
-
   const [uploadProductImage] = useUploadProductImageMutation();
   const [createProduct] = useCreateProductMutation();
   const { data: categories } = useFetchCategoriesQuery();
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image") {
-      setFormValues((prev) => ({ ...prev, image: files[0] }));
-      uploadFileHandler(files[0]);
+    if (name === "image" && files.length > 0) {
+      const selectedFile = files[0];
+      setFormValues((prev) => ({ ...prev, image: selectedFile }));
+      const url = URL.createObjectURL(selectedFile);
+      setImageUrl(url);
     } else {
       setFormValues((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl]);
+
+  const validateFormValues = () => {
+    const { name, price, quantity, category, image } = formValues;
+    if (!name || !price || !quantity || !category || !image) {
+      toast.error("Veuillez remplir tous les champs.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formValues) {
-      toast.error("Les valeurs du formulaire sont indéfinies.");
-      return;
-    }
-    console.log("Valeurs du formulaire avant soumission :", formValues);
 
-    const { name, price, quantity, category, image } = formValues;
-
-    // Validation des données d'entrée
-    if (!name || !price || !quantity || !category || !image) {
-      toast.error("Veuillez remplir tous les champs obligatoires.");
-      return;
-    }
+    if (!validateFormValues()) return;
 
     try {
-      const productData = new FormData();
-      Object.entries(formValues).forEach(([key, value]) => {
-        productData.append(key, value);
-        console.log(`Ajout de ${key} :`, value);
-      });
-
+      const uploadedImageUrl = await uploadImage(formValues.image);
+      const productData = { ...formValues, image: uploadedImageUrl };
       const { data } = await createProduct(productData).unwrap();
       toast.success(`${data.name} a bien été créé !`);
 
       // Réinitialisation du formulaire
-      setFormValues({
-        image: null,
-        name: "",
-        description: "",
-        price: "",
-        category: "",
-        quantity: "",
-        brand: "",
-        stock: 0,
-      });
+      setFormValues(initialFormValues);
       setImageUrl(null);
       navigate("/");
     } catch (error) {
-      console.error("Erreur lors de la création du produit :", error);
-      toast.error("Échec de la création du produit. Veuillez réessayer.");
-      if (error.data) {
-        console.error("Détails de l'erreur :", error.data);
-      }
+      handleError(error);
     }
   };
 
-  const uploadFileHandler = async (file) => {
-    const formData = new FormData();
-    formData.append("image", file);
+  const uploadImage = async (image) => {
+    const imageFormData = new FormData();
+    imageFormData.append("image", image);
+    const uploadResponse = await uploadProductImage(imageFormData).unwrap();
+    return uploadResponse.image; // Obtenez l'URL de l'image
+  };
 
-    try {
-      const res = await uploadProductImage(formData).unwrap();
-      console.log("Réponse de téléchargement de l'image :", res);
-      toast.success(res.message);
-      setImageUrl(res.image);
-    } catch (error) {
-      console.error("Erreur lors du téléchargement de l'image :", error);
-      toast.error(error?.data?.message || error.error);
+  const handleError = (error) => {
+    console.error("Erreur lors de la création du produit :", error);
+    toast.error("Échec de la création du produit. Veuillez réessayer.");
+    if (error.data) {
+      console.error("Détails de l'erreur :", error.data);
     }
   };
 
@@ -116,7 +106,9 @@ const ProductCreate = () => {
 
           <div className="upload-image">
             <label className="upload-label">
-              {formValues.image ? formValues.image.name : "Télécharger une image"}
+              {formValues.image
+                ? formValues.image.name
+                : "Télécharger une image"}
               <input
                 type="file"
                 name="image"
@@ -128,63 +120,38 @@ const ProductCreate = () => {
           </div>
 
           <div className="form-fields">
-            <div className="input-group">
-              <label htmlFor="name">Nom</label>
-              <input
-                type="text"
-                name="name"
-                className="input-field"
-                value={formValues.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="price">Prix</label>
-              <input
-                type="number"
-                name="price"
-                className="input-field"
-                value={formValues.price}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="quantity">Quantité</label>
-              <input
-                type="number"
-                name="quantity"
-                className="input-field"
-                value={formValues.quantity}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="brand">Marque</label>
-              <input
-                type="text"
-                name="brand"
-                className="input-field"
-                value={formValues.brand}
-                onChange={handleInputChange}
-              />
-            </div>
-            <label htmlFor="description">Description</label>
-            <textarea
-              name="description"
-              className="textarea-field"
-              value={formValues.description}
-              onChange={handleInputChange}
-            ></textarea>
-            <div className="input-group">
-              <label htmlFor="stock">En stock</label>
-              <input
-                type="number"
-                name="stock"
-                className="input-field"
-                value={formValues.stock}
-                onChange={handleInputChange}
-              />
-            </div>
+            {["name", "price", "quantity", "brand", "description", "stock"].map(
+              (field) => (
+                <div className="input-group" key={field}>
+                  <label htmlFor={field}>
+                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                  </label>
+                  {field === "description" ? (
+                    <textarea
+                      name={field}
+                      className="textarea-field"
+                      value={formValues[field]}
+                      onChange={handleInputChange}
+                    ></textarea>
+                  ) : (
+                    <input
+                      type={
+                        field === "price" ||
+                        field === "quantity" ||
+                        field === "stock"
+                          ? "number"
+                          : "text"
+                      }
+                      name={field}
+                      className="input-field"
+                      value={formValues[field]}
+                      onChange={handleInputChange}
+                      readOnly={field === "stock"}
+                    />
+                  )}
+                </div>
+              )
+            )}
             <div className="input-group">
               <label htmlFor="category">Catégorie</label>
               <select

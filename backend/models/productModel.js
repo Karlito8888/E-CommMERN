@@ -58,7 +58,13 @@ productSchema.methods.calculateRating = function () {
 
 // Middleware pre-save pour mettre à jour le rating avant de sauvegarder le produit
 productSchema.pre("save", function (next) {
-  this.calculateRating();
+  if (this.isNew) {
+    this.stock = this.quantity;
+  } else {
+    this.stock += this.quantity; 
+  }
+
+  this.calculateRating(); 
   next();
 });
 

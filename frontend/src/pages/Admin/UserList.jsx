@@ -72,7 +72,7 @@ const UserList = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>NAME</th>
+                <th>NOM</th>
                 <th>EMAIL</th>
                 <th>ADMIN</th>
                 <th></th>

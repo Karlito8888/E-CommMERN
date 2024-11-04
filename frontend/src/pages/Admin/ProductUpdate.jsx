@@ -165,6 +165,7 @@ const ProductUpdate = () => {
                   name={field}
                   value={product[field]}
                   onChange={handleInputChange}
+                  readOnly={field === "stock"}
                 />
               )}
             </div>
