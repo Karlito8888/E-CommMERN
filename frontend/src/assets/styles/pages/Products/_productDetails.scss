@@ -1,0 +1,107 @@
+.product-details {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  margin-top: 2rem;
+  margin-left: 10rem;
+
+  .product-image {
+    width: 100%;
+    @media (min-width: 1280px) {
+      width: 50rem;
+    }
+    @media (min-width: 1024px) {
+      width: 45rem;
+    }
+    @media (min-width: 768px) {
+      width: 30rem;
+    }
+    @media (max-width: 640px) {
+      width: 20rem;
+    }
+    margin-right: 2rem;
+  }
+
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .product-title {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .product-description {
+      margin: 1rem 0;
+      width: 35rem;
+      color: #b0b0b0;
+    }
+
+    .product-price {
+      font-size: 5rem;
+      margin: 1rem 0;
+      font-weight: 800;
+    }
+
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      width: 20rem;
+
+      .brand-info,
+      .rating-info {
+        h1 {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1.5rem;
+
+          .icon {
+            margin-right: 0.5rem;
+            color: white;
+          }
+        }
+      }
+    }
+
+    .quantity-selector {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      .qty-select {
+        padding: 0.5rem;
+        width: 6rem;
+        border-radius: 0.5rem;
+        color: black;
+      }
+    }
+
+    .btn-container {
+      .btn-add-to-cart {
+        background-color: #d5006d; // Correspond à bg-pink-600
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        margin-right: 0;
+      }
+    }
+  }
+
+  .product-tabs-container {
+    margin-top: 5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-left: 10rem;
+  }
+}
+
+.btn-back {
+  color: white;
+  font-weight: 600;
+  text-decoration: underline;
+  margin-left: 10rem;
+}

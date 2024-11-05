@@ -9,7 +9,7 @@ export const productApiSlice = apiSlice.injectEndpoints({
       // query: ({ keyword }) => ({
       query: ({ keyword } = {}) => ({
         url: `${PRODUCT_URL}`,
-        params: { keyword },
+        params: keyword ? { keyword } : {}, // Passez `keyword` uniquement s'il est défini
       }),
       keepUnusedDataFor: 5,
       providesTags: ["Product"],
@@ -104,3 +104,4 @@ export const {
   useUploadProductImageMutation,
   useGetFilteredProductsQuery,
 } = productApiSlice;
+

@@ -1,23 +1,30 @@
+// Header.scss
+
 .header-container {
-  display: flex;
-  justify-content: space-around;
-  gap: 2rem;
+  padding: 2rem;                // Espace intérieur pour le conteneur
+  background-color: #f9f9f9;   // Couleur de fond légère
+  border-bottom: 2px solid #e0e0e0; // Ligne de séparation en bas
+}
 
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+.products-grid {
+  display: grid;                // Utiliser la grille CSS pour les produits
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); // Colonnes réactives
+  gap: 1.5rem;                 // Espacement entre les éléments de la grille
+}
 
-    @media (max-width: 1280px) {
-      display: block;
-    }
+.product-item {
+  background-color: #fff;      // Couleur de fond pour chaque produit
+  border: 1px solid #e0e0e0;   // Bordure légère autour des produits
+  border-radius: 8px;          // Coins arrondis
+  overflow: hidden;             // Évite que le contenu déborde
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Ombre douce pour un effet de profondeur
+  transition: transform 0.3s;  // Transition pour l'animation d'agrandissement
+}
 
-    @media (min-width: 1024px) and (max-width: 1279px) {
-      display: none;
-    }
-  }
+.product-item:hover {
+  transform: scale(1.05);      // Agrandissement au survol
+}
 
-//   .product-item {
-//     // Styles pour chaque produit dans la grille
-//   }
+.product-carousel {
+  margin-top: 2rem;            // Espace au-dessus du carrousel
 }

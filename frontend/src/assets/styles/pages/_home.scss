@@ -1,0 +1,29 @@
+// Home.scss
+
+.home-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-title {
+  margin-left: 20rem; /* ml-[20rem] */
+  margin-top: 10rem;  /* mt-[10rem] */
+  font-size: 3rem;    /* text-[3rem] */
+}
+
+.shop-button {
+  background-color: #ec4899; /* bg-pink-600 */
+  font-weight: bold;          /* font-bold */
+  border-radius: 9999px;     /* rounded-full */
+  padding: 0.5rem 2.5rem;    /* py-2 px-10 */
+  margin-right: 18rem;       /* mr-[18rem] */
+  margin-top: 10rem;         /* mt-[10rem] */
+}
+
+.products-container {
+  display: flex;
+  justify-content: center;    /* justify-center */
+  flex-wrap: wrap;           /* flex-wrap */
+  margin-top: 2rem;          /* mt-[2rem] */
+}

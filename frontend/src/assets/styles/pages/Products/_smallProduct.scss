@@ -1,0 +1,42 @@
+.small-product {
+  width: 100%;
+  margin-left: 2rem;
+  padding: 0.75rem;
+  color: black !important;
+  position: relative;
+
+  .product-image {
+    width: 100%;
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 0.25rem;
+    }
+  }
+
+  .product-info {
+    padding: 1rem;
+
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .product-price {
+        background-color: #ffe4e1;
+        color: #b10f2e;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+
+        // Dark mode
+        .dark & {
+          background-color: #5e0d14;
+          color: #ffc1b6;
+        }
+      }
+    }
+  }
+}

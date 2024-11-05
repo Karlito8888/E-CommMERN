@@ -1,0 +1,16 @@
+.compteur-favoris-container {
+  position: absolute;
+  left: 0.5rem;  // Valeur de left-2
+  top: 2rem;     // Valeur de top-8
+
+  .compteur-favoris {
+    padding-left: 0.25rem;   // Valeur de px-1
+    padding-right: 0.25rem;  // Valeur de px-1
+    padding-top: 0;          // Valeur de py-0
+    padding-bottom: 0;       // Valeur de py-0
+    font-size: 0.875rem;     // Taille de police text-sm
+    color: white;            // Couleur de texte white
+    background-color: #ec4899; // Couleur de fond bg-pink-500
+    border-radius: 9999px;   // Valeur de rounded-full
+  }
+}

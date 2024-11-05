@@ -1,0 +1,14 @@
+.heart-icon {
+  position: absolute;
+  bottom: 0.5rem; // correspond à top-2
+  left: 1.25rem; // correspond à right-5
+  cursor: pointer;
+
+  &.favorite {
+    color: #ec4899; // couleur équivalente à text-pink-500
+  }
+
+  &.not-favorite {
+    color: #ffffff; // couleur équivalente à text-white
+  }
+}

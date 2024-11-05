@@ -1,0 +1,15 @@
+.favoris-container {
+  margin-left: 10rem;
+
+  .favoris-title {
+    font-size: 1.125rem; // Taille de police lg
+    font-weight: bold;   // Font bold
+    margin-left: 3rem;
+    margin-top: 3rem;
+  }
+
+  .favoris-list {
+    display: flex;       // Flexbox pour l'affichage en ligne
+    flex-wrap: wrap;    // Permet le retour à la ligne des éléments
+  }
+}

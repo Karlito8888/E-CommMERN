@@ -1,0 +1,45 @@
+.product-card {
+  width: 30rem;
+  margin-left: 2rem;
+  padding: 0.75rem;
+  position: relative;
+
+  .product-image-container {
+    position: relative;
+
+    img {
+      width: 100%;
+      border-radius: 0.25rem;
+    }
+  }
+
+  .product-details {
+    padding: 1rem;
+
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .product-name {
+        font-size: 1.125rem; // correspond à la classe text-lg de Tailwind
+      }
+
+      .product-price {
+        background-color: #ffe4e1;
+        color: #b10f2e;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+
+        // Dark mode
+        .dark & {
+          background-color: #5e0d14;
+          color: #ffc1b6;
+        }
+      }
+    }
+  }
+}

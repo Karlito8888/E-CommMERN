@@ -11,6 +11,9 @@ import './assets/styles/index.css'
 import App from './App.jsx'
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import Home from './pages/Home.jsx';
+import Favorites from './pages/Products/Favorites.jsx';
+import ProductDetails from './pages/Products/ProductDetails.jsx';
 
 import PrivateRoute from './components/PrivateRoute.jsx';
 import Profile from './pages/User/Profile.jsx';
@@ -29,6 +32,9 @@ const router = createBrowserRouter(
     <Route path="/" element={<App />}>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route index={true} path="/" element={<Home />} />
+      <Route path="/favorite" element={<Favorites />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
 
       {/* Registered users */}
       <Route path="" element={<PrivateRoute />}>

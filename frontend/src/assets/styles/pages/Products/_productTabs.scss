@@ -1,0 +1,72 @@
+.product-tabs {
+  display: flex;
+  flex-direction: column;
+  
+  &__tabs {
+    margin-right: 5rem;
+
+    &-item {
+      flex: 1;
+      padding: 1rem;
+      cursor: pointer;
+      font-size: 1.125rem;
+
+      &--active {
+        font-weight: bold;
+      }
+    }
+  }
+
+  &__form {
+    margin-top: 1rem;
+
+    &-label {
+      display: block;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    &-select,
+    &-textarea {
+      padding: 0.5rem;
+      border: 1px solid;
+      border-radius: 0.5rem;
+      width: 100%; // Utiliser une largeur de 100% par défaut
+      color: black;
+    }
+
+    &-submit {
+      background-color: #ff79da; // Couleur du bouton "Soumettre"
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+    }
+  }
+
+  &__reviews {
+    margin-top: 1rem;
+
+    &-item {
+      background-color: #1A1A1A;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.25rem;
+      width: 50rem; // Largeur des avis sur grand écran
+      margin-left: 2rem; // Espacement pour les grands écrans
+
+      &-author {
+        color: #B0B0B0;
+      }
+
+      &-date {
+        color: #B0B0B0;
+      }
+    }
+  }
+
+  &__related-products {
+    margin-left: 4rem;
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

@@ -4,6 +4,7 @@
 @import "./components/header";
 @import "./components/message";
 @import "./components/modal";
+@import "./components/header";
 @import "./pages/Auth/navigation";
 @import "./pages/Auth/login";
 @import "./pages/Auth/register";
@@ -15,3 +16,14 @@
 @import "./pages/Admin/productList";
 @import "./pages/Admin/productUpdate";
 @import "./pages/Admin/allProducts";
+@import "./pages/Products/favorites";
+@import "./pages/Products/favoritesCount";
+@import "./pages/Products/productCarousel";
+@import "./pages/Products/smallProduct";
+@import "./pages/Products/product";
+@import "./pages/Products/heartIcon";
+@import "./pages/Products/productDetails";
+@import "./pages/Products/productTabs";
+@import "./pages/cart";
+@import "./pages/home";
+@import "./pages/shop";
