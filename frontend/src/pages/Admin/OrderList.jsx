@@ -16,75 +16,69 @@ const OrderList = () => {
           {error?.data?.message || error.error}
         </Message>
       ) : (
-        <table className="container mx-auto">
+        <div className="order-list">
           <AdminMenu />
-
-          <thead className="w-full border">
-            <tr className="mb-[5rem]">
-              <th className="text-left pl-1">ITEMS</th>
-              <th className="text-left pl-1">ID</th>
-              <th className="text-left pl-1">USER</th>
-              <th className="text-left pl-1">DATA</th>
-              <th className="text-left pl-1">TOTAL</th>
-              <th className="text-left pl-1">PAID</th>
-              <th className="text-left pl-1">DELIVERED</th>
-              <th></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>
-                  <img
-                    src={order.orderItems[0].image}
-                    alt={order._id}
-                    className="w-[5rem] pt-4"
-                  />
-                </td>
-                <td>{order._id}</td>
-
-                <td>{order.user ? order.user.username : "N/A"}</td>
-
-                <td>
-                  {order.createdAt ? order.createdAt.substring(0, 10) : "N/A"}
-                </td>
-
-                <td>$ {order.totalPrice}</td>
-
-                <td className="py-2">
-                  {order.isPaid ? (
-                    <p className="p-1 text-center bg-green-400 w-[6rem] rounded-full">
-                      Completed
-                    </p>
-                  ) : (
-                    <p className="p-1 text-center bg-red-400 w-[6rem] rounded-full">
-                      Pending
-                    </p>
-                  )}
-                </td>
-
-                <td className="px-2 py-2">
-                  {order.isDelivered ? (
-                    <p className="p-1 text-center bg-green-400 w-[6rem] rounded-full">
-                      Completed
-                    </p>
-                  ) : (
-                    <p className="p-1 text-center bg-red-400 w-[6rem] rounded-full">
-                      Pending
-                    </p>
-                  )}
-                </td>
-
-                <td>
-                  <Link to={`/order/${order._id}`}>
-                    <button>More</button>
-                  </Link>
-                </td>
+          <table className="order-list__table">
+            <thead>
+              <tr>
+                <th className="order-list__header">ITEMS</th>
+                <th className="order-list__header">ID</th>
+                <th className="order-list__header">USER</th>
+                <th className="order-list__header">DATE</th>
+                <th className="order-list__header">TOTAL</th>
+                <th className="order-list__header">PAID</th>
+                <th className="order-list__header">DELIVERED</th>
+                <th className="order-list__header">ACTIONS</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order._id}>
+                  <td className="order-list__image">
+                    <img
+                      src={order.orderItems[0].image}
+                      alt={order._id}
+                      className="order-list__image-img"
+                    />
+                  </td>
+                  <td>{order._id}</td>
+                  <td>{order.user ? order.user.username : "N/A"}</td>
+                  <td>
+                    {order.createdAt ? order.createdAt.substring(0, 10) : "N/A"}
+                  </td>
+                  <td>$ {order.totalPrice}</td>
+                  <td className="order-list__status">
+                    {order.isPaid ? (
+                      <span className="order-list__status--paid">
+                        Completed
+                      </span>
+                    ) : (
+                      <span className="order-list__status--pending">
+                        Pending
+                      </span>
+                    )}
+                  </td>
+                  <td className="order-list__status">
+                    {order.isDelivered ? (
+                      <span className="order-list__status--paid">
+                        Completed
+                      </span>
+                    ) : (
+                      <span className="order-list__status--pending">
+                        Pending
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    <Link to={`/order/${order._id}`}>
+                      <button className="order-list__btn">More</button>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

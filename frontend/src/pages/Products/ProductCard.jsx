@@ -48,7 +48,7 @@ const ProductCard = ({ p }) => {
 
         <section className="action-buttons">
           <Link to={`/product/${p._id}`} className="read-more-btn">
-            Read More
+            plus d'infos
             <svg
               className="w-3.5 h-3.5 ml-2"
               aria-hidden="true"

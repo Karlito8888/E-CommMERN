@@ -1,0 +1,113 @@
+.order-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10rem;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+
+  .order-details {
+    display: flex;
+    flex-direction: column;
+    
+    .order-items {
+      border: 1px solid #ddd;
+      margin-top: 2rem;
+      padding-bottom: 1rem;
+
+      .order-items-table {
+        width: 80%;
+        margin: 0 auto;
+        border-collapse: collapse;
+
+        th, td {
+          padding: 8px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+        }
+
+        .order-item-image {
+          width: 50px;
+          height: 50px;
+          object-fit: cover;
+        }
+
+        .order-item-name {
+          text-decoration: none;
+          color: #9356dc;
+          
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  .order-summary {
+    .shipping-info {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      margin-top: 2rem;
+
+      h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .order-summary-title {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .summary-details {
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .paypal-buttons {
+      margin-top: 1rem;
+    }
+
+    .deliver-button {
+      background-color: #ff79da;
+      color: white;
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 2rem;
+      border: none;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: #e06db4;
+      }
+    }
+  }
+}
+
+.message {
+  padding: 10px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 1rem;
+
+  &.success {
+    background-color: #28a745;
+    color: white;
+  }
+
+  &.danger {
+    background-color: #ff4e4e;
+    color: white;
+  }
+}

@@ -30,8 +30,14 @@ const Shop = () => {
   }, [categoriesQuery.data, dispatch]);
 
   const filterProducts = () => {
-    if (filteredProductsQuery.data && !filteredProductsQuery.isLoading) {
-      const filtered = filteredProductsQuery.data.filter(
+    console.log("Filtered Products Data:", filteredProductsQuery.data);
+    // Vérifier que les données des produits existent
+    if (
+      filteredProductsQuery.data &&
+      Array.isArray(filteredProductsQuery.data.data) &&
+      !filteredProductsQuery.isLoading
+    ) {
+      const filtered = filteredProductsQuery.data.data.filter(
         (product) =>
           product.price.toString().includes(priceFilter) ||
           product.price === parseInt(priceFilter, 10)
@@ -45,10 +51,12 @@ const Shop = () => {
   }, [checked, radio, priceFilter, filteredProductsQuery.data]);
 
   const handleBrandClick = (brand) => {
-    const productsByBrand = filteredProductsQuery.data?.filter(
-      (product) => product.brand === brand
-    );
-    dispatch(setProducts(productsByBrand));
+    if (Array.isArray(filteredProductsQuery.data.data)) {
+      const productsByBrand = filteredProductsQuery.data.data.filter(
+        (product) => product.brand === brand
+      );
+      dispatch(setProducts(productsByBrand));
+    }
   };
 
   const handleCheck = (value, id) => {
@@ -59,13 +67,21 @@ const Shop = () => {
   };
 
   const uniqueBrands = useMemo(() => {
-    return [
-      ...new Set(
-        filteredProductsQuery.data
-          ?.map((product) => product.brand)
-          .filter(Boolean)
-      ),
-    ];
+    if (
+      filteredProductsQuery.data &&
+      Array.isArray(filteredProductsQuery.data.data)
+    ) {
+      const brands = [
+        ...new Set(
+          filteredProductsQuery.data.data
+            .map((product) => product.brand)
+            .filter(Boolean)
+        ),
+      ];
+      console.log("brands :", brands); // Vérifier les marques extraites
+      return brands;
+    }
+    return [];
   }, [filteredProductsQuery.data]);
 
   const handlePriceChange = (e) => {
@@ -75,8 +91,8 @@ const Shop = () => {
   return (
     <div className="shop-container">
       <div className="flex">
-        <aside className="filters">
-          <h2>Filter by Categories</h2>
+        <div className="filters">
+          <h2>Catégories</h2>
           <div>
             {categories.map((c) => (
               <div key={c._id}>
@@ -89,7 +105,7 @@ const Shop = () => {
             ))}
           </div>
 
-          <h2>Filter by Brands</h2>
+          <h2>Marques</h2>
           <div>
             {uniqueBrands.map((brand) => (
               <div key={brand}>
@@ -103,7 +119,7 @@ const Shop = () => {
             ))}
           </div>
 
-          <h2>Filter by Price</h2>
+          <h2>Prix</h2>
           <input
             type="text"
             placeholder="Enter Price"
@@ -112,13 +128,18 @@ const Shop = () => {
           />
 
           <button onClick={() => window.location.reload()}>Reset</button>
-        </aside>
+        </div>
 
         <section className="products">
-          <h2>{products.length} Products</h2>
+          <h2>{products.length} Produits</h2>
           <div className="product-list">
-            {products.length === 0 ? (
+            {filteredProductsQuery.isLoading ? (
               <Loader />
+            ) : !filteredProductsQuery.data ||
+              !Array.isArray(filteredProductsQuery.data.data) ? (
+              <p>No products available.</p>
+            ) : products.length === 0 ? (
+              <p>No products match the filters.</p>
             ) : (
               products.map((p) => <ProductCard key={p._id} p={p} />)
             )}

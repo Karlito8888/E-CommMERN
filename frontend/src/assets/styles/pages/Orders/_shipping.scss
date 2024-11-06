@@ -1,0 +1,99 @@
+.shipping-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10rem;
+  width: 100%;
+  
+  .shipping-form-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .shipping-form {
+    width: 40rem;
+    background-color: #ffffff;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+
+    .shipping-form-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+
+      .input-label {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        color: #333;
+        
+        &:focus {
+          border-color: #9356dc;
+          outline: none;
+        }
+      }
+    }
+
+    .payment-method-group {
+      margin-bottom: 1.5rem;
+
+      .payment-method-label {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .payment-method-radio-group {
+        display: flex;
+        align-items: center;
+        
+        .radio-label {
+          display: inline-flex;
+          align-items: center;
+          cursor: pointer;
+
+          .payment-method-radio {
+            margin-right: 0.5rem;
+            accent-color: #ff79da;
+          }
+
+          .radio-label-text {
+            font-size: 1rem;
+            color: #333;
+          }
+        }
+      }
+    }
+
+    .submit-button {
+      background-color: #ff79da;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      width: 100%;
+      border-radius: 50px;
+      font-size: 1.125rem;
+      cursor: pointer;
+      border: none;
+
+      &:hover {
+        background-color: #e06db4;
+      }
+    }
+  }
+}

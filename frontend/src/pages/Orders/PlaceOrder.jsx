@@ -5,14 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import Message from "../../components/Message";
 import ProgressSteps from "../../components/ProgressSteps";
 import Loader from "../../components/Loader";
-import { useCreateOrderMutation } from "../../redux/api/orderApiSlice";
+import { useCreateOrderMutation } from "../../redux/features/orderApiSlice";
 import { clearCartItems } from "../../redux/features/cart/cartSlice";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
-
   const cart = useSelector((state) => state.cart);
-
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
   useEffect(() => {
@@ -45,39 +43,41 @@ const PlaceOrder = () => {
     <>
       <ProgressSteps step1 step2 step3 />
 
-      <div className="container mx-auto mt-8">
+      <div className="place-order-container">
         {cart.cartItems.length === 0 ? (
           <Message>Your cart is empty</Message>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+          <div className="place-order-table">
+            <table className="place-order-table__inner">
               <thead>
                 <tr>
-                  <td className="px-1 py-2 text-left align-top">Image</td>
-                  <td className="px-1 py-2 text-left">Product</td>
-                  <td className="px-1 py-2 text-left">Quantity</td>
-                  <td className="px-1 py-2 text-left">Price</td>
-                  <td className="px-1 py-2 text-left">Total</td>
+                  <td className="place-order-table__header">Image</td>
+                  <td className="place-order-table__header">Product</td>
+                  <td className="place-order-table__header">Quantity</td>
+                  <td className="place-order-table__header">Price</td>
+                  <td className="place-order-table__header">Total</td>
                 </tr>
               </thead>
 
               <tbody>
                 {cart.cartItems.map((item, index) => (
                   <tr key={index}>
-                    <td className="p-2">
+                    <td className="place-order-table__image">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-16 h-16 object-cover"
+                        className="place-order-table__image-img"
                       />
                     </td>
 
-                    <td className="p-2">
+                    <td className="place-order-table__product">
                       <Link to={`/product/${item.product}`}>{item.name}</Link>
                     </td>
-                    <td className="p-2">{item.qty}</td>
-                    <td className="p-2">{item.price.toFixed(2)}</td>
-                    <td className="p-2">
+                    <td className="place-order-table__quantity">{item.qty}</td>
+                    <td className="place-order-table__price">
+                      {item.price.toFixed(2)}
+                    </td>
+                    <td className="place-order-table__total">
                       $ {(item.qty * item.price).toFixed(2)}
                     </td>
                   </tr>
@@ -87,32 +87,32 @@ const PlaceOrder = () => {
           </div>
         )}
 
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-5">Order Summary</h2>
-          <div className="flex justify-between flex-wrap p-8 bg-[#181818]">
-            <ul className="text-lg">
+        <div className="place-order-summary">
+          <h2 className="place-order-summary__title">Order Summary</h2>
+          <div className="place-order-summary__details">
+            <ul className="place-order-summary__list">
               <li>
-                <span className="font-semibold mb-4">Items:</span> $
+                <span className="place-order-summary__label">Items:</span> $
                 {cart.itemsPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Shipping:</span> $
+                <span className="place-order-summary__label">Shipping:</span> $
                 {cart.shippingPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Tax:</span> $
+                <span className="place-order-summary__label">Tax:</span> $
                 {cart.taxPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Total:</span> $
+                <span className="place-order-summary__label">Total:</span> $
                 {cart.totalPrice}
               </li>
             </ul>
 
             {error && <Message variant="danger">{error.data.message}</Message>}
 
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Shipping</h2>
+            <div className="place-order-summary__shipping">
+              <h2 className="place-order-summary__section-title">Shipping</h2>
               <p>
                 <strong>Address:</strong> {cart.shippingAddress.address},{" "}
                 {cart.shippingAddress.city} {cart.shippingAddress.postalCode},{" "}
@@ -120,15 +120,17 @@ const PlaceOrder = () => {
               </p>
             </div>
 
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Payment Method</h2>
+            <div className="place-order-summary__payment">
+              <h2 className="place-order-summary__section-title">
+                Payment Method
+              </h2>
               <strong>Method:</strong> {cart.paymentMethod}
             </div>
           </div>
 
           <button
             type="button"
-            className="bg-pink-500 text-white py-2 px-4 rounded-full text-lg w-full mt-4"
+            className="place-order-summary__button"
             disabled={cart.cartItems === 0}
             onClick={placeOrderHandler}
           >

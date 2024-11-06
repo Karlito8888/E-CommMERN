@@ -1,3 +1,5 @@
+// backend/models/productModel.js
+
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Schema;
 
@@ -61,10 +63,10 @@ productSchema.pre("save", function (next) {
   if (this.isNew) {
     this.stock = this.quantity;
   } else {
-    this.stock += this.quantity; 
+    this.stock += this.quantity;
   }
 
-  this.calculateRating(); 
+  this.calculateRating();
   next();
 });
 

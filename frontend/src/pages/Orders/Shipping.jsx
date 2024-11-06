@@ -30,7 +30,6 @@ const Shipping = () => {
     navigate("/placeorder");
   };
 
-  // Payment
   useEffect(() => {
     if (!shippingAddress.address) {
       navigate("/shipping");
@@ -38,77 +37,78 @@ const Shipping = () => {
   }, [navigate, shippingAddress]);
 
   return (
-    <div className="container mx-auto mt-10">
+    <div className="shipping-container">
       <ProgressSteps step1 step2 />
-      <div className="mt-[10rem] flex justify-around items-center flex-wrap">
-        <form onSubmit={submitHandler} className="w-[40rem]">
-          <h1 className="text-2xl font-semibold mb-4">Shipping</h1>
-          <div className="mb-4">
-            <label className="block text-white mb-2">Address</label>
+      <div className="shipping-form-container">
+        <form onSubmit={submitHandler} className="shipping-form">
+          <h1 className="shipping-form-title">Shipping</h1>
+
+          <div className="input-group">
+            <label className="input-label">Address</label>
             <input
               type="text"
-              className="w-full p-2 border rounded"
+              className="input-field"
               placeholder="Enter address"
               value={address}
               required
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-white mb-2">City</label>
+
+          <div className="input-group">
+            <label className="input-label">City</label>
             <input
               type="text"
-              className="w-full p-2 border rounded"
+              className="input-field"
               placeholder="Enter city"
               value={city}
               required
               onChange={(e) => setCity(e.target.value)}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-white mb-2">Postal Code</label>
+
+          <div className="input-group">
+            <label className="input-label">Postal Code</label>
             <input
               type="text"
-              className="w-full p-2 border rounded"
+              className="input-field"
               placeholder="Enter postal code"
               value={postalCode}
               required
               onChange={(e) => setPostalCode(e.target.value)}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-white mb-2">Country</label>
+
+          <div className="input-group">
+            <label className="input-label">Country</label>
             <input
               type="text"
-              className="w-full p-2 border rounded"
+              className="input-field"
               placeholder="Enter country"
               value={country}
               required
               onChange={(e) => setCountry(e.target.value)}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-400">Select Method</label>
-            <div className="mt-2">
-              <label className="inline-flex items-center">
+
+          <div className="payment-method-group">
+            <label className="payment-method-label">Select Method</label>
+            <div className="payment-method-radio-group">
+              <label className="radio-label">
                 <input
                   type="radio"
-                  className="form-radio text-pink-500"
+                  className="payment-method-radio"
                   name="paymentMethod"
                   value="PayPal"
                   checked={paymentMethod === "PayPal"}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
-
-                <span className="ml-2">PayPal or Credit Card</span>
+                <span className="radio-label-text">PayPal or Credit Card</span>
               </label>
             </div>
           </div>
 
-          <button
-            className="bg-pink-500 text-white py-2 px-4 rounded-full text-lg w-full"
-            type="submit"
-          >
+          <button className="submit-button" type="submit">
             Continue
           </button>
         </form>
