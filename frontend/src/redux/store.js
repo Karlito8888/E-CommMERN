@@ -5,8 +5,8 @@ import { setupListeners } from "@reduxjs/toolkit/query/react";
 import { apiSlice } from "./features/apiSlice"; // Importation de la slice API principale
 import authReducer from "./features/auth/authSlice.js"; // Reducer pour l'authentification
 import favoritesReducer from "./features/favorites/favoriteSlice"; // Reducer pour les favoris
-// import cartSliceReducer from "./features/cart/cartSlice"; // Reducer pour le panier
-// import shopReducer from "./features/shop/shopSlice"; // Reducer pour la boutique
+import cartSliceReducer from "./features/cart/cartSlice"; // Reducer pour le panier
+import shopReducer from "./features/shop/shopSlice"; // Reducer pour la boutique
 import { getFavoritesFromLocalStorage } from "../Utils/localStorage"; // Fonction pour obtenir les favoris du localStorage
 
 // Récupération des favoris depuis le localStorage
@@ -18,8 +18,8 @@ const store = configureStore({
     [apiSlice.reducerPath]: apiSlice.reducer, // Intégration de la slice API
     auth: authReducer, // Reducer pour l'authentification
     favorites: favoritesReducer, // Reducer pour les favoris
-    // cart: cartSliceReducer, // Reducer pour le panier
-    // shop: shopReducer, // Reducer pour la boutique
+    cart: cartSliceReducer, // Reducer pour le panier
+    shop: shopReducer, // Reducer pour la boutique
   },
   preloadedState: {
     favorites: initialFavorites, // État initial des favoris

@@ -1,0 +1,135 @@
+/* Conteneur principal */
+.shop-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+
+  /* Section de filtre */
+  .filters {
+    background-color: #151515;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 18rem;
+  }
+
+  .filters h2 {
+    background-color: #000;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .filters .p-5 {
+    padding: 1.25rem;
+  }
+
+  .filters label {
+    color: #fff;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+  }
+
+  /* Checkbox et radio */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+  }
+
+  /* Styles des produits */
+  .products {
+    flex: 1;
+    padding: 1rem;
+  }
+
+  .products h2 {
+    font-size: 1.25rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .product-list .product-card {
+    width: calc(33.33% - 1rem); /* Pour un affichage sur 3 colonnes */
+    box-sizing: border-box;
+  }
+
+  /* Prix et autres filtres */
+  input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #ff79da;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+
+  button:hover {
+    background-color: #e158c9;
+  }
+
+  /* Style Loader (si tu utilises un loader) */
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+  }
+
+  /* Responsive Design */
+  @media screen and (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+
+    .filters {
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+
+    .products h2 {
+      font-size: 1.125rem;
+    }
+
+    .product-list {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .product-list .product-card {
+      width: 100%; /* Occupation totale sur mobile */
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .filters {
+      width: 50%;
+      padding: 1.5rem;
+    }
+
+    .product-list .product-card {
+      width: 48%; /* 2 colonnes */
+    }
+  }
+}

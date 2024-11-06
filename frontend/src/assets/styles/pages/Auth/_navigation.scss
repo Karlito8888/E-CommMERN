@@ -27,6 +27,7 @@ aside {
 
       .nav-item {
         margin: 0.5rem 0;
+        position: relative;
 
         .nav-link {
           display: flex;
@@ -46,9 +47,26 @@ aside {
             margin-right: 0.5rem;
           }
 
-           span {
-                margin-top: 7px;
-              }
+          span {
+            margin-top: 7px;
+          }
+        }
+
+        .cart-quantity-indicator {
+          position: absolute;
+          top: 0;
+          right: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .quantity-badge {
+          padding: 2px 6px; /* équivalent à Tailwind `px-1 py-0` */
+          font-size: 0.875rem; /* équivalent à `text-sm` */
+          color: white; /* équivalent à `text-white` */
+          background-color: #ff79da; /* couleur personnalisée pour `bg-pink-500` */
+          border-radius: 9999px; /* pour créer un cercle complet */
         }
       }
     }

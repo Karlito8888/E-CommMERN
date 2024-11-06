@@ -1,0 +1,141 @@
+.cart-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin: 2rem auto;
+  max-width: 80%;
+
+  .text-center {
+    text-align: center;
+  }
+
+  .cart {
+    &__title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    &__empty-message {
+      font-size: 1rem;
+      color: #333;
+    }
+
+    &__link {
+      color: #ff79da;
+      text-decoration: underline;
+      font-weight: 500;
+
+      &:hover {
+        color: #e066b7;
+      }
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #d1d5db;
+
+      &-image {
+        width: 5rem;
+        height: 5rem;
+        border-radius: 4px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      &-details {
+        flex: 1;
+        margin-left: 1rem;
+
+        &-name {
+          color: #ff79da;
+          font-weight: 600;
+        }
+
+        &-brand {
+          margin-top: 0.5rem;
+          color: #6b7280;
+        }
+
+        &-price {
+          margin-top: 0.5rem;
+          color: #fff;
+          font-weight: bold;
+        }
+      }
+
+      &-quantity {
+        width: 6rem;
+
+        select {
+          width: 100%;
+          padding: 0.25rem;
+          border: 1px solid #d1d5db;
+          border-radius: 4px;
+          color: #000;
+        }
+      }
+
+      &-remove-btn {
+        color: #ff4d4f;
+        margin-left: 1rem;
+        cursor: pointer;
+        transition: color 0.3s;
+
+        &:hover {
+          color: #ff3333;
+        }
+
+        svg {
+          margin-left: 1rem;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+
+    &__summary {
+      margin-top: 2rem;
+      width: 100%;
+
+      &-container {
+        padding: 1rem;
+        background-color: #e5e7eb;
+        border-radius: 8px;
+      }
+
+      &-total {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+
+      &-btn {
+        background-color: #ff79da;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 1.125rem;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #e066b7;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          background-color: #d1d5db;
+        }
+      }
+    }
+  }
+}

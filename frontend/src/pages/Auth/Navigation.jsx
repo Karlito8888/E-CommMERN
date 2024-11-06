@@ -19,7 +19,7 @@ import Users from "./icons/users.svg";
 
 const Navigation = () => {
   const { userInfo } = useSelector((state) => state.auth);
-  // const { cartItems } = useSelector((state) => state.cart);
+  const { cartItems } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logoutApiCall] = useLogoutUserMutation();
@@ -34,13 +34,22 @@ const Navigation = () => {
     }
   };
 
+  const totalCartItems = cartItems.reduce((a, c) => a + c.qty, 0);
+
   return (
     <aside>
       <nav role="navigation">
         <ul className="main-nav" role="menubar">
           <NavItem to="/" icon={Home} label="Accueil" />
           <NavItem to="/shop" icon={Shopping} label="Shop" />
-          <NavItem to="/cart" icon={Cart} label="Panier" />
+          <NavItem to="/cart" icon={Cart} label="Panier">
+            {totalCartItems > 0 && (
+              <span className="cart-quantity-indicator">
+                <span className="quantity-badge">{totalCartItems}</span>
+              </span>
+            )}
+          </NavItem>
+
           <NavItem to="/favorite" icon={Heart} label="Mes favoris" />
         </ul>
 
