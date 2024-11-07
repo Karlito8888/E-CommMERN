@@ -66,10 +66,7 @@ const Product = () => {
   return (
     <>
       <div>
-        <Link
-          className="text-white font-semibold hover:underline ml-[10rem]"
-          to="/"
-        >
+        <Link className="go-back-link" to="/">
           Go Back
         </Link>
       </div>
@@ -81,67 +78,61 @@ const Product = () => {
         </Message>
       ) : (
         <>
-          <div className="flex flex-wrap relative items-between mt-[2rem] ml-[10rem]">
+          <div className="product-container">
             <div>
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full  xl:w-[50rem] lg:w-[45rem] md:w-[30rem] sm:w-[20rem] mr-[2rem]"
+                className="product-image"
               />
               <HeartIcon product={product} />
             </div>
-            <div className="flex flex-col justify-between">
-              <h2 className="text-2xl font-semibold">{product.name}</h2>
+            <div className="product-details">
+              <h2 className="product-title">{product.name}</h2>
 
-              <p className="my-4 xl:w-[35rem] lg:w-[35] md:w-[30rem] text-[#B0B0B0]">
-                {product.description}
-              </p>
-              <p className="text-5xl my-4 font-extrabold">${product.price}</p>
-              {/* --------------------------------------------------- */}
+              <p className="product-description">{product.description}</p>
+              <p className="product-price">${product.price}</p>
 
-              <div className="flex items-center justify-between w-[20rem]">
-                <div className="one">
-                  <h1 className="flex items-center mb-6">
-                    <FaStore className="mr-2 text-white" /> Brand:{" "}
-                    {product.brand}
+              <div className="product-info">
+                <div className="product-info-left">
+                  <h1 className="product-info-item">
+                    <FaStore className="icon" /> Brand: {product.brand}
                   </h1>
-                  <h1 className="flex items-center mb-6">
-                    <FaClock className="mr-2 text-white" /> Added:{" "}
+                  <h1 className="product-info-item">
+                    <FaClock className="icon" /> Added:{" "}
                     {moment(product.createdAt).fromNow()}
                   </h1>
-                  <h1 className="flex items-center mb-6">
-                    <FaStar className="mr-2 text-white" /> Reviews:
-                    {product.numReviews}
+                  <h1 className="product-info-item">
+                    <FaStar className="icon" /> Reviews: {product.numReviews}
                   </h1>
                 </div>
 
-                <div className="two">
-                  <h1 className="flex items-center mb-6">
-                    <FaStar className="mr-2 text-white" /> Ratings: {rating}
+                <div className="product-info-right">
+                  <h1 className="product-info-item">
+                    <FaStar className="icon" /> Ratings: {rating}
                   </h1>
-                  <h1 className="flex items-center mb-6">
-                    <FaShoppingCart className="mr-2 text-white" /> Quantity:{" "}
+                  <h1 className="product-info-item">
+                    <FaShoppingCart className="icon" /> Quantity:{" "}
                     {product.quantity}
                   </h1>
-                  <h1 className="flex items-center mb-6">
-                    <FaBox className="mr-2 text-white" /> In Stock:{" "}
-                    {product.stock}
+                  <h1 className="product-info-item">
+                    <FaBox className="icon" /> In Stock: {product.stock}
                   </h1>
                 </div>
               </div>
 
-              <div className="flex justify-between flex-wrap">
+              <div className="rating-quantity">
                 <Rating
                   value={product.rating}
                   text={`${product.numReviews} reviews`}
                 />
 
                 {product.stock > 0 && (
-                  <div className="">
+                  <div className="quantity-selector">
                     <select
                       value={qty}
                       onChange={(e) => setQty(Number(e.target.value))}
-                      className="p-2 w-[6rem] rounded-lg text-black"
+                      className="quantity-dropdown"
                     >
                       {[...Array(product.stock).keys()].map((x) => (
                         <option key={x + 1} value={x + 1}>
@@ -153,20 +144,19 @@ const Product = () => {
                 )}
               </div>
 
-              <div className="btn-container">
+              <div className="add-to-cart-btn-container">
                 <button
                   onClick={addToCartHandler}
                   disabled={product.stock === 0}
-                  className="bg-pink-600 text-white py-2 px-4 rounded-lg mt-4 md:mt-0"
+                  className="add-to-cart-btn"
                 >
                   Add To Cart
                 </button>
               </div>
-              {/* --------------------------------------------------- */}
             </div>
           </div>
 
-          <div className="mt-[5rem] container flex flex-wrap items-start justify-between ml-[10rem]">
+          <div className="product-tabs-container">
             <ProductTabs
               loadingProductReview={loadingProductReview}
               userInfo={userInfo}

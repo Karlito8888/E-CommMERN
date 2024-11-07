@@ -49,3 +49,4 @@ router
   .put(authenticate, authorizeAdmin, markOrderAsDelivered);
 
 export default router;
+

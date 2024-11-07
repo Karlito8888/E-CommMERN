@@ -8,6 +8,8 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import './assets/styles/index.css'
 
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
 import App from './App.jsx'
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
@@ -29,7 +31,8 @@ import CategoryList from './pages/Admin/CategoryList.jsx';
 import ProductList from './pages/Admin/ProductList.jsx';
 import ProductUpdate from './pages/Admin/ProductUpdate.jsx';
 import ProductCreate from './pages/Admin/ProductCreate.jsx';
-// import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
+import OrderList from "./pages/Admin/OrderList.jsx";
+import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
 
 
 const router = createBrowserRouter(
@@ -57,18 +60,22 @@ const router = createBrowserRouter(
         <Route path="productlist" element={<ProductList />} />
         <Route path="product/create" element={<ProductCreate />} />
         <Route path="product/update/:_id" element={<ProductUpdate />} />
-        {/* <Route path="orderlist" element={<OrderList />} /> */}
-        {/* <Route path="dashboard" element={<AdminDashboard />} /> */}
+        <Route path="orderlist" element={<OrderList />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
       </Route>
     </Route>
   )
 );
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <PayPalScriptProvider 
+      // options={{ "client-id": "YOUR_CLIENT_ID" }}
+      >
+        <RouterProvider router={router} />
+      </PayPalScriptProvider>
     </Provider>
   </StrictMode>
-)
+);
 

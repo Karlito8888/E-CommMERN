@@ -1,5 +1,4 @@
-// backend/controllers/orderController.js.js
-import mongoose from "mongoose";
+// backend/controllers/orderControllers.js
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 
@@ -11,27 +10,29 @@ function calcPrices(orderItems) {
   );
 
   const shippingPrice = itemsPrice > 100 ? 0 : 10;
-  const taxRate = 0.2;
-  const taxPrice = parseFloat((itemsPrice * taxRate).toFixed(2));
-  const totalPrice = parseFloat(
-    (itemsPrice + shippingPrice + taxPrice).toFixed(2)
-  );
+  const taxRate = 0.15;
+  const taxPrice = (itemsPrice * taxRate).toFixed(2);
+
+  const totalPrice = (
+    itemsPrice +
+    shippingPrice +
+    parseFloat(taxPrice)
+  ).toFixed(2);
 
   return {
-    itemsPrice: mongoose.Types.Decimal128.fromString(itemsPrice.toFixed(2)),
-    shippingPrice: mongoose.Types.Decimal128.fromString(
-      shippingPrice.toFixed(2)
-    ),
-    taxPrice: mongoose.Types.Decimal128.fromString(taxPrice.toFixed(2)),
-    totalPrice: mongoose.Types.Decimal128.fromString(totalPrice.toFixed(2)),
+    itemsPrice: itemsPrice.toFixed(2),
+    shippingPrice: shippingPrice.toFixed(2),
+    taxPrice,
+    totalPrice,
   };
 }
 
+// Order Creation and Management
 const createOrder = async (req, res) => {
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
 
-    if (orderItems && orderItems.length === 0) {
+    if (!orderItems || orderItems.length === 0) {
       res.status(400);
       throw new Error("No order items");
     }
@@ -79,6 +80,7 @@ const createOrder = async (req, res) => {
   }
 };
 
+// Order Retrieval
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find({}).populate("user", "id username");
@@ -92,46 +94,6 @@ const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id });
     res.json(orders);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-const countTotalOrders = async (req, res) => {
-  try {
-    const totalOrders = await Order.countDocuments();
-    res.json({ totalOrders });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-const calculateTotalSales = async (req, res) => {
-  try {
-    const orders = await Order.find();
-    const totalSales = orders.reduce(
-      (sum, order) => sum + parseFloat(order.totalPrice.toString()),
-      0
-    );
-    res.json({ totalSales });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-const calculateTotalSalesByDate = async (req, res) => {
-  try {
-    const salesByDate = await Order.aggregate([
-      { $match: { isPaid: true } },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$paidAt" } },
-          totalSales: { $sum: "$totalPrice" },
-        },
-      },
-    ]);
-
-    res.json(salesByDate);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -155,6 +117,7 @@ const findOrderById = async (req, res) => {
   }
 };
 
+// Order Status Updates
 const markOrderAsPaid = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -169,8 +132,8 @@ const markOrderAsPaid = async (req, res) => {
         email_address: req.body.payer.email_address,
       };
 
-      const updateOrder = await order.save();
-      res.status(200).json(updateOrder);
+      const updatedOrder = await order.save();
+      res.status(200).json(updatedOrder);
     } else {
       res.status(404);
       throw new Error("Order not found");
@@ -199,14 +162,53 @@ const markOrderAsDelivered = async (req, res) => {
   }
 };
 
+// Order Statistics
+const countTotalOrders = async (req, res) => {
+  try {
+    const totalOrders = await Order.countDocuments();
+    res.json({ totalOrders });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const calculateTotalSales = async (req, res) => {
+  try {
+    const orders = await Order.find();
+    const totalSales = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    res.json({ totalSales });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const calculateTotalSalesByDate = async (req, res) => {
+  try {
+    const salesByDate = await Order.aggregate([
+      { $match: { isPaid: true } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$paidAt" } },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    res.json(salesByDate);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Exports
 export {
   createOrder,
   getAllOrders,
   getUserOrders,
-  countTotalOrders,
-  calculateTotalSales,
-  calculateTotalSalesByDate,
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
+  countTotalOrders,
+  calculateTotalSales,
+  calculateTotalSalesByDate,
 };

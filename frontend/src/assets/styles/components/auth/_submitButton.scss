@@ -1,0 +1,32 @@
+.submit-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    background-color: #004085;
+  }
+
+  &:disabled {
+    background-color: #b0c4de;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  // Optional: Add text ellipsis for long text
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -97,9 +97,9 @@ const Profile = () => {
 
               <div className="form-actions">
                 <SubmitButton isLoading={loadingUpdateProfile} text="Ok!" />
-                {/* <a href="/user-orders" className="btn-orders">
+                <a href="/user-orders" className="btn-orders">
                   Mes commandes
-                </a> */}
+                </a>
               </div>
               {loadingUpdateProfile && <Loader />}
             </form>

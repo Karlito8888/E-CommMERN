@@ -1,22 +1,43 @@
 // frontend/src/pages/ProductList.jsx
 
 import moment from "moment";
-import { useGetProductsQuery } from "../../redux/features/productApiSlice";
+import { useGetProductsQuery as useMongoProductsQuery } from "../../redux/features/productApiSlice";
+import { useGetProductsQuery as useFakeStoreProductsQuery } from "../../redux/FakeStore/fakeStoreProductApiSlice"; // Importation pour les produits FakeStore
 import AdminMenu from "./AdminMenu";
 
 const ProductList = () => {
-  const { data, isLoading, isError } = useGetProductsQuery();
-  const products = data?.products || [];
+  // Récupération des produits de MongoDB
+  const {
+    data: mongoData,
+    isLoading: isLoadingMongo,
+    isError: isErrorMongo,
+  } = useMongoProductsQuery();
+  const mongoProducts = mongoData?.products || [];
 
-  if (isLoading) {
+  // Récupération des produits de FakeStore
+  const {
+    data: fakeStoreData,
+    isLoading: isLoadingFakeStore,
+    isError: isErrorFakeStore,
+  } = useFakeStoreProductsQuery();
+  const fakeStoreProducts = fakeStoreData || []; // FakeStore renvoie directement la liste
+
+  // Gestion des chargements et erreurs pour chaque source
+  if (isLoadingMongo || isLoadingFakeStore) {
     return <div className="loading">Loading...</div>;
   }
 
-  if (isError) {
+  if (isErrorMongo || isErrorFakeStore) {
     return <div className="error">Error loading products</div>;
   }
 
-  if (!Array.isArray(products)) {
+  // Combine les produits de MongoDB et FakeStore
+  const allProducts = [
+    ...mongoProducts.map((product) => ({ ...product, source: "mongo" })),
+    ...fakeStoreProducts.map((product) => ({ ...product, source: "fake" })),
+  ];
+
+  if (!Array.isArray(allProducts)) {
     return <div className="error">Unexpected data format</div>;
   }
 
@@ -24,12 +45,21 @@ const ProductList = () => {
     <>
       <section className="products-content">
         <div className="products-header">
-          <h1>All Products ({products.length})</h1>
+          <h1>All Products ({allProducts.length})</h1>
         </div>
         <AdminMenu />
         <ul className="product-list">
-          {products.map((product) => (
-            <li key={product._id} className="product-card">
+          {/* {allProducts.map((product) => (
+            <li key={product._id} className="product-card"> */}
+          {allProducts.map((product, index) => (
+            <li
+              key={
+                product._id
+                  ? `mongo-${product._id}`
+                  : `fake-${product.id || index}`
+              }
+              className="product-card"
+            >
               <article className="product-details">
                 <img
                   src={product.image}

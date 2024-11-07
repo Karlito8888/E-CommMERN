@@ -1,91 +1,118 @@
-.product-list-container {
-  margin-left: 200px;
-  max-width: 1200px;
-  padding: 2rem;
+.products-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
-  .product-list-content {
-    display: flex;
+  .products-header {
+    text-align: center;
+    margin-bottom: 20px;
 
-    .form-section {
-      width: 75%;
-      padding: 1rem;
+    h1 {
+      font-size: 2rem;
+      color: $primary-color;
+    }
+  }
+  .product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
 
-      h2 {
-        margin-bottom: 1rem;
+    .product-card {
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
 
-      .image-preview {
-        text-align: center;
+      .product-details {
+        padding: 15px;
 
         .product-image {
-          max-height: 200px;
-          margin: 0 auto;
-        }
-      }
-
-      .upload-image {
-        margin-bottom: 1rem;
-
-        .upload-label {
-          display: block;
-          border: 1px solid #ccc;
-          text-align: center;
-          padding: 2rem;
-          background-color: #101011;
-          color: white;
-          font-weight: bold;
-          cursor: pointer;
+          width: 100%;
+          height: auto;
           border-radius: 8px;
-
-          .upload-input {
-            display: none;
-          }
-        }
-      }
-
-      .form-fields {
-        display: flex;
-        flex-direction: column;
-
-        .input-group {
-          margin-bottom: 1rem;
-          display: grid;
-
-          label {
-            display: block;
-            margin-bottom: 0.5rem;
-          }
-
-          .input-field,
-          .textarea-field {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #101011;
-            color: white;
-          }
-
-          .textarea-field {
-            height: 100px;
-          }
+          object-fit: cover;
         }
 
-        .submit-button {
-          padding: 1rem 2rem;
-          border-radius: 8px;
-          font-size: 1rem;
-          font-weight: bold;
-          background-color: #ff79da;
-          color: white;
-          cursor: pointer;
-          transition: background-color 0.3s;
+        .product-info {
+          margin-top: 10px;
 
-          &:hover {
-            background-color: #9356dc;
+          .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .product-name {
+              font-size: 1.5rem;
+              color: $text-color;
+            }
+
+            .product-date {
+              font-size: 0.9rem;
+              color: #777;
+            }
+          }
+
+          .product-description {
+            margin: 10px 0;
+            color: #555;
+          }
+
+          .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .update-button {
+              background-color: $primary-color;
+              color: white;
+              border: none;
+              border-radius: 5px;
+              padding: 10px 15px;
+              cursor: pointer;
+              transition: background-color 0.3s;
+
+              &:hover {
+                background-color: $secondary-color;
+              }
+
+              .update-icon {
+                margin-left: 5px;
+                width: 14px;
+                height: 14px;
+              }
+            }
+
+            .product-price {
+              font-size: 1.2rem;
+              color: $text-color;
+              font-weight: bold;
+            }
           }
         }
       }
     }
   }
+
+  .admin-menu {
+    margin-left: 20px;
+    width: 250px; // Ajustez la largeur de la barre latérale si nécessaire
+  }
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.5rem;
+  color: $text-color;
+  margin-top: 20px;
 }

@@ -1,3 +1,5 @@
+// frontend/src/pages/Order.jsx
+
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
@@ -34,20 +36,22 @@ const Order = () => {
   } = useGetPaypalClientIdQuery();
 
   useEffect(() => {
-    if (!errorPaypal && !loadingPaypal && paypal.clientId) {
-      const loadPaypalScript = async () => {
+    if (
+      !errorPaypal &&
+      !loadingPaypal &&
+      paypal.clientId &&
+      order &&
+      !order.isPaid
+    ) {
+      if (!window.paypal) {
         paypalDispatch({
           type: "resetOptions",
           value: {
             "client-id": paypal.clientId,
-            currency: "USD",
+            currency: "EUR",
           },
         });
         paypalDispatch({ type: "setLoadingStatus", value: "pending" });
-      };
-
-      if (order && !order.isPaid && !window.paypal) {
-        loadPaypalScript();
       }
     }
   }, [errorPaypal, loadingPaypal, order, paypal, paypalDispatch]);
@@ -57,7 +61,7 @@ const Order = () => {
       try {
         await payOrder({ orderId, details });
         refetch();
-        toast.success("Order is paid");
+        toast.success("La commande est payée");
       } catch (error) {
         toast.error(error?.data?.message || error.message);
       }
@@ -98,7 +102,7 @@ const Order = () => {
               <thead>
                 <tr>
                   <th>Image</th>
-                  <th>Product</th>
+                  <th>Article</th>
                   <th className="text-center">Quantity</th>
                   <th>Unit Price</th>
                   <th>Total</th>
@@ -125,7 +129,7 @@ const Order = () => {
                     <td className="text-center">{item.qty}</td>
                     <td className="text-center">{item.price}</td>
                     <td className="text-center">
-                      $ {(item.qty * item.price).toFixed(2)}
+                       {(item.qty * item.price).toFixed(2)} €
                     </td>
                   </tr>
                 ))}
@@ -167,19 +171,19 @@ const Order = () => {
         <div className="summary-details">
           <div className="summary-item">
             <span>Items</span>
-            <span>${order.itemsPrice}</span>
+            <span>{order.itemsPrice} €</span>
           </div>
           <div className="summary-item">
             <span>Shipping</span>
-            <span>${order.shippingPrice}</span>
+            <span>{order.shippingPrice} €</span>
           </div>
           <div className="summary-item">
             <span>Tax</span>
-            <span>${order.taxPrice}</span>
+            <span>{order.taxPrice} €</span>
           </div>
           <div className="summary-item">
             <span>Total</span>
-            <span>${order.totalPrice}</span>
+            <span>{order.totalPrice} €</span>
           </div>
         </div>
 

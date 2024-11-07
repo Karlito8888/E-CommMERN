@@ -45,16 +45,16 @@ const PlaceOrder = () => {
 
       <div className="place-order-container">
         {cart.cartItems.length === 0 ? (
-          <Message>Your cart is empty</Message>
+          <Message>Votre panier est vide</Message>
         ) : (
           <div className="place-order-table">
             <table className="place-order-table__inner">
               <thead>
                 <tr>
                   <td className="place-order-table__header">Image</td>
-                  <td className="place-order-table__header">Product</td>
-                  <td className="place-order-table__header">Quantity</td>
-                  <td className="place-order-table__header">Price</td>
+                  <td className="place-order-table__header">Produit</td>
+                  <td className="place-order-table__header">Quantité</td>
+                  <td className="place-order-table__header">Prix</td>
                   <td className="place-order-table__header">Total</td>
                 </tr>
               </thead>
@@ -78,7 +78,7 @@ const PlaceOrder = () => {
                       {item.price.toFixed(2)}
                     </td>
                     <td className="place-order-table__total">
-                      $ {(item.qty * item.price).toFixed(2)}
+                       {(item.qty * item.price).toFixed(2)} €
                     </td>
                   </tr>
                 ))}
@@ -88,33 +88,33 @@ const PlaceOrder = () => {
         )}
 
         <div className="place-order-summary">
-          <h2 className="place-order-summary__title">Order Summary</h2>
+          <h2 className="place-order-summary__title">Votre commande</h2>
           <div className="place-order-summary__details">
             <ul className="place-order-summary__list">
               <li>
-                <span className="place-order-summary__label">Items:</span> $
-                {cart.itemsPrice}
+                <span className="place-order-summary__label">Total HT:</span> 
+                {cart.itemsPrice} €
               </li>
               <li>
-                <span className="place-order-summary__label">Shipping:</span> $
-                {cart.shippingPrice}
+                <span className="place-order-summary__label">Frais de livraion:</span> 
+                {cart.shippingPrice} €
               </li>
               <li>
-                <span className="place-order-summary__label">Tax:</span> $
-                {cart.taxPrice}
+                <span className="place-order-summary__label">TVA:</span> 
+                {cart.taxPrice} €
               </li>
               <li>
-                <span className="place-order-summary__label">Total:</span> $
-                {cart.totalPrice}
+                <span className="place-order-summary__label">Total:</span> 
+                {cart.totalPrice} €
               </li>
             </ul>
 
             {error && <Message variant="danger">{error.data.message}</Message>}
 
             <div className="place-order-summary__shipping">
-              <h2 className="place-order-summary__section-title">Shipping</h2>
+              <h2 className="place-order-summary__section-title">Livraison</h2>
               <p>
-                <strong>Address:</strong> {cart.shippingAddress.address},{" "}
+                <strong>Adresse:</strong> {cart.shippingAddress.address},{" "}
                 {cart.shippingAddress.city} {cart.shippingAddress.postalCode},{" "}
                 {cart.shippingAddress.country}
               </p>
@@ -122,9 +122,9 @@ const PlaceOrder = () => {
 
             <div className="place-order-summary__payment">
               <h2 className="place-order-summary__section-title">
-                Payment Method
+                Moyen de paiement
               </h2>
-              <strong>Method:</strong> {cart.paymentMethod}
+              <strong>Par:</strong> {cart.paymentMethod}
             </div>
           </div>
 
@@ -134,7 +134,7 @@ const PlaceOrder = () => {
             disabled={cart.cartItems === 0}
             onClick={placeOrderHandler}
           >
-            Place Order
+            Procéder au paiement
           </button>
 
           {isLoading && <Loader />}

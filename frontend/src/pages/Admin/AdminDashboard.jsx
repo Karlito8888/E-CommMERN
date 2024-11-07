@@ -1,11 +1,10 @@
 import Chart from "react-apexcharts";
-import { useGetUsersQuery } from "../../redux/api/usersApiSlice";
+import { useGetUsersQuery } from "../../redux/features/adminApiSlice";
 import {
   useGetTotalOrdersQuery,
   useGetTotalSalesByDateQuery,
   useGetTotalSalesQuery,
-} from "../../redux/api/orderApiSlice";
-
+} from "../../redux/features/orderApiSlice";
 import { useState, useEffect } from "react";
 import AdminMenu from "./AdminMenu";
 import OrderList from "./OrderList";
@@ -67,9 +66,11 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (salesDetail) {
+      console.log("salesDetail:", salesDetail);
       const formattedSalesDate = salesDetail.map((item) => ({
         x: item._id,
-        y: item.totalSales,
+        // y: item.totalSales,
+         y: parseFloat(item.totalSales.toString()) || 0,  // Conversion en nombre
       }));
 
       setState((prevState) => ({
@@ -80,7 +81,6 @@ const AdminDashboard = () => {
             categories: formattedSalesDate.map((item) => item.x),
           },
         },
-
         series: [
           { name: "Sales", data: formattedSalesDate.map((item) => item.y) },
         ],
@@ -92,50 +92,44 @@ const AdminDashboard = () => {
     <>
       <AdminMenu />
 
-      <section className="xl:ml-[4rem] md:ml-[0rem]">
-        <div className="w-[80%] flex justify-around flex-wrap">
-          <div className="rounded-lg bg-black p-5 w-[20rem] mt-5">
-            <div className="font-bold rounded-full w-[3rem] bg-pink-500 text-center p-3">
-              $
-            </div>
-
-            <p className="mt-5">Sales</p>
-            <h1 className="text-xl font-bold">
-              $ {isLoading ? <Loader /> : sales.totalSales.toFixed(2)}
+      <section className="admin-dashboard">
+        <div className="stat-cards">
+          <div className="stat-card">
+            <div className="stat-card__currency">$</div>
+            <p className="stat-card__label">Sales</p>
+            <h1 className="stat-card__value">
+              {isLoading ? <Loader /> : sales.totalSales.toFixed(2)}
             </h1>
           </div>
-          <div className="rounded-lg bg-black p-5 w-[20rem] mt-5">
-            <div className="font-bold rounded-full w-[3rem] bg-pink-500 text-center p-3">
-              $
-            </div>
 
-            <p className="mt-5">Customers</p>
-            <h1 className="text-xl font-bold">
-              $ {isLoading ? <Loader /> : customers?.length}
+          <div className="stat-card">
+            <div className="stat-card__currency">$</div>
+            <p className="stat-card__label">Customers</p>
+            <h1 className="stat-card__value">
+              {isLoading ? <Loader /> : customers?.length}
             </h1>
           </div>
-          <div className="rounded-lg bg-black p-5 w-[20rem] mt-5">
-            <div className="font-bold rounded-full w-[3rem] bg-pink-500 text-center p-3">
-              $
-            </div>
 
-            <p className="mt-5">All Orders</p>
-            <h1 className="text-xl font-bold">
-              $ {isLoading ? <Loader /> : orders?.totalOrders}
+          <div className="stat-card">
+            <div className="stat-card__currency">$</div>
+            <p className="stat-card__label">All Orders</p>
+            <h1 className="stat-card__value">
+              {isLoading ? <Loader /> : orders?.totalOrders}
             </h1>
           </div>
         </div>
 
-        <div className="ml-[10rem] mt-[4rem]">
+        <div className="chart-container">
           <Chart
             options={state.options}
             series={state.series}
-            type="bar"
+            // type="bar"
+            type="line"
             width="70%"
           />
         </div>
 
-        <div className="mt-[4rem]">
+        <div className="order-list-container">
           <OrderList />
         </div>
       </section>
