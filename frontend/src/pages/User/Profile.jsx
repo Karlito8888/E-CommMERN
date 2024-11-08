@@ -13,7 +13,7 @@ import SubmitButton from "../../components/auth/SubmitButton";
 const Profile = () => {
   const { data: userProfile, isLoading: loadingProfile } =
     useGetCurrentUserProfileQuery();
-  console.log("userProfile:", userProfile);
+  // console.log("userProfile:", userProfile);
   const [username, setUserName] = useState(userProfile?.user?.username || "");
   const [email, setEmail] = useState(userProfile?.user?.email || "");
   const [password, setPassword] = useState("");

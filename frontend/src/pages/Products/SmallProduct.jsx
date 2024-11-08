@@ -5,7 +5,7 @@ const SmallProduct = ({ product }) => {
   return (
     <div className="small-product">
       <div className="product-image">
-        <img src={product.image} alt={product.name} />
+        <img src={product.image} alt={product.name} loading="lazy" />
         <HeartIcon product={product} />
       </div>
 
@@ -22,3 +22,4 @@ const SmallProduct = ({ product }) => {
 };
 
 export default SmallProduct;
+

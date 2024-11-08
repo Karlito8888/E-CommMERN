@@ -66,7 +66,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (salesDetail) {
-      console.log("salesDetail:", salesDetail);
+      // console.log("salesDetail:", salesDetail);
       const formattedSalesDate = salesDetail.map((item) => ({
         x: item._id,
         // y: item.totalSales,

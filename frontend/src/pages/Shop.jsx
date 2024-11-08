@@ -30,7 +30,7 @@ const Shop = () => {
   }, [categoriesQuery.data, dispatch]);
 
   const filterProducts = () => {
-    console.log("Filtered Products Data:", filteredProductsQuery.data);
+    // console.log("Filtered Products Data:", filteredProductsQuery.data);
     // Vérifier que les données des produits existent
     if (
       filteredProductsQuery.data &&
@@ -78,7 +78,7 @@ const Shop = () => {
             .filter(Boolean)
         ),
       ];
-      console.log("brands :", brands); // Vérifier les marques extraites
+      // console.log("brands :", brands); // Vérifier les marques extraites
       return brands;
     }
     return [];

@@ -2,7 +2,7 @@ import { useGetTopProductsQuery } from "../redux/features/productApiSlice";
 import Loader from "./Loader";
 import SmallProduct from "../pages/Products/SmallProduct";
 import ProductCarousel from "../pages/Products/ProductCarousel";
-import Message from "./Message"; // Importer le composant Message pour gérer les erreurs
+import Message from "./Message";
 
 const Header = () => {
   const { data, isLoading, error } = useGetTopProductsQuery();

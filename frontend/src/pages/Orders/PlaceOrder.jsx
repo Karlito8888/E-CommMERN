@@ -67,6 +67,7 @@ const PlaceOrder = () => {
                         src={item.image}
                         alt={item.name}
                         className="place-order-table__image-img"
+                        loading="lazy"
                       />
                     </td>
 
@@ -78,7 +79,7 @@ const PlaceOrder = () => {
                       {item.price.toFixed(2)}
                     </td>
                     <td className="place-order-table__total">
-                       {(item.qty * item.price).toFixed(2)} €
+                      {(item.qty * item.price).toFixed(2)} €
                     </td>
                   </tr>
                 ))}
@@ -92,19 +93,21 @@ const PlaceOrder = () => {
           <div className="place-order-summary__details">
             <ul className="place-order-summary__list">
               <li>
-                <span className="place-order-summary__label">Total HT:</span> 
+                <span className="place-order-summary__label">Total HT:</span>
                 {cart.itemsPrice} €
               </li>
               <li>
-                <span className="place-order-summary__label">Frais de livraion:</span> 
+                <span className="place-order-summary__label">
+                  Frais de livraion:
+                </span>
                 {cart.shippingPrice} €
               </li>
               <li>
-                <span className="place-order-summary__label">TVA:</span> 
+                <span className="place-order-summary__label">TVA:</span>
                 {cart.taxPrice} €
               </li>
               <li>
-                <span className="place-order-summary__label">Total:</span> 
+                <span className="place-order-summary__label">Total:</span>
                 {cart.totalPrice} €
               </li>
             </ul>

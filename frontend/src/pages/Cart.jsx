@@ -28,7 +28,7 @@ const Cart = () => {
   const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const totalPrice = cartItems
     .reduce((acc, item) => acc + item.qty * item.price, 0)
-    .toFixed(2);
+    ;
 
   return (
     <div className="cart-container">
@@ -45,7 +45,7 @@ const Cart = () => {
           {cartItems.map((item) => (
             <div key={item._id} className="cart__item">
               <div className="cart__item-image">
-                <img src={item.image} alt={item.name} />
+                <img src={item.image} alt={item.name} loading="lazy" />
               </div>
               <div className="cart__item-details">
                 <Link
@@ -55,9 +55,7 @@ const Cart = () => {
                   {item.name}
                 </Link>
                 <div className="cart__item-details-brand">{item.brand}</div>
-                <div className="cart__item-details-price">
-                  {item.price.toFixed(2)} €
-                </div>
+                <div className="cart__item-details-price">{item.price} €</div>
               </div>
               <div className="cart__item-quantity">
                 <label htmlFor={`qty-${item._id}`} className="sr-only">
@@ -71,7 +69,7 @@ const Cart = () => {
                   }
                 >
                   {[...Array(item.stock).keys()].map((x) => (
-                    <option key={x + 1} value={x + 1}>
+                    <option key={`${item._id}-${x + 1}`} value={x + 1}>
                       {x + 1}
                     </option>
                   ))}

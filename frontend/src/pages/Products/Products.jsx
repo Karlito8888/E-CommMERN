@@ -84,6 +84,7 @@ const Product = () => {
                 src={product.image}
                 alt={product.name}
                 className="product-image"
+                loading="lazy"
               />
               <HeartIcon product={product} />
             </div>

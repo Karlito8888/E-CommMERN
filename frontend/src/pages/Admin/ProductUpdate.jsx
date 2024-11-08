@@ -119,7 +119,7 @@ const ProductUpdate = () => {
         <div className="header">Mettre à jour / Supprimer le produit</div>
         {product.image && (
           <div className="image-container">
-            <img src={product.image} alt="produit" />
+            <img src={product.image} alt="produit" loading="lazy" />
           </div>
         )}
         <label className="upload-button">

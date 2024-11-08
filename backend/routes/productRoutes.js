@@ -18,14 +18,14 @@ import {
   fetchTopProducts,
   fetchNewProducts,
   filterProducts,
-} from "../controllers/productController.js"; 
+} from "../controllers/productController.js";
 
 // Middlewares
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 import checkId from "../middlewares/checkId.js";
 
 // Routes publiques
-router.get("/", fetchProducts); 
+router.get("/", fetchProducts);
 router.get("/top", fetchTopProducts);
 router.get("/new", fetchNewProducts);
 router.post("/filtered-products", filterProducts);
@@ -43,5 +43,3 @@ router.put("/:id", checkId, upload.single("image"), updateProductDetails);
 router.delete("/:id", checkId, removeProduct);
 
 export default router;
-
-

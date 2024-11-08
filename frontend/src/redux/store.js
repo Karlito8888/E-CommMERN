@@ -7,8 +7,7 @@ import authReducer from "./features/auth/authSlice.js"; // Reducer pour l'authen
 import favoritesReducer from "./features/favorites/favoriteSlice"; // Reducer pour les favoris
 import cartSliceReducer from "./features/cart/cartSlice"; // Reducer pour le panier
 import shopReducer from "./features/shop/shopSlice"; // Reducer pour la boutique
-import { getFavoritesFromLocalStorage } from "../Utils/localStorage"; // Fonction pour obtenir les favoris du localStorage
-import { fakeStoreApi } from "./FakeStore/fakeStoreProductApiSlice.js";
+import { getFavoritesFromLocalStorage } from "../Utils/localStorage";
 
 // Récupération des favoris depuis le localStorage
 const initialFavorites = getFavoritesFromLocalStorage() || [];
@@ -17,7 +16,6 @@ const initialFavorites = getFavoritesFromLocalStorage() || [];
 const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer, // Intégration de la slice API
-    [fakeStoreApi.reducerPath]: fakeStoreApi.reducer,
     auth: authReducer, // Reducer pour l'authentification
     favorites: favoritesReducer, // Reducer pour les favoris
     cart: cartSliceReducer, // Reducer pour le panier
@@ -28,8 +26,7 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .concat(apiSlice.middleware)
-      .concat(fakeStoreApi.middleware), // Ajout des middlewares des slices API
+      .concat(apiSlice.middleware), // Ajout des middlewares des slices API
   devTools: true, // Activation des outils de développement
 });
 

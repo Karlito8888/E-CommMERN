@@ -15,7 +15,7 @@ import moment from "moment";
 import HeartIcon from "./HeartIcon";
 // import Ratings from "./Ratings";
 import ProductTabs from "./ProductTabs";
-// import { addToCart } from "../../redux/features/cart/cartSlice";
+import { addToCart } from "../../redux/features/cart/cartSlice";
 import { useCreateReviewMutation, useGetProductByIdQuery } from "../../redux/features/productApiSlice";
 
 const ProductDetails = () => {
@@ -82,6 +82,7 @@ const ProductDetails = () => {
                 src={product.image}
                 alt={product.name}
                 className="product-image"
+                loading="lazy"
               />
 
               <HeartIcon product={product} />

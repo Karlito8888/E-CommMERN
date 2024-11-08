@@ -52,7 +52,12 @@ const ProductCarousel = () => {
                 stock,
               }) => (
                 <div key={_id}>
-                  <img src={image} alt={name} className="slider-image" />
+                  <img
+                    src={image}
+                    alt={name}
+                    className="slider-image"
+                    loading="lazy"
+                  />
                   <div className="product-details">
                     <div className="product-info">
                       <h2 className="product-title">{name}</h2>

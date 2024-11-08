@@ -31,7 +31,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await login({ email, password }).unwrap();
-      console.log(res);
+      // console.log(res);
       dispatch(setCredentials({ ...res }));
       toast.success("Connexion réussie! 👌"); 
       navigate(redirect);
@@ -86,6 +86,7 @@ const Login = () => {
           alt="Sign In"
           className="signin-image"
           aria-hidden="true"
+          loading="lazy"
         />
       </section>
     </>

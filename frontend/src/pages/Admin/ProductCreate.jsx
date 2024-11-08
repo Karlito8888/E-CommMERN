@@ -100,7 +100,12 @@ const ProductCreate = () => {
 
           {imageUrl && (
             <div className="image-preview">
-              <img src={imageUrl} alt="produit" className="product-image" />
+              <img
+                src={imageUrl}
+                alt="produit"
+                className="product-image"
+                loading="lazy"
+              />
             </div>
           )}
 

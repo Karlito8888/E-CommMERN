@@ -116,6 +116,7 @@ const Order = () => {
                         src={item.image}
                         alt={item.name}
                         className="order-item-image"
+                        loading="lazy"
                       />
                     </td>
                     <td>
@@ -129,7 +130,7 @@ const Order = () => {
                     <td className="text-center">{item.qty}</td>
                     <td className="text-center">{item.price}</td>
                     <td className="text-center">
-                       {(item.qty * item.price).toFixed(2)} €
+                      {(item.qty * item.price).toFixed(2)} €
                     </td>
                   </tr>
                 ))}

@@ -35,6 +35,7 @@ const UserOrder = () => {
                     src={order.orderItems[0].image}
                     alt={order.user}
                     className="order-image"
+                    loading="lazy"
                   />
                 </td>
                 <td>{order._id}</td>

@@ -26,6 +26,7 @@ const ProductCard = ({ p }) => {
             className="product-image"
             src={p.image}
             alt={`Image of ${p.name} from ${p.brand}`}
+            loading="lazy"
           />
         </Link>
         <HeartIcon product={p} />

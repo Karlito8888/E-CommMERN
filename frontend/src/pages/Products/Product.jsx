@@ -5,7 +5,7 @@ const Product = ({ product }) => {
   return (
     <div className="product-card">
       <div className="product-image-container">
-        <img src={product.image} alt={product.name} />
+        <img src={product.image} alt={product.name} loading="lazy" />
         <HeartIcon product={product} />
       </div>
 
