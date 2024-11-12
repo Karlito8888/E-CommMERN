@@ -11,6 +11,7 @@ const formatUserResponse = (user) => ({
   _id: user._id,
   username: user.username,
   email: user.email,
+  shippingAddress: user.shippingAddress,
   isAdmin: user.isAdmin,
 });
 
@@ -118,6 +119,33 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   res.json({ success: true, user: formatUserResponse(updatedUser) });
 });
 
+// Mettre à jour l'adresse de livraison de l'utilisateur actuel
+const updateShippingAddress = asyncHandler(async (req, res) => {
+  const { address, city, postalCode, country } = req.body;
+
+  // Vérifiez si l'utilisateur est connecté
+  const user = await findUserById(req.user._id);
+  if (!user)
+    return res
+      .status(404)
+      .json({ success: false, message: "Utilisateur non trouvé." });
+
+  // Mettez à jour l'adresse de livraison
+  user.shippingAddress = {
+    address: address || user.shippingAddress.address,
+    city: city || user.shippingAddress.city,
+    postalCode: postalCode || user.shippingAddress.postalCode,
+    country: country || user.shippingAddress.country,
+  };
+
+  const updatedUser = await user.save();
+  res.json({
+    success: true,
+    message: "Adresse de livraison mise à jour avec succès.",
+    user: formatUserResponse(updatedUser),
+  });
+});
+
 // Supprimer un utilisateur par ID
 const deleteUserById = asyncHandler(async (req, res) => {
   const user = await findUserById(req.params.id);
@@ -176,6 +204,7 @@ export {
   getAllUsers,
   getCurrentUserProfile,
   updateCurrentUserProfile,
+  updateShippingAddress,
   deleteUserById,
   getUserById,
   updateUserById,

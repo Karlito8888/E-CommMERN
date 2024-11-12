@@ -36,6 +36,7 @@ const productSchema = mongoose.Schema(
     price: { type: Number, required: true, default: 0, min: 0 },
     currency: { type: String, required: true, default: "EUR" },
     stock: { type: Number, required: true, default: 0, min: 0 },
+    stripeProductId: { type: String, required: false },
   },
   { timestamps: true }
 );

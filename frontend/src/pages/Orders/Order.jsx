@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Message from "../../components/Message";
@@ -10,7 +9,6 @@ import Loader from "../../components/Loader";
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
-  useGetPaypalClientIdQuery,
   usePayOrderMutation,
 } from "../../redux/features/orderApiSlice";
 
@@ -27,60 +25,6 @@ const Order = () => {
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
   const { userInfo } = useSelector((state) => state.auth);
-
-  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
-  const {
-    data: paypal,
-    isLoading: loadingPaypal,
-    error: errorPaypal,
-  } = useGetPaypalClientIdQuery();
-
-  useEffect(() => {
-    if (
-      !errorPaypal &&
-      !loadingPaypal &&
-      paypal.clientId &&
-      order &&
-      !order.isPaid
-    ) {
-      if (!window.paypal) {
-        paypalDispatch({
-          type: "resetOptions",
-          value: {
-            "client-id": paypal.clientId,
-            currency: "EUR",
-          },
-        });
-        paypalDispatch({ type: "setLoadingStatus", value: "pending" });
-      }
-    }
-  }, [errorPaypal, loadingPaypal, order, paypal, paypalDispatch]);
-
-  function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        await payOrder({ orderId, details });
-        refetch();
-        toast.success("La commande est payée");
-      } catch (error) {
-        toast.error(error?.data?.message || error.message);
-      }
-    });
-  }
-
-  function createOrder(data, actions) {
-    return actions.order
-      .create({
-        purchase_units: [{ amount: { value: order.totalPrice } }],
-      })
-      .then((orderID) => {
-        return orderID;
-      });
-  }
-
-  function onError(err) {
-    toast.error(err.message);
-  }
 
   const deliverHandler = async () => {
     await deliverOrder(orderId);
@@ -187,21 +131,6 @@ const Order = () => {
             <span>{order.totalPrice} €</span>
           </div>
         </div>
-
-        {!order.isPaid && (
-          <div className="paypal-buttons">
-            {loadingPay && <Loader />}
-            {isPending ? (
-              <Loader />
-            ) : (
-              <PayPalButtons
-                createOrder={createOrder}
-                onApprove={onApprove}
-                onError={onError}
-              />
-            )}
-          </div>
-        )}
 
         {loadingDeliver && <Loader />}
         {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (

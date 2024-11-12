@@ -1270,9 +1270,6 @@ aside nav .user-nav .guest-nav .nav-link img {
   justify-content: space-between;
   margin-bottom: 1rem;
 }
-.order-container .order-summary .paypal-buttons {
-  margin-top: 1rem;
-}
 .order-container .order-summary .deliver-button {
   background-color: #ff79da;
   color: white;

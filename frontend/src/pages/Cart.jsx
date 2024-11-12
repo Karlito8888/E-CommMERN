@@ -42,48 +42,52 @@ const Cart = () => {
       ) : (
         <div className="cart">
           <h1 className="cart__title">Shopping Cart</h1>
-          {cartItems.map((item) => (
-            <div key={item._id} className="cart__item">
-              <div className="cart__item-image">
-                <img src={item.image} alt={item.name} loading="lazy" />
-              </div>
-              <div className="cart__item-details">
-                <Link
-                  to={`/product/${item._id}`}
-                  className="cart__item-details-name"
+          {cartItems.map((item) => {
+            console.log("Rendered item with key:", item._id);
+            return (
+              <div key={item._id} className="cart__item">
+                <div className="cart__item-image">
+                  <img src={item.image} alt={item.name} loading="lazy" />
+                </div>
+                <div className="cart__item-details">
+                  <Link
+                    to={`/product/${item._id}`}
+                    className="cart__item-details-name"
+                  >
+                    {item.name}
+                  </Link>
+                  <div className="cart__item-details-brand">{item.brand}</div>
+                  <div className="cart__item-details-price">{item.price} €</div>
+                </div>
+                <div className="cart__item-quantity">
+                  <label htmlFor={`qty-${item._id}`} className="sr-only">
+                    Quantité
+                  </label>
+                  <select
+                    id={`qty-${item._id}`}
+                    value={item.qty}
+                    onChange={(e) =>
+                      addToCartHandler(item, Number(e.target.value))
+                    }
+                  >
+                    {[...Array(item.stock).keys()].map((x) => (
+                      <option key={`${item._id}-${x + 1}`} value={x + 1}>
+                        {x + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  className="cart__item-remove-btn"
+                  onClick={() => removeFromCartHandler(item._id)}
+                  aria-label={`Supprimer ${item.name} du panier`}
                 >
-                  {item.name}
-                </Link>
-                <div className="cart__item-details-brand">{item.brand}</div>
-                <div className="cart__item-details-price">{item.price} €</div>
+                  <FaTrash />
+                </button>
               </div>
-              <div className="cart__item-quantity">
-                <label htmlFor={`qty-${item._id}`} className="sr-only">
-                  Quantité
-                </label>
-                <select
-                  id={`qty-${item._id}`}
-                  value={item.qty}
-                  onChange={(e) =>
-                    addToCartHandler(item, Number(e.target.value))
-                  }
-                >
-                  {[...Array(item.stock).keys()].map((x) => (
-                    <option key={`${item._id}-${x + 1}`} value={x + 1}>
-                      {x + 1}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button
-                className="cart__item-remove-btn"
-                onClick={() => removeFromCartHandler(item._id)}
-                aria-label={`Supprimer ${item.name} du panier`}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ))}
+            );
+          })}
+
           <div className="cart__summary">
             <div className="cart__summary-container">
               <h2 className="cart__summary-total">Articles ({totalItems})</h2>

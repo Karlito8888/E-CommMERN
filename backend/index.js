@@ -12,6 +12,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 dotenv.config();
 const port = process.env.PORT || 5000;
@@ -30,13 +31,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
-
-app.get("/api/config/paypal", (req, res) => {
-  if (!process.env.PAYPAL_CLIENT_ID) {
-    return res.status(500).send("PayPal client ID is not set");
-  }
-  res.send({ clientId: process.env.PAYPAL_CLIENT_ID });
-});
+app.use("/api/payments", paymentRoutes);
 
 const __dirname = path.resolve();
 app.use(
@@ -60,3 +55,4 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => console.log(`Server running on port: ${port}`));
+

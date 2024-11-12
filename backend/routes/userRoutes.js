@@ -11,6 +11,7 @@ import {
   deleteUserById,
   getUserById,
   updateUserById,
+  updateShippingAddress,
 } from '../controllers/userController.js';
 import {
   changeUserPassword,
@@ -30,6 +31,7 @@ router.post('/logout', authenticate, logoutCurrentUser); // Déconnexion d'un ut
 router.get('/', authenticate, authorizeAdmin, getAllUsers); // Obtenir tous les utilisateurs
 router.get('/profile', authenticate, getCurrentUserProfile); // Obtenir le profil de l'utilisateur actuel
 router.put('/profile', authenticate, updateCurrentUserProfile); // Mettre à jour le profil de l'utilisateur actuel
+router.put("/shipping-address", authenticate, updateShippingAddress);
 router.delete('/:id', authenticate, authorizeAdmin, deleteUserById); // Supprimer un utilisateur par ID
 router.get('/:id', authenticate, authorizeAdmin, getUserById); // Obtenir un utilisateur par ID
 router.put('/:id', authenticate, authorizeAdmin, updateUserById); // Mettre à jour un utilisateur par ID

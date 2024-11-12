@@ -5,7 +5,7 @@ import { updateCart } from "../../../Utils/cartUtils";
 
 const initialState = localStorage.getItem("cart")
   ? JSON.parse(localStorage.getItem("cart"))
-  : { cartItems: [], shippingAddress: {}, paymentMethod: "PayPal" };
+  : { cartItems: [], shippingAddress: {} };
 
 const cartSlice = createSlice({
   name: "cart",
@@ -22,40 +22,28 @@ const cartSlice = createSlice({
       } else {
         state.cartItems = [...state.cartItems, item];
       }
-      // return updateCart(state, item);
       updateCart(state);
     },
 
     removeFromCart: (state, action) => {
       state.cartItems = state.cartItems.filter((x) => x._id !== action.payload);
-      // return updateCart(state);
       updateCart(state);
     },
 
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
-      // localStorage.setItem("cart", JSON.stringify(state));
-      updateCart(state);
-    },
-
-    savePaymentMethod: (state, action) => {
-      state.paymentMethod = action.payload;
-      // localStorage.setItem("cart", JSON.stringify(state));
       updateCart(state);
     },
 
     clearCartItems: (state) => {
       state.cartItems = [];
-      // localStorage.setItem("cart", JSON.stringify(state));
       updateCart(state);
     },
 
-    // resetCart: (state) => (state = initialState),
     resetCart: (state) => {
       state.cartItems = [];
       state.shippingAddress = {};
-      state.paymentMethod = "PayPal";
-      updateCart(state); // Cette mise à jour va vider le localStorage
+      updateCart(state); 
     },
   },
 });
@@ -63,7 +51,6 @@ const cartSlice = createSlice({
 export const {
   addToCart,
   removeFromCart,
-  savePaymentMethod,
   saveShippingAddress,
   clearCartItems,
   resetCart,
