@@ -1,41 +1,64 @@
+// frontend/src/pages/placeOrder.jsx
+
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useCreateCheckoutSessionMutation } from "../../redux/features/services/paymentService";
 import Message from "../../components/Message";
 import ProgressSteps from "../../components/ProgressSteps";
 import Loader from "../../components/Loader";
-import { useCreateOrderMutation } from "../../redux/features/orderApiSlice";
-import { clearCartItems } from "../../redux/features/cart/cartSlice";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
-  const [createOrder, { isLoading, error }] = useCreateOrderMutation();
+
+  // Utilisation de la mutation pour créer une session de paiement
+  const [createCheckoutSession, { isLoading, error }] =
+    useCreateCheckoutSessionMutation();
 
   useEffect(() => {
     if (!cart.shippingAddress.address) {
       navigate("/shipping");
     }
-  }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
+  }, [cart.shippingAddress.address, navigate]);
 
-  const dispatch = useDispatch();
+  // Récupère les informations de l'utilisateur depuis le local storage
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  // Vérifie si userInfo existe et obtient l'email
+  const customerEmail = userInfo?.user?.email || null;
+
+  const cartData = {
+    cartItems: cart.cartItems,
+    shippingAddress: cart.shippingAddress,
+    itemsPrice: cart.itemsPrice,
+    shippingPrice: cart.shippingPrice,
+    taxPrice: cart.taxPrice,
+    totalPrice: cart.totalPrice,
+    customerEmail: customerEmail, // Assigne l'email de l'utilisateur ici
+  };
+
+  // Fonction de gestion de commande avec createCheckoutSession
   const placeOrderHandler = async () => {
+    if (!cart.cartItems || cart.cartItems.length === 0) {
+      toast.error("Votre panier est vide !");
+      return;
+    }
     try {
-      const res = await createOrder({
-        orderItems: cart.cartItems,
-        shippingAddress: cart.shippingAddress,
-        paymentMethod: cart.paymentMethod,
-        itemsPrice: cart.itemsPrice,
-        shippingPrice: cart.shippingPrice,
-        taxPrice: cart.taxPrice,
-        totalPrice: cart.totalPrice,
-      }).unwrap();
-      dispatch(clearCartItems());
-      navigate(`/order/${res._id}`);
-    } catch (error) {
-      toast.error(error);
+      console.log("cartData:", cartData);
+
+      const response = await createCheckoutSession(cartData).unwrap();
+      console.log("Réponse du backend:", response);
+      // Vérifie si la session URL existe et redirige
+      if (response?.sessionUrl) {
+        window.location.href = response.sessionUrl;
+      } else {
+        throw new Error("URL de session manquante.");
+      }
+    } catch (err) {
+      console.error("Error creating checkout session:", err);
+      toast.error("Erreur lors de la création de la session de paiement.");
     }
   };
 
@@ -58,7 +81,6 @@ const PlaceOrder = () => {
                   <td className="place-order-table__header">Total</td>
                 </tr>
               </thead>
-
               <tbody>
                 {cart.cartItems.map((item, index) => (
                   <tr key={index}>
@@ -70,7 +92,6 @@ const PlaceOrder = () => {
                         loading="lazy"
                       />
                     </td>
-
                     <td className="place-order-table__product">
                       <Link to={`/product/${item.product}`}>{item.name}</Link>
                     </td>
@@ -98,7 +119,7 @@ const PlaceOrder = () => {
               </li>
               <li>
                 <span className="place-order-summary__label">
-                  Frais de livraion:
+                  Frais de livraison:
                 </span>
                 {cart.shippingPrice} €
               </li>
@@ -112,7 +133,9 @@ const PlaceOrder = () => {
               </li>
             </ul>
 
-            {error && <Message variant="danger">{error.data.message}</Message>}
+            {error && (
+              <Message variant="danger">{error?.data?.message}</Message>
+            )}
 
             <div className="place-order-summary__shipping">
               <h2 className="place-order-summary__section-title">Livraison</h2>
@@ -122,19 +145,12 @@ const PlaceOrder = () => {
                 {cart.shippingAddress.country}
               </p>
             </div>
-
-            <div className="place-order-summary__payment">
-              <h2 className="place-order-summary__section-title">
-                Moyen de paiement
-              </h2>
-              <strong>Par:</strong> {cart.paymentMethod}
-            </div>
           </div>
 
           <button
             type="button"
             className="place-order-summary__button"
-            disabled={cart.cartItems === 0}
+            disabled={cart.cartItems.length === 0}
             onClick={placeOrderHandler}
           >
             Procéder au paiement

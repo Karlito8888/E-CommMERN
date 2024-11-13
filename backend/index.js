@@ -1,9 +1,11 @@
 // backend/index.js
+
 import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import cors from "cors"; // Importer CORS
 
 // Utiles
 import connectDB from "./config/db.js";
@@ -14,6 +16,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 
+
 dotenv.config();
 const port = process.env.PORT || 5000;
 
@@ -21,11 +24,28 @@ connectDB();
 
 const app = express();
 
+// Configuration de CORS
+const corsOptions = {
+  origin: 'http://localhost:5173', // L'URL de ton frontend React (en développement)
+  methods: 'GET,POST,PUT,DELETE', // Les méthodes HTTP autorisées
+  allowedHeaders: 'Content-Type,Authorization', // En-têtes autorisés
+};
+
+app.use(cors(corsOptions)); // Appliquer CORS
+
 app.use(helmet());
-app.use(express.json());
+app.use(express.json()); // Pour le parsing JSON classique
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Route spécifique pour le Webhook Stripe (nécessite le contenu brut)
+app.post(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+  paymentRoutes
+);
+
+// Routes API
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
@@ -56,3 +76,4 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => console.log(`Server running on port: ${port}`));
 
+export default app; // Ajout de l'export default
