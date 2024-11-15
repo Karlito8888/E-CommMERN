@@ -1,43 +1,31 @@
 // backend/middlewares/authMiddleware.js
 
-import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
-import asyncHandler from "./asyncHandler.js";
+import jwt from 'jsonwebtoken';
+import { UserService } from '../services/userService.js';
+import asyncHandler from './asyncHandler.js';
+import { APIError } from './errorMiddleware.js';
+import { ERROR_MESSAGES } from '../utils/errorMessages.js';
 
-const authenticate = asyncHandler(async (req, res, next) => {
-  let token;
+export const authenticate = asyncHandler(async (req, res, next) => {
+  const token = req.cookies.jwt;
 
-  // Lire le JWT depuis le cookie 'jwt'
-  token = req.cookies.jwt;
+  if (!token) {
+    throw new APIError(ERROR_MESSAGES.AUTH.TOKEN_INVALID, 401);
+  }
 
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.userId).select("-password");
-
-      if (!user) {
-        res.status(401);
-        throw new Error("Not authorized, user not found.");
-      }
-
-      req.user = user; // Assigner l'utilisateur validé à req.user
-      next();
-    } catch (error) {
-      console.error(error);
-      res.status(401).json({ message: "Not authorized, token failed." });
-    }
-  } else {
-    res.status(401).json({ message: "Not authorized, no token." });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await UserService.findById(decoded.userId);
+    req.user = user;
+    next();
+  } catch (error) {
+    throw new APIError(ERROR_MESSAGES.AUTH.TOKEN_EXPIRED, 401);
   }
 });
 
-const authorizeAdmin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
-    next();
-  } else {
-    res.status(403).json({ message: "Not authorized as an admin." }); // Utiliser 403 pour l'accès interdit
+export const authorizeAdmin = (req, res, next) => {
+  if (!req.user?.isAdmin) {
+    throw new APIError(ERROR_MESSAGES.AUTH.UNAUTHORIZED, 403);
   }
+  next();
 };
-
-export { authenticate, authorizeAdmin };
-

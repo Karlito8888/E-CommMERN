@@ -1,18 +1,30 @@
 // backend/middlewares/asyncHandler.js
 
+import { APIError } from './errorMiddleware.js';
+import logger from '../utils/logger.js';
+
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
-    console.error(error); // Logger l'erreur pour le débogage
-    if (error.status) {
-      // Si l'erreur a un code de statut, utilise-le
-      return res
-        .status(error.status)
-        .json({ success: false, message: error.message });
-    }
-    // Par défaut, renvoyer une erreur 500
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    // Logger l'erreur avec le contexte de la requête
+    logger.error('Request error', {
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: process.env.NODE_ENV === 'production' ? '🥞' : error.stack,
+      },
+      request: {
+        method: req.method,
+        path: req.originalUrl,
+        body: req.body,
+        params: req.params,
+        query: req.query,
+        userId: req.user?._id
+      }
+    });
+
+    // Passer l'erreur au middleware d'erreur
+    next(error instanceof APIError ? error : new APIError(error.message, 500));
   });
 };
 
 export default asyncHandler;
-

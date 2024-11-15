@@ -4,21 +4,21 @@ import { toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import { setCredentials } from "../../redux/features/auth/authSlice";
 import {
-  useGetCurrentUserProfileQuery,
-  useUpdateCurrentUserProfileMutation,
+  useProfileQuery,
+  useUpdateProfileMutation,
 } from "../../redux/features/usersApiSlice";
 import InputField from "../../components/auth/InputField";
 import SubmitButton from "../../components/auth/SubmitButton";
 
 const Profile = () => {
   const { data: userProfile, isLoading: loadingProfile } =
-    useGetCurrentUserProfileQuery();
+    useProfileQuery();
   // console.log("userProfile:", userProfile);
   const [username, setUserName] = useState(userProfile?.user?.username || "");
   const [email, setEmail] = useState(userProfile?.user?.email || "");
   const [password, setPassword] = useState("");
   const [updateProfile, { isLoading: loadingUpdateProfile }] =
-    useUpdateCurrentUserProfileMutation();
+    useUpdateProfileMutation();
 
   const dispatch = useDispatch();
 

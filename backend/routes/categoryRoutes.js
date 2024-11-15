@@ -9,22 +9,57 @@ import {
   readCategory,
 } from "../controllers/categoryController.js";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
+import { cacheMiddleware, invalidateCache } from "../utils/cache.js";
+import { validateCategory } from "../validators/categoryValidator.js";
 
 const router = express.Router();
 
-// Création d'une catégorie - admin uniquement
-router.post("/", authenticate, authorizeAdmin, createCategory);
+// Middleware pour invalider le cache des catégories
+const invalidateCategoryCache = async (req, res, next) => {
+  try {
+    await invalidateCache(['categories', 'products']); // Invalider aussi le cache des produits car ils peuvent dépendre des catégories
+    if (req.params.id || req.params.categoryId) {
+      const categoryId = req.params.id || req.params.categoryId;
+      await invalidateCache([
+        `category-detail:${categoryId}`,
+        `category-products:${categoryId}`
+      ]);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 
-// Mise à jour d'une catégorie par ID - admin uniquement
-router.put("/:categoryId", authenticate, authorizeAdmin, updateCategory);
+// Routes publiques
+router.get("/", 
+  cacheMiddleware('categories', 1800), 
+  listCategory
+);
 
-// Suppression d'une catégorie par ID - admin uniquement
-router.delete("/:categoryId", authenticate, authorizeAdmin, removeCategory);
+router.get("/:id", 
+  cacheMiddleware('category-detail', 1800), 
+  readCategory
+);
 
-// Liste de toutes les catégories - accessible à tous
-router.get("/", listCategory);
+// Routes protégées (admin uniquement)
+router.use(authenticate, authorizeAdmin);
 
-// Lecture d'une catégorie spécifique par ID - accessible à tous
-router.get("/:id", readCategory);
+router.post("/", 
+  validateCategory,
+  invalidateCategoryCache,
+  createCategory
+);
+
+router.put("/:categoryId", 
+  validateCategory,
+  invalidateCategoryCache,
+  updateCategory
+);
+
+router.delete("/:categoryId", 
+  invalidateCategoryCache,
+  removeCategory
+);
 
 export default router;

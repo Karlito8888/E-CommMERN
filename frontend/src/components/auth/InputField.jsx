@@ -11,13 +11,13 @@ const InputField = ({
   ariaInvalid,
 }) => (
   <div className="form-group">
-    <label htmlFor={id} className="form-label">
+    <label htmlFor={id} className="label">
       {label}
     </label>
     <input
       type={type}
       id={id}
-      className="form-input"
+      className="input"
       placeholder={placeholder}
       value={value}
       onChange={onChange}
@@ -29,4 +29,3 @@ const InputField = ({
 );
 
 export default InputField;
-

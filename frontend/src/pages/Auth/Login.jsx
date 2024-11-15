@@ -1,97 +1,100 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import Loader from "../../components/Loader";
-import { checkExpiration, setCredentials } from "../../redux/features/auth/authSlice.js";
-import { toast } from "react-toastify";
-import { useLoginUserMutation } from "../../redux/features/usersApiSlice";
-import InputField from "../../components/auth/InputField.jsx";
-import SubmitButton from "../../components/auth/SubmitButton.jsx";
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLoginMutation } from '../../redux/features/usersApiSlice';
+import { setCredentials } from '../../redux/features/auth/authSlice';
+import { toast } from 'react-toastify';
+import InputField from '../../components/auth/InputField';
+import SubmitButton from '../../components/auth/SubmitButton';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [login, { isLoading }] = useLoginUserMutation();
+
+  const [login, { isLoading }] = useLoginMutation();
+
   const { userInfo } = useSelector((state) => state.auth);
+
   const { search } = useLocation();
-  // const sp = new URLSearchParams(search);
-  // const redirect = sp.get("redirect") || "/";
-  const redirect = new URLSearchParams(search).get("redirect") || "/";
+  const sp = new URLSearchParams(search);
+  const redirect = sp.get('redirect') || '/';
 
   useEffect(() => {
-    // Vérifie si la session de l'utilisateur est expirée
-    dispatch(checkExpiration());
+    if (userInfo) {
+      navigate(redirect);
+    }
+  }, [navigate, redirect, userInfo]);
 
-    if (userInfo) navigate(redirect);
-  }, [navigate, redirect, userInfo, dispatch]);
-
-  const submitHandler = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await login({ email, password }).unwrap();
-      // console.log(res);
       dispatch(setCredentials({ ...res }));
-      toast.success("Connexion réussie! 👌"); 
       navigate(redirect);
+      toast.success('Connexion réussie');
     } catch (err) {
       toast.error(err?.data?.message || err.error);
     }
   };
 
   return (
-    <>
-      <section className="signin-container">
-        <div className="signin-form">
-          <h1 className="title">Connectez-vous</h1>
-          <form onSubmit={submitHandler} className="form" noValidate>
+    <section className="login-section">
+      <div className="login-container">
+        <div className="login-content">
+          <h1>Connexion</h1>
+          
+          <form onSubmit={handleSubmit} className="login-form">
             <InputField
               id="email"
               label="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Votre adresse email"
-              ariaRequired="true"
-              ariaInvalid={isLoading ? "false" : "true"}
+              placeholder="Votre email"
+              ariaRequired={true}
+              ariaInvalid={false}
             />
+
             <InputField
               id="password"
-              label="Password"
+              label="Mot de passe"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Votre mot de passe"
-              ariaRequired="true"
+              ariaRequired={true}
+              ariaInvalid={false}
             />
-            <SubmitButton isLoading={isLoading} text="Ok!" />
-            {isLoading && <Loader />}
+
+            <SubmitButton 
+              isLoading={isLoading} 
+              text="Se connecter"
+            />
           </form>
 
-          <div className="register-link">
-            <p>
-              Pas de compte ?{" "}
-              <a
-                href={redirect ? `/register?redirect=${redirect}` : "/register"}
-                className="link"
-              >
-                Créer un compte...
-              </a>
-            </p>
+          <div className="login-links">
+            <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="register-link">
+              Pas encore de compte ? S'inscrire
+            </Link>
+            <Link to="/forgot-password" className="forgot-password-link">
+              Mot de passe oublié ?
+            </Link>
           </div>
         </div>
-        <img
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80"
-          alt="Sign In"
-          className="signin-image"
-          aria-hidden="true"
-          loading="lazy"
-        />
-      </section>
-    </>
+
+        <div className="login-image">
+          <img
+            src="/images/login-image.jpg"
+            alt="Connexion"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
   );
 };
 
 export default Login;
-

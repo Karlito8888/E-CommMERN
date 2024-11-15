@@ -22,6 +22,8 @@ dist-ssr
 /frontend/.env
 /backend/.env
 .env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -38,3 +40,39 @@ dist-ssr
 /backend/logs
 /backend/uploads
 /uploads
+
+# Cache and temporary files
+.cache
+*.cache
+.temp
+*.temp
+.tmp
+*.tmp
+
+# Redis dump file
+dump.rdb
+*.rdb
+
+# Coverage directory used by tools like istanbul
+coverage
+.nyc_output
+
+# Test reports
+/reports
+*.report.html
+/backend/coverage
+/frontend/coverage
+
+# Production configuration
+/backend/config/environments/production.js
+
+# Local development files
+*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# System Files
+.DS_Store
+Thumbs.db

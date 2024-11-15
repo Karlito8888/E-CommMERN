@@ -1,141 +1,128 @@
-// Classe de la carte produit
-.product-card {
-  max-width: 20rem;
-  position: relative;
-  background-color: #1a1a1a;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
+@use "../../base/variables" as *;
+@use "sass:color";
 
-  &.dark {
-    background-color: #2d2d2d;
-    border: 1px solid #555;
+.product-card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
 
   .product-card-image {
     position: relative;
-    display: block;
+    width: 100%;
+    height: 200px;
 
     .product-image {
-      cursor: pointer;
       width: 100%;
-      height: 170px;
-      object-fit: cover;
+      height: 100%;
+      object-fit: contain;
+      padding: 1rem;
     }
 
     .brand-tag {
       position: absolute;
-      bottom: 0.75rem;
-      right: 1rem;
-      background-color: #ff79da;
+      top: 10px;
+      right: 10px;
+      background: $primary-color;
       color: white;
-      font-size: 0.75rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
     }
   }
 
   .heart-icon {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    cursor: pointer;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+      color: #ff4b4b;
+    }
   }
 
   .product-details {
-    padding: 1.25rem;
-    
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    background: white;
+
     .product-name {
+      font-size: 0.9rem;
+      color: #333;
       margin-bottom: 0.5rem;
-      font-size: 1.25rem;
-      color: #cfcfcf;
+      font-weight: 500;
+      height: 2.4em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
 
     .product-price {
-      color: #ff79da;
+      font-size: 1.1rem;
       font-weight: 600;
-      font-size: 1.125rem;
+      color: $primary-color;
+      margin-bottom: 1rem;
     }
 
     .product-description {
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-      color: white;
+      display: none; 
     }
 
     .action-buttons {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
 
       .read-more-btn {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
+        flex: 1;
+        padding: 0.5rem;
+        background: $primary-color;
         color: white;
-        background-color: #ff79da;
-        border-radius: 0.375rem;
-        text-transform: uppercase;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        text-align: center;
         text-decoration: none;
-        transition: background-color 0.3s ease;
+        transition: background 0.2s ease;
 
         &:hover {
-          background-color: darken(#ff79da, 10%);
-        }
-
-        svg {
-          margin-left: 0.5rem;
-          width: 1rem;
-          height: 1rem;
+          background: color.adjust($primary-color, $lightness: -10%);
         }
       }
 
       .add-to-cart-btn {
-        padding: 0.5rem;
-        border-radius: 50%;
-        background-color: #1a1a1a;
+        background: none;
         border: none;
+        padding: 0.5rem;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-
-        &:hover {
-          background-color: #ff79da;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        svg {
+          width: 1.2rem;
+          height: 1.2rem;
+          color: $primary-color;
         }
 
-        svg {
-          width: 1.25rem;
-          height: 1.25rem;
-          color: #cfcfcf;
+        &:hover svg {
+          color: color.adjust($primary-color, $lightness: -15%);
         }
       }
-    }
-  }
-}
-
-// Classes de thème sombre
-.product-card.dark {
-  .product-name,
-  .product-price,
-  .product-description {
-    color: #cfcfcf;
-  }
-
-  .read-more-btn {
-    background-color: #ff79da;
-    &:hover {
-      background-color: darken(#ff79da, 10%);
-    }
-  }
-
-  .add-to-cart-btn {
-    background-color: #2d2d2d;
-    &:hover {
-      background-color: #ff79da;
-    }
-
-    svg {
-      color: #cfcfcf;
     }
   }
 }

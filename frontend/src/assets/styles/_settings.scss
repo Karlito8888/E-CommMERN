@@ -22,28 +22,11 @@ body {
   width: 100%;
   max-width: 1920px;
   margin-inline: auto;
-//   padding-inline: clamp(0.75rem, -0.0417rem + 3.1667vw, 3.125rem);
   font-size: 16px;
   font-family: "Nimbus Mono PS", "Courier New", monospace;
   letter-spacing: 1px;
-//   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
   overflow-x: clip;
-
-//   &::before {
-//     position: fixed;
-//     width: 400px;
-//     height: auto;
-//     aspect-ratio: 1/1;
-//     content: "";
-//     background-image: linear-gradient(to right, transparent, #70d7f7);
-//     z-index: -1;
-//     top: -100px;
-//     left: calc(50% - 100px);
-//     border-radius: 50% 50% 0 0;
-//     pointer-events: none;
-//     filter: blur(250px);
-//   }
 }
 
 // [data-theme="dark"] {

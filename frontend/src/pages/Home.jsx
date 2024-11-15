@@ -1,14 +1,17 @@
 import { Link, useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-import Header from "../components/Header";
+import Podium from "../components/Podium";
 import Product from "./Products/Product";
 import { useGetProductsQuery } from "../redux/features/productApiSlice";
 
 const Home = () => {
   const { keyword } = useParams();
   const { data, isLoading, isError } = useGetProductsQuery({ keyword });
-  const products = data?.products || []; // Accès aux produits
+
+  
+  // Accéder aux produits via data.data au lieu de data.products
+  const products = data?.data.products || [];
 
   if (isLoading) {
     return <Loader />;
@@ -17,25 +20,19 @@ const Home = () => {
   if (isError) {
     return (
       <Message variant="danger">
-        {isError?.data?.message || isError?.error || "An error occurred"}
+        {isError?.data?.message || isError?.error || "Une erreur est survenue"}
       </Message>
     );
   }
 
-  // Vérification du format des données
-  if (!Array.isArray(products)) {
-    console.error("Unexpected data format", products);
-    return <Message variant="danger">Unexpected data format</Message>;
-  }
-
   return (
     <>
-      {!keyword ? <Header data={data} /> : null}
+      {!keyword ? <Podium /> : null}
       <div className="home-container">
-        <h1 className="home-title">Special Products</h1>
+        <h1 className="home-title">Produits Spéciaux</h1>
 
         <Link to="/shop" className="shop-button">
-          Shop
+          Boutique
         </Link>
       </div>
       <div className="products-container">
@@ -46,7 +43,7 @@ const Home = () => {
             </div>
           ))
         ) : (
-          <Message variant="warning">No products found</Message>
+          <Message variant="warning">Aucun produit trouvé</Message>
         )}
       </div>
     </>

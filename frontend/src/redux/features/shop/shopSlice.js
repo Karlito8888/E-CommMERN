@@ -9,7 +9,8 @@ const initialState = {
     selectedBrands: [],
   },
   brandCheckboxes: {},
-  checked: [], // Ajout de l'état checked
+  checked: [],
+  radio: [], // Ajout de l'état radio
 };
 
 const shopSlice = createSlice({
@@ -32,7 +33,10 @@ const shopSlice = createSlice({
       state.filters.selectedBrands = action.payload;
     },
     setChecked: (state, action) => {
-      state.checked = action.payload; // Mise à jour de l'état checked
+      state.checked = action.payload;
+    },
+    setRadio: (state, action) => {
+      state.radio = action.payload;
     },
   },
 });
@@ -43,7 +47,8 @@ export const {
   setSelectedCategories,
   setPriceRange,
   setSelectedBrands,
-  setChecked, // Exporte le nouvel action creator
+  setChecked,
+  setRadio,
 } = shopSlice.actions;
 
 export default shopSlice.reducer;

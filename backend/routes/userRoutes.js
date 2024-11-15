@@ -1,45 +1,55 @@
 // backend/routes/userRoutes.js
 
 import express from 'express';
-import {
-  createUser,
-  loginUser,
-  logoutCurrentUser,
-  getAllUsers,
-  getCurrentUserProfile,
-  updateCurrentUserProfile,
-  deleteUserById,
-  getUserById,
-  updateUserById,
-  updateShippingAddress,
-} from '../controllers/userController.js';
-import {
-  changeUserPassword,
-  requestPasswordReset,
-  resetPassword,
-} from '../controllers/passwordController.js';
+import * as userController from '../controllers/userController.js';
+import * as passwordController from '../controllers/passwordController.js';
 import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js';
+import { validateRequest, mongoIdValidation } from '../middlewares/validationMiddleware.js';
+import { userValidationRules } from '../middlewares/userValidation.js';
 
 const router = express.Router();
 
-// Routes d'authentification
-router.post('/register', createUser); // Créer un nouvel utilisateur
-router.post('/login', loginUser); // Connexion d'un utilisateur
-router.post('/logout', authenticate, logoutCurrentUser); // Déconnexion d'un utilisateur
+// Middleware pour les routes authentifiées
+const authenticatedRoute = [authenticate];
+const adminRoute = [...authenticatedRoute, authorizeAdmin];
 
-// Routes de gestion des utilisateurs
-router.get('/', authenticate, authorizeAdmin, getAllUsers); // Obtenir tous les utilisateurs
-router.get('/profile', authenticate, getCurrentUserProfile); // Obtenir le profil de l'utilisateur actuel
-router.put('/profile', authenticate, updateCurrentUserProfile); // Mettre à jour le profil de l'utilisateur actuel
-router.put("/shipping-address", authenticate, updateShippingAddress);
-router.delete('/:id', authenticate, authorizeAdmin, deleteUserById); // Supprimer un utilisateur par ID
-router.get('/:id', authenticate, authorizeAdmin, getUserById); // Obtenir un utilisateur par ID
-router.put('/:id', authenticate, authorizeAdmin, updateUserById); // Mettre à jour un utilisateur par ID
+// Routes publiques
+router.post('/register', userValidationRules.register, validateRequest, userController.createUser);
+router.post('/login', userValidationRules.login, validateRequest, userController.loginUser);
+router.post('/password/reset-request', userValidationRules.email, validateRequest, passwordController.requestPasswordReset);
+router.post('/password/reset/:token', userValidationRules.resetPassword, validateRequest, passwordController.resetPassword);
 
-// Routes de gestion des mots de passe
-router.post('/password/change', authenticate, changeUserPassword); // Changer le mot de passe
-router.post('/password/reset/request', requestPasswordReset); // Demander une réinitialisation de mot de passe
-router.post('/password/reset', resetPassword); // Réinitialiser le mot de passe
+// Routes authentifiées
+router.use(authenticate);
+
+router.route('/profile')
+  .get(userController.getCurrentUserProfile)
+  .put(userValidationRules.updateProfile, validateRequest, userController.updateCurrentUserProfile);
+
+router.put('/profile/shipping', 
+  userValidationRules.shippingAddress, 
+  validateRequest, 
+  userController.updateShippingAddress
+);
+
+router.put('/password/change',
+  userValidationRules.changePassword,
+  validateRequest,
+  passwordController.changeUserPassword
+);
+
+router.post('/logout', userController.logoutCurrentUser);
+
+// Routes admin
+router.use(authorizeAdmin);
+
+router.route('/')
+  .get(userController.getAllUsers)
+  .post(userValidationRules.register, validateRequest, userController.createUser);
+
+router.route('/:id')
+  .get(mongoIdValidation, userController.getUserById)
+  .put(mongoIdValidation, userValidationRules.updateUser, validateRequest, userController.updateUserById)
+  .delete(mongoIdValidation, userController.deleteUserById);
 
 export default router;
-

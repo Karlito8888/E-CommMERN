@@ -1,9 +1,9 @@
 // frontend/src/redux/features/constants.js
 
 export const BASE_URL = "";
-export const USERS_URL = "/api/users";
-export const CATEGORY_URL = "/api/categories";
-export const PRODUCT_URL = "/api/products";
-export const UPLOAD_URL = "/api/upload";
-export const ORDERS_URL = "/api/orders";
+export const USERS_URL = "/api/v1/users";
+export const CATEGORY_URL = "/api/v1/categories";
+export const PRODUCT_URL = "/api/v1/products";
+export const UPLOAD_URL = "/api/v1/upload";
+export const ORDERS_URL = "/api/v1/orders";
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/Loader";
 import { setCredentials } from "../../redux/features/auth/authSlice.js";
 import { toast } from "react-toastify";
-import { useCreateUserMutation } from "../../redux/features/usersApiSlice";
+import { useRegisterMutation } from "../../redux/features/usersApiSlice";
 import InputField from "../../components/auth/InputField.jsx";
 import SubmitButton from "../../components/auth/SubmitButton.jsx";
 
@@ -15,7 +15,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [register, { isLoading }] = useCreateUserMutation();
+  const [register, { isLoading }] = useRegisterMutation();
   const { userInfo } = useSelector((state) => state.auth);
   const { search } = useLocation();
   // const sp = new URLSearchParams(search);

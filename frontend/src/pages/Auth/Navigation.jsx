@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/auth/authSlice.js";
-import { useLogoutUserMutation } from "../../redux/features/usersApiSlice";
+import { useLogoutMutation } from "../../redux/features/usersApiSlice";
 import NavItem from "../../components/auth/NavItems.jsx";
 import Cart from "./icons/cart.svg";
 import Heart from "./icons/heart.svg";
@@ -22,7 +22,7 @@ const Navigation = () => {
   const { cartItems } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [logoutApiCall] = useLogoutUserMutation();
+  const [logoutApiCall] = useLogoutMutation();
 
   const logoutHandler = async () => {
     try {

@@ -1,79 +1,90 @@
 // backend/index.js
+import express from 'express';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
 
-import path from "path";
-import express from "express";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import helmet from "helmet";
-import cors from "cors"; // Importer CORS
+import config from './config/index.js';
+import connectDB from './config/db.js';
+import { errorHandler } from './middlewares/errorMiddleware.js';
+import { formatResponse } from './middlewares/responseMiddleware.js';
+import logger from './utils/logger.js';
 
-// Utiles
-import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
-
-
-dotenv.config();
-const port = process.env.PORT || 5000;
-
-connectDB();
+// Routes
+import userRoutes from './routes/userRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import sessionRoutes from './routes/sessionRoutes.js';
 
 const app = express();
 
-// Configuration de CORS
-const corsOptions = {
-  origin: 'http://localhost:5173', // L'URL de ton frontend React (en développement)
-  methods: 'GET,POST,PUT,DELETE', // Les méthodes HTTP autorisées
-  allowedHeaders: 'Content-Type,Authorization', // En-têtes autorisés
-};
+// Security Middlewares
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
 
-app.use(cors(corsOptions)); // Appliquer CORS
+app.use(cors(config.cors));
+app.use(rateLimit(config.rateLimit));
 
-app.use(helmet());
-app.use(express.json()); // Pour le parsing JSON classique
+// Basic Middlewares
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(compression());
 
-// Route spécifique pour le Webhook Stripe (nécessite le contenu brut)
-app.post(
-  "/api/payments/webhook",
-  express.raw({ type: "application/json" }),
-  paymentRoutes
-);
+// Response Formatting
+app.use(formatResponse());
 
-// Routes API
-app.use("/api/users", userRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/upload", uploadRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payments", paymentRoutes);
+// API Routes
+app.use(`${config.server.apiPrefix}/users`, userRoutes);
+app.use(`${config.server.apiPrefix}/categories`, categoryRoutes);
+app.use(`${config.server.apiPrefix}/products`, productRoutes);
+app.use(`${config.server.apiPrefix}/upload`, uploadRoutes);
+app.use(`${config.server.apiPrefix}/orders`, orderRoutes);
+app.use(`${config.server.apiPrefix}/payments`, paymentRoutes);
+app.use(`${config.server.apiPrefix}/cart`, cartRoutes);
+app.use(`${config.server.apiPrefix}/sessions`, sessionRoutes);
 
-const __dirname = path.resolve();
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "/uploads"), {
-    setHeaders: (res) => {
-      res.set("Cache-Control", "public, max-age=86400"); // Cache pendant 1 jour
-    },
-  })
-);
+// Error Handling
+app.use(errorHandler);
 
-// Gestion des routes inconnues
-app.use((req, res, next) => {
-  res.status(404).json({ message: "Route not found" });
+// Initialize Server
+const startServer = async () => {
+  try {
+    // Connect to MongoDB
+    await connectDB();
+    
+    // Start Server
+    app.listen(config.server.port, () => {
+      logger.info(`Server running in ${config.server.env} mode on port ${config.server.port}`);
+    });
+  } catch (error) {
+    logger.error('Server initialization failed:', error);
+    process.exit(1);
+  }
+};
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  logger.error('Unhandled Promise Rejection:', err);
+  process.exit(1);
 });
 
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something went wrong!");
-});
+// Start the server
+startServer();
 
-app.listen(port, () => console.log(`Server running on port: ${port}`));
-
-export default app; // Ajout de l'export default
+export default app;

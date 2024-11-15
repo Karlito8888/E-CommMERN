@@ -6,16 +6,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   useDeleteProductMutation,
-  useGetProductByIdQuery,
+  useGetProductQuery,
   useUpdateProductMutation,
-  useUploadProductImageMutation,
+  useUploadImageMutation,
 } from "../../redux/features/productApiSlice";
 import { useFetchCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 
 const ProductUpdate = () => {
   const navigate = useNavigate();
   const { _id: productId } = useParams();
-  const { data: productData } = useGetProductByIdQuery(productId);
+  const { data: productData } = useGetProductQuery(productId);
   const { data: categories = [] } = useFetchCategoriesQuery();
 
   const [product, setProduct] = useState({
@@ -29,7 +29,7 @@ const ProductUpdate = () => {
     stock: 0,
   });
 
-  const [uploadProductImage] = useUploadProductImageMutation();
+  const [uploadProductImage] = useUploadImageMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
 

@@ -8,6 +8,7 @@ import { useCreateCheckoutSessionMutation } from "../../redux/features/services/
 import Message from "../../components/Message";
 import ProgressSteps from "../../components/ProgressSteps";
 import Loader from "../../components/Loader";
+import { getItem } from "../../Utils/localStorage";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const PlaceOrder = () => {
   }, [cart.shippingAddress.address, navigate]);
 
   // Récupère les informations de l'utilisateur depuis le local storage
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = getItem("userInfo");
 
   // Vérifie si userInfo existe et obtient l'email
   const customerEmail = userInfo?.user?.email || null;

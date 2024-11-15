@@ -1,39 +1,48 @@
-@import "./settings";
-@import "./components/auth/inputField";
-@import "./components/auth/navItems";
-@import "./components/auth/submitButton";
-@import "./components/categoryForm";
-@import "./components/header";
-@import "./components/loader";
-@import "./components/message";
-@import "./components/modal";
-@import "./components/progessSteps";
-@import "./pages/Admin/adminDashboard";
-@import "./pages/Admin/adminMenu";
-@import "./pages/Admin/categoryList";
-@import "./pages/Admin/orderList";
-@import "./pages/Admin/productCreate";
-@import "./pages/Admin/productList";
-@import "./pages/Admin/productUpdate";
-@import "./pages/Admin/userList";
-@import "./pages/Auth/login";
-@import "./pages/Auth/navigation";
-@import "./pages/Auth/register";
-@import "./pages/Orders/order";
-@import "./pages/Orders/placeOrder";
-@import "./pages/Orders/shipping";
-@import "./pages/Products/favorites";
-@import "./pages/Products/favoritesCount";
-@import "./pages/Products/heartIcon";
-@import "./pages/Products/product";
-@import "./pages/Products/productCard";
-@import "./pages/Products/productCarousel";
-@import "./pages/Products/productDetails";
-@import "./pages/Products/products";
-@import "./pages/Products/productTabs";
-@import "./pages/Products/smallProduct";
-@import "./pages/User/profile";
-@import "./pages/User/userOrder";
-@import "./pages/cart";
-@import "./pages/home";
-@import "./pages/shop";
+// Base styles
+@use "./base/variables";
+@use "./base/reset";
+
+// Components
+@use "./components/auth/inputField";
+@use "./components/auth/submitButton";
+@use "./components/categoryForm";
+@use "./components/header";
+@use "./components/loader";
+@use "./components/message";
+@use "./components/modal";
+@use "./components/progessSteps";
+
+// Pages - Admin
+@use "./pages/Admin/adminDashboard";
+@use "./pages/Admin/adminMenu";
+@use "./pages/Admin/categoryList";
+@use "./pages/Admin/orderList";
+@use "./pages/Admin/productCreate";
+@use "./pages/Admin/productList";
+@use "./pages/Admin/productUpdate";
+@use "./pages/Admin/userList";
+
+// Pages - Auth
+@use "./pages/Auth/login";
+@use "./pages/Auth/navigation";
+@use "./pages/Auth/register";
+
+// Pages - Orders
+@use "./pages/Orders/order";
+@use "./pages/Orders/placeOrder";
+@use "./pages/Orders/shipping";
+
+// Pages - Products
+@use "./pages/Products/favorites";
+@use "./pages/Products/favoritesCount";
+@use "./pages/Products/heartIcon";
+@use "./pages/Products/product";
+@use "./pages/Products/productCard";
+@use "./pages/Products/productCarousel";
+@use "./pages/Products/productDetails";
+@use "./pages/Products/products";
+@use "./pages/Products/productTabs";
+@use "./pages/Products/smallProduct";
+
+// Pages - User
+@use "./pages/User/profile";

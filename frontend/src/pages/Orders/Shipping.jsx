@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveShippingAddress } from "../../redux/features/cart/cartSlice";
 import ProgressSteps from "../../components/ProgressSteps";
-import { useGetCurrentUserProfileQuery } from "../../redux/features/usersApiSlice";
+import { useProfileQuery } from "../../redux/features/usersApiSlice";
 
 const Shipping = () => {
   const cart = useSelector((state) => state.cart);
@@ -23,7 +23,7 @@ const Shipping = () => {
     data: userProfile,
     isLoading,
     error,
-  } = useGetCurrentUserProfileQuery();
+  } = useProfileQuery();
 
   useEffect(() => {
     if (userProfile && userProfile.user && userProfile.user.shippingAddress) {

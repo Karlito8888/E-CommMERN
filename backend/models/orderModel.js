@@ -46,6 +46,7 @@ const orderSchema = mongoose.Schema(
     // Prices
     itemsPrice: { type: Number, required: true, default: 0.0 },
     taxPrice: { type: Number, required: true, default: 0.0 },
+    taxRate: { type: Number, required: true }, // Stocker le taux de TVA utilisé
     shippingPrice: { type: Number, required: true, default: 0.0 },
     totalPrice: { type: Number, required: true, default: 0.0 },
 
@@ -62,4 +63,3 @@ const orderSchema = mongoose.Schema(
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;
-

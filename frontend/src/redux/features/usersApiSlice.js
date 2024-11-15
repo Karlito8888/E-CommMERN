@@ -3,82 +3,89 @@
 import { apiSlice } from "./apiSlice";
 import { USERS_URL } from "../constants";
 
-// Définition des points de terminaison pour les utilisateurs (sans autorisation admin)
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Créer un nouvel utilisateur
-    createUser: builder.mutation({
-      query: (newUser) => ({
+    register: builder.mutation({
+      query: (data) => ({
         url: `${USERS_URL}/register`,
         method: "POST",
-        body: newUser,
+        body: data,
       }),
+      invalidatesTags: ["User"],
     }),
-    // Connexion d'un utilisateur
-    loginUser: builder.mutation({
-      query: (credentials) => ({
+
+    login: builder.mutation({
+      query: (data) => ({
         url: `${USERS_URL}/login`,
         method: "POST",
-        body: credentials,
+        body: data,
       }),
     }),
-    // Déconnexion d'un utilisateur
-    logoutUser: builder.mutation({
+
+    logout: builder.mutation({
       query: () => ({
         url: `${USERS_URL}/logout`,
         method: "POST",
       }),
     }),
-    // Obtenir le profil de l'utilisateur actuel
-    getCurrentUserProfile: builder.query({
+
+    profile: builder.query({
       query: () => `${USERS_URL}/profile`,
       providesTags: ["User"],
     }),
-    // Mettre à jour le profil de l'utilisateur actuel
-    updateCurrentUserProfile: builder.mutation({
-      query: (userData) => ({
+
+    updateProfile: builder.mutation({
+      query: (data) => ({
         url: `${USERS_URL}/profile`,
         method: "PUT",
-        body: userData,
+        body: data,
       }),
       invalidatesTags: ["User"],
     }),
-    // Changer le mot de passe
-    changeUserPassword: builder.mutation({
-      query: (passwordData) => ({
+
+    updateShipping: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/profile/shipping`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    changePassword: builder.mutation({
+      query: (data) => ({
         url: `${USERS_URL}/password/change`,
-        method: "POST",
-        body: passwordData,
+        method: "PUT",
+        body: data,
       }),
     }),
-    // Demander une réinitialisation de mot de passe
+
     requestPasswordReset: builder.mutation({
       query: (email) => ({
-        url: `${USERS_URL}/password/reset/request`,
+        url: `${USERS_URL}/password/reset-request`,
         method: "POST",
         body: { email },
       }),
     }),
-    // Réinitialiser le mot de passe
+
     resetPassword: builder.mutation({
-      query: (resetData) => ({
-        url: `${USERS_URL}/password/reset`,
+      query: ({ token, password }) => ({
+        url: `${USERS_URL}/password/reset/${token}`,
         method: "POST",
-        body: resetData,
+        body: { password, confirmPassword: password },
       }),
     }),
   }),
 });
 
-// Export des hooks générés par les points de terminaison
 export const {
-  useCreateUserMutation,
-  useLoginUserMutation,
-  useLogoutUserMutation,
-  useGetCurrentUserProfileQuery,
-  useUpdateCurrentUserProfileMutation,
-  useChangeUserPasswordMutation,
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useProfileQuery,
+  useUpdateProfileMutation,
+  useUpdateShippingMutation,
+  useChangePasswordMutation,
   useRequestPasswordResetMutation,
   useResetPasswordMutation,
 } = usersApiSlice;
-

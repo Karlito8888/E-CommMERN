@@ -7,46 +7,33 @@ import {
   createOrder,
   getAllOrders,
   getUserOrders,
-  countTotalOrders,
-  calculateTotalSales,
-  calculateTotalSalesByDate,
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
+  getOrderStats
 } from "../controllers/orderController.js";
 
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
-// Routes pour la création et la récupération de toutes les commandes (admin uniquement)
+// Routes pour la création et la récupération des commandes
 router
   .route("/")
-  .post(authenticate, createOrder) // Créer une nouvelle commande
-  .get(authenticate, authorizeAdmin, getAllOrders); // Récupérer toutes les commandes (admin)
+  .post(authenticate, createOrder)
+  .get(authenticate, authorizeAdmin, getAllOrders);
 
-// Route pour récupérer les commandes d'un utilisateur spécifique
+// Route pour récupérer les commandes d'un utilisateur
 router.route("/mine").get(authenticate, getUserOrders);
 
-// Routes pour les statistiques des commandes (admin uniquement)
-router
-  .route("/orders/count")
-  .get(authenticate, authorizeAdmin, countTotalOrders); // Nombre total de commandes
-router
-  .route("/sales/total")
-  .get(authenticate, authorizeAdmin, calculateTotalSales); // Total des ventes
-router
-  .route("/sales/by-date")
-  .get(authenticate, authorizeAdmin, calculateTotalSalesByDate); // Total des ventes par date
+// Route pour les statistiques des commandes (admin uniquement)
+router.route("/stats").get(authenticate, authorizeAdmin, getOrderStats);
 
-// Route pour récupérer une commande spécifique par ID
-router.route("/:id").get(authenticate, findOrderById);
-
-// Route pour marquer une commande comme payée
-router.route("/:id/pay").put(authenticate, markOrderAsPaid);
-
-// Route pour marquer une commande comme livrée (admin uniquement)
+// Routes pour une commande spécifique
 router
-  .route("/:id/deliver")
+  .route("/:id")
+  .get(authenticate, findOrderById)
   .put(authenticate, authorizeAdmin, markOrderAsDelivered);
 
-export default router;
+// Route pour le paiement
+router.route("/:id/pay").put(authenticate, markOrderAsPaid);
 
+export default router;
