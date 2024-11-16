@@ -44,6 +44,58 @@ export const ERROR_MESSAGES = {
     }
   },
 
+  CATEGORY: {
+    ...createErrorMessages('Catégorie'),
+    NAME: {
+      REQUIRED: 'Le nom de la catégorie est requis',
+      TOO_SHORT: 'Le nom de la catégorie doit contenir au moins 2 caractères',
+      TOO_LONG: 'Le nom de la catégorie ne doit pas dépasser 32 caractères',
+      INVALID_FORMAT: 'Le nom de la catégorie ne peut contenir que des lettres, chiffres, espaces et tirets'
+    },
+    DESCRIPTION: {
+      TOO_LONG: 'La description ne doit pas dépasser 200 caractères'
+    },
+    ALREADY_EXISTS: 'Une catégorie avec ce nom existe déjà',
+    HAS_PRODUCTS: 'Impossible de supprimer cette catégorie car elle contient des produits',
+    NOT_FOUND: 'Catégorie non trouvée',
+    DELETED_SUCCESS: 'Catégorie supprimée avec succès'
+  },
+
+  PRODUCT: {
+    ...createErrorMessages('Produit'),
+    NAME: {
+      REQUIRED: 'Le nom du produit est requis',
+      TOO_SHORT: 'Le nom du produit doit contenir au moins 2 caractères',
+      TOO_LONG: 'Le nom du produit ne doit pas dépasser 100 caractères'
+    },
+    PRICE: {
+      REQUIRED: 'Le prix est requis',
+      INVALID: 'Le prix doit être un nombre positif',
+      MIN_PRICE: 'Le prix minimum doit être un nombre valide',
+      MAX_PRICE: 'Le prix maximum doit être un nombre valide',
+      RANGE_ERROR: 'Le prix minimum ne peut pas être supérieur au prix maximum'
+    },
+    DESCRIPTION: {
+      REQUIRED: 'La description est requise',
+      TOO_SHORT: 'La description doit contenir au moins 10 caractères',
+      TOO_LONG: 'La description ne doit pas dépasser 1000 caractères'
+    },
+    CATEGORY: {
+      REQUIRED: 'La catégorie est requise',
+      INVALID: 'Catégorie invalide'
+    },
+    STOCK: {
+      INVALID: 'Le stock ne peut pas être négatif',
+      INSUFFICIENT: 'Stock insuffisant pour cette opération'
+    }
+  },
+
+  PAGINATION: {
+    PAGE_NUMBER: 'Le numéro de page doit être un nombre positif',
+    LIMIT_NUMBER: 'La limite doit être un nombre positif',
+    MAX_LIMIT: 'La limite ne peut pas dépasser 100 éléments par page'
+  },
+
   AUTH: {
     ...createErrorMessages('Authentification'),
     TOKEN_EXPIRED: 'Session expirée, veuillez vous reconnecter',

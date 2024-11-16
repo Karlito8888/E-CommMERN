@@ -20,36 +20,34 @@ router.post('/password/reset-request', userValidationRules.email, validateReques
 router.post('/password/reset/:token', userValidationRules.resetPassword, validateRequest, passwordController.resetPassword);
 
 // Routes authentifiées
-router.use(authenticate);
-
 router.route('/profile')
-  .get(userController.getCurrentUserProfile)
-  .put(userValidationRules.updateProfile, validateRequest, userController.updateCurrentUserProfile);
+  .get(authenticatedRoute, userController.getCurrentUserProfile)
+  .put(authenticatedRoute, userValidationRules.updateProfile, validateRequest, userController.updateCurrentUserProfile);
 
 router.put('/profile/shipping', 
+  authenticatedRoute,
   userValidationRules.shippingAddress, 
   validateRequest, 
   userController.updateShippingAddress
 );
 
 router.put('/password/change',
+  authenticatedRoute,
   userValidationRules.changePassword,
   validateRequest,
   passwordController.changeUserPassword
 );
 
-router.post('/logout', userController.logoutCurrentUser);
+router.post('/logout', authenticatedRoute, userController.logoutCurrentUser);
 
 // Routes admin
-router.use(authorizeAdmin);
-
 router.route('/')
-  .get(userController.getAllUsers)
-  .post(userValidationRules.register, validateRequest, userController.createUser);
+  .get(adminRoute, userController.getAllUsers)
+  .post(adminRoute, userValidationRules.register, validateRequest, userController.createUser);
 
 router.route('/:id')
-  .get(mongoIdValidation, userController.getUserById)
-  .put(mongoIdValidation, userValidationRules.updateUser, validateRequest, userController.updateUserById)
-  .delete(mongoIdValidation, userController.deleteUserById);
+  .get(adminRoute, mongoIdValidation, userController.getUserById)
+  .put(adminRoute, mongoIdValidation, userValidationRules.updateUser, validateRequest, userController.updateUserById)
+  .delete(adminRoute, mongoIdValidation, userController.deleteUserById);
 
 export default router;

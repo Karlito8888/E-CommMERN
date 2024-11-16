@@ -37,8 +37,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email }).select('+password');
   
   if (!user || !(await user.matchPassword(password))) {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    throw new APIError(ERROR_MESSAGES.USER.INVALID_CREDENTIALS, 401);
   }
   
   const token = user.getSignedJwtToken();
@@ -79,15 +78,13 @@ export const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   
   if (!user) {
-    res.status(404);
-    throw new Error('Utilisateur non trouvé');
+    throw new APIError(ERROR_MESSAGES.USER.NOT_FOUND('Utilisateur'), 404);
   }
 
   // Vérifier le mot de passe actuel
   const isPasswordValid = await user.matchPassword(req.body.currentPassword);
   if (!isPasswordValid) {
-    res.status(401);
-    throw new Error('Mot de passe incorrect');
+    throw new APIError(ERROR_MESSAGES.USER.PASSWORD.INVALID, 401);
   }
 
   // Mise à jour des champs

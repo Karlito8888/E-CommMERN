@@ -8,80 +8,109 @@ class ValidationService {
     const errors = [];
 
     // Validation du nom
-    if (!data.name || data.name.trim().length < 2) {
-      errors.push('Le nom du produit doit contenir au moins 2 caractères');
+    if (!data.name) {
+      errors.push(ERROR_MESSAGES.PRODUCT.NAME.REQUIRED);
+    } else if (data.name.trim().length < 2) {
+      errors.push(ERROR_MESSAGES.PRODUCT.NAME.TOO_SHORT);
+    } else if (data.name.trim().length > 100) {
+      errors.push(ERROR_MESSAGES.PRODUCT.NAME.TOO_LONG);
     }
 
     // Validation du prix
-    if (data.price === undefined || data.price < 0) {
-      errors.push('Le prix doit être un nombre positif');
+    if (data.price === undefined) {
+      errors.push(ERROR_MESSAGES.PRODUCT.PRICE.REQUIRED);
+    } else if (data.price < 0 || isNaN(data.price)) {
+      errors.push(ERROR_MESSAGES.PRODUCT.PRICE.INVALID);
     }
 
     // Validation de la description
-    if (!data.description || data.description.trim().length < 10) {
-      errors.push('La description doit contenir au moins 10 caractères');
+    if (!data.description) {
+      errors.push(ERROR_MESSAGES.PRODUCT.DESCRIPTION.REQUIRED);
+    } else {
+      const descLength = data.description.trim().length;
+      if (descLength < 10) {
+        errors.push(ERROR_MESSAGES.PRODUCT.DESCRIPTION.TOO_SHORT);
+      } else if (descLength > 1000) {
+        errors.push(ERROR_MESSAGES.PRODUCT.DESCRIPTION.TOO_LONG);
+      }
     }
 
     // Validation de la catégorie
     if (!data.category) {
-      errors.push('La catégorie est requise');
+      errors.push(ERROR_MESSAGES.PRODUCT.CATEGORY.REQUIRED);
     }
 
     // Validation du stock et de la quantité
-    if (data.stock !== undefined && data.stock < 0) {
-      errors.push('Le stock ne peut pas être négatif');
+    if (data.stock !== undefined && (data.stock < 0 || isNaN(data.stock))) {
+      errors.push(ERROR_MESSAGES.PRODUCT.STOCK.INVALID);
     }
 
     if (data.quantity !== undefined) {
       const futureStock = (data.stock || 0) + data.quantity;
       if (futureStock < 0) {
-        errors.push('La quantité à retirer ne peut pas rendre le stock négatif');
+        errors.push(ERROR_MESSAGES.PRODUCT.STOCK.INSUFFICIENT);
       }
     }
 
     if (errors.length > 0) {
-      throw new APIError(errors.join(', '), 400);
+      throw new APIError(ERROR_MESSAGES.VALIDATION.INVALID_DATA, 400, errors);
     }
   }
 
   static validatePagination(page, limit) {
     const errors = [];
+    const maxLimit = 100;
 
+    // Validation de la page
     if (page && (isNaN(page) || page < 1)) {
-      errors.push('Le numéro de page doit être un nombre positif');
+      errors.push(ERROR_MESSAGES.PAGINATION.PAGE_NUMBER);
     }
 
-    if (limit && (isNaN(limit) || limit < 1)) {
-      errors.push('La limite doit être un nombre positif');
+    // Validation de la limite
+    if (limit) {
+      if (isNaN(limit) || limit < 1) {
+        errors.push(ERROR_MESSAGES.PAGINATION.LIMIT_NUMBER);
+      } else if (limit > maxLimit) {
+        errors.push(ERROR_MESSAGES.PAGINATION.MAX_LIMIT);
+      }
     }
 
     if (errors.length > 0) {
-      throw new APIError(errors.join(', '), 400);
+      throw new APIError(ERROR_MESSAGES.VALIDATION.INVALID_DATA, 400, errors);
     }
 
     return {
       page: parseInt(page) || 1,
-      limit: parseInt(limit) || 10
+      limit: Math.min(parseInt(limit) || 10, maxLimit)
     };
   }
 
   static validateSearchParams(params) {
     const errors = [];
 
-    if (params.minPrice && isNaN(params.minPrice)) {
-      errors.push('Le prix minimum doit être un nombre');
+    // Validation des prix
+    if (params.minPrice !== undefined) {
+      if (isNaN(params.minPrice)) {
+        errors.push(ERROR_MESSAGES.PRODUCT.PRICE.MIN_PRICE);
+      }
     }
 
-    if (params.maxPrice && isNaN(params.maxPrice)) {
-      errors.push('Le prix maximum doit être un nombre');
+    if (params.maxPrice !== undefined) {
+      if (isNaN(params.maxPrice)) {
+        errors.push(ERROR_MESSAGES.PRODUCT.PRICE.MAX_PRICE);
+      }
     }
 
-    if (params.minPrice && params.maxPrice && Number(params.minPrice) > Number(params.maxPrice)) {
-      errors.push('Le prix minimum ne peut pas être supérieur au prix maximum');
+    if (params.minPrice && params.maxPrice) {
+      const min = Number(params.minPrice);
+      const max = Number(params.maxPrice);
+      if (min > max) {
+        errors.push(ERROR_MESSAGES.PRODUCT.PRICE.RANGE_ERROR);
+      }
     }
 
     if (errors.length > 0) {
-      throw new APIError(errors.join(', '), 400);
+      throw new APIError(ERROR_MESSAGES.VALIDATION.INVALID_DATA, 400, errors);
     }
   }
 }
