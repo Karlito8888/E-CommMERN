@@ -1,128 +1,193 @@
 // backend/controllers/productController.js
 
-import asyncHandler from '../middlewares/asyncHandler.js';
-import { ProductService } from '../services/productService.js';
-import { ValidationService } from '../services/validationService.js';
-import logger from '../utils/logger.js';
-import { APIError } from '../middlewares/errorMiddleware.js';
-import { ERROR_MESSAGES } from '../utils/errorMessages.js';
+import Product from '../models/productModel.js';
+import { asyncHandler } from '../core/index.js';
 
-const logProductAction = (action, productId, userId = null) => {
-  const logData = { productId, action };
-  if (userId) logData.userId = userId;
-  logger.info(`Product ${action}`, logData);
-};
+const PRODUCT_FIELDS = 'name price description image thumbnail brand category stock rating numReviews';
+const CACHE_TTL = 300; // 5 minutes
 
-// Ajouter un produit
-const addProduct = asyncHandler(async (req, res) => {
-  const product = await ProductService.create(req.body, req.file);
-  logProductAction('created', product._id, req.user?._id);
-  res.status(201).json({ success: true, data: product });
+const formatProduct = product => ({
+  _id: product._id,
+  name: product.name,
+  price: product.price,
+  description: product.description,
+  image: product.image,
+  thumbnail: product.thumbnail,
+  brand: product.brand,
+  category: product.category,
+  stock: product.stock,
+  rating: product.rating,
+  numReviews: product.numReviews
 });
 
-// Mettre à jour un produit
-const updateProductDetails = asyncHandler(async (req, res) => {
-  const product = await ProductService.update(req.params.id, req.body, req.file);
-  if (!product) {
-    throw new APIError(ERROR_MESSAGES.PRODUCT.NOT_FOUND('Produit'), 404);
-  }
-  logProductAction('updated', product._id, req.user?._id);
-  res.status(200).json({ success: true, data: product });
-});
+const getProducts = asyncHandler(async (req, res) => {
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.min(50, parseInt(req.query.limit) || 12);
+  const sort = { [req.query.sort || 'createdAt']: req.query.order === 'asc' ? 1 : -1 };
 
-// Supprimer un produit
-const removeProduct = asyncHandler(async (req, res) => {
-  const product = await ProductService.delete(req.params.id);
-  if (!product) {
-    throw new APIError(ERROR_MESSAGES.PRODUCT.NOT_FOUND('Produit'), 404);
-  }
-  logProductAction('deleted', req.params.id, req.user?._id);
-  res.status(200).json({ 
-    success: true, 
-    message: ERROR_MESSAGES.PRODUCT.DELETED_SUCCESS
+  const query = {};
+  if (req.query.category) query.category = req.query.category;
+  if (req.query.minPrice) query.price = { $gte: parseFloat(req.query.minPrice) };
+  if (req.query.maxPrice) query.price = { ...query.price, $lte: parseFloat(req.query.maxPrice) };
+  if (req.query.brand) query.brand = req.query.brand;
+  if (req.query.inStock) query.stock = { $gt: 0 };
+
+  const [products, total] = await Promise.all([
+    Product.find(query)
+      .select(PRODUCT_FIELDS)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean()
+      .cache(CACHE_TTL),
+    Product.countDocuments(query).cache(CACHE_TTL)
+  ]);
+
+  res.json({
+    products: products.map(formatProduct),
+    page,
+    pages: Math.ceil(total / limit),
+    total
   });
 });
 
-// Récupérer les produits avec filtres
-const fetchProducts = asyncHandler(async (req, res) => {
-  try {
-    // Valider les paramètres de recherche
-    ValidationService.validateSearchParams(req.query);
-    const { page, limit } = ValidationService.validatePagination(req.query.page, req.query.limit);
-    
-    const result = await ProductService.search({ ...req.query, page, limit });
-    logger.debug('Products fetched', { 
-      filters: req.query,
-      count: result.data.length,
-      page,
-      limit
-    });
-    
-    res.status(200).json({
-      success: true,
-      data: result
-    });
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      throw new APIError(ERROR_MESSAGES.VALIDATION.INVALID_DATA, 400, error.details);
-    }
-    throw error;
+const searchProducts = asyncHandler(async (req, res) => {
+  const { q } = req.query;
+  if (!q?.trim()) {
+    return res.status(400).json({ message: 'Terme de recherche requis' });
   }
+
+  const products = await Product.find(
+    { $text: { $search: q } },
+    { score: { $meta: 'textScore' } }
+  )
+    .select(PRODUCT_FIELDS)
+    .sort({ score: { $meta: 'textScore' } })
+    .limit(20)
+    .lean()
+    .cache(CACHE_TTL);
+
+  res.json(products.map(formatProduct));
 });
 
-// Récupérer un produit par ID
-const fetchProductById = asyncHandler(async (req, res) => {
-  const product = await ProductService.findById(req.params.id);
+const getProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id)
+    .select(PRODUCT_FIELDS)
+    .populate('category', 'name')
+    .lean()
+    .cache(CACHE_TTL);
+
   if (!product) {
-    throw new APIError(ERROR_MESSAGES.PRODUCT.NOT_FOUND('Produit'), 404);
+    return res.status(404).json({ message: 'Produit introuvable' });
   }
-  logger.debug('Product fetched by ID', { productId: req.params.id });
-  res.status(200).json({
-    success: true,
-    data: product
-  });
+
+  res.json(formatProduct(product));
 });
 
-// Mettre à jour le stock d'un produit
-const updateProductStock = asyncHandler(async (req, res) => {
-  const product = await ProductService.updateStock(req.params.id, req.body.quantity);
-  if (!product) {
-    throw new APIError(ERROR_MESSAGES.PRODUCT.NOT_FOUND('Produit'), 404);
-  }
-  logProductAction('stock updated', product._id, req.user?._id);
-  res.status(200).json({
-    success: true,
-    data: product
-  });
+const getProductsByCategory = asyncHandler(async (req, res) => {
+  const products = await Product.find({ 
+    category: req.params.categoryId,
+    stock: { $gt: 0 }
+  })
+    .select(PRODUCT_FIELDS)
+    .sort('-rating')
+    .lean()
+    .cache(CACHE_TTL);
+
+  res.json(products.map(formatProduct));
 });
 
-// Récupérer les produits les mieux notés
 const getTopProducts = asyncHandler(async (req, res) => {
-  const products = await ProductService.getTopRatedProducts();
-  logger.debug('Top rated products fetched', { count: products.length });
-  res.status(200).json({
-    success: true,
-    data: products
-  });
+  const products = await Product.find({ 
+    rating: { $gte: 4 },
+    stock: { $gt: 0 }
+  })
+    .select(PRODUCT_FIELDS)
+    .sort('-rating -numReviews')
+    .limit(4)
+    .lean()
+    .cache(CACHE_TTL);
+
+  res.json(products.map(formatProduct));
 });
 
-// Récupérer toutes les marques uniques
-const getAllBrands = asyncHandler(async (req, res) => {
-  const brands = await ProductService.getAllBrands();
-  logger.debug('All brands fetched', { count: brands.length });
-  res.status(200).json({
-    success: true,
-    data: brands
+const createProduct = asyncHandler(async (req, res) => {
+  const { name, price, description, brand, category, stock } = req.body;
+
+  if (!name?.trim() || !price || !category) {
+    return res.status(400).json({ 
+      message: 'Nom, prix et catégorie requis' 
+    });
+  }
+
+  if (!req.processedImage) {
+    return res.status(400).json({ 
+      message: 'Image requise' 
+    });
+  }
+
+  const product = await Product.create({
+    name,
+    price,
+    description,
+    image: req.processedImage.main,
+    thumbnail: req.processedImage.thumbnail,
+    brand,
+    category,
+    stock: stock || 0
+  });
+
+  res.status(201).json(formatProduct(product));
+});
+
+const updateProduct = asyncHandler(async (req, res) => {
+  const updates = {};
+  const fields = ['name', 'price', 'description', 'brand', 'category', 'stock'];
+  
+  fields.forEach(field => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
+    }
+  });
+
+  if (req.processedImage) {
+    updates.image = req.processedImage.main;
+    updates.thumbnail = req.processedImage.thumbnail;
+  }
+
+  const product = await Product.findByIdAndUpdate(
+    req.params.id,
+    updates,
+    { new: true, runValidators: true }
+  ).lean();
+
+  if (!product) {
+    return res.status(404).json({ message: 'Produit introuvable' });
+  }
+
+  res.json(formatProduct(product));
+});
+
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findByIdAndDelete(req.params.id).lean();
+
+  if (!product) {
+    return res.status(404).json({ message: 'Produit introuvable' });
+  }
+
+  res.json({ 
+    message: 'Produit supprimé',
+    _id: product._id 
   });
 });
 
 export {
-  addProduct,
-  updateProductDetails,
-  removeProduct,
-  fetchProducts,
-  fetchProductById,
-  updateProductStock,
+  getProducts,
+  searchProducts,
+  getProduct,
+  getProductsByCategory,
   getTopProducts,
-  getAllBrands
+  createProduct,
+  updateProduct,
+  deleteProduct
 };

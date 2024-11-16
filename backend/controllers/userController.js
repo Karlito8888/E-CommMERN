@@ -1,154 +1,368 @@
 // backend/controllers/userController.js
-import User from '../models/userModel.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import logger from '../utils/logger.js';
-import { APIError } from '../middlewares/errorMiddleware.js';
-import { formatUserResponse } from '../middlewares/responseMiddleware.js';
-import { ERROR_MESSAGES } from '../utils/errorMessages.js';
 
-const logUserAction = (action, userId, email = null, adminId = null) => {
-  const logData = { userId, action };
-  if (email) logData.email = email;
-  if (adminId) logData.adminId = adminId;
-  logger.info(`User ${action}`, logData);
+import User from "../models/userModel.js";
+import { 
+  asyncHandler, 
+  validateFields,
+  generateToken,
+  validatePassword,
+  sendEmail,
+  hashPassword,
+  cache,
+  createTransporter
+} from "../core/index.js";
+import crypto from 'crypto';
+
+// Constants
+const CACHE_TTL = 300; // 5 minutes
+const PASSWORD_RESET_EXPIRY = 10 * 60 * 1000; // 10 minutes
+
+// Format de réponse standard pour les utilisateurs
+const formatUserResponse = (user) => ({
+  _id: user._id,
+  username: user.username,
+  email: user.email,
+  isAdmin: user.isAdmin,
+  shippingAddress: user.shippingAddress || null,
+  createdAt: user.createdAt
+});
+
+// Vérifier l'existence d'un utilisateur
+const checkUserExists = async (email, username, excludeUserId = null) => {
+  const query = {
+    $and: [
+      excludeUserId ? { _id: { $ne: excludeUserId } } : {},
+      {
+        $or: [
+          email ? { email: { $regex: new RegExp(`^${email}$`, 'i') } } : { _id: null },
+          username ? { username: { $regex: new RegExp(`^${username}$`, 'i') } } : { _id: null }
+        ]
+      }
+    ]
+  };
+
+  const existingUser = await User.findOne(query).lean();
+  if (!existingUser) return null;
+
+  return existingUser.email === email 
+    ? "Cet email est déjà utilisé" 
+    : "Ce nom d'utilisateur est déjà utilisé";
 };
 
-// @desc    Créer un nouvel utilisateur
-// @route   POST /api/users/register
-// @access  Public
-export const createUser = asyncHandler(async (req, res) => {
-  const user = await User.create(req.body);
-  const token = user.getSignedJwtToken();
-  
-  res.cookie('token', token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+// Créer un nouvel utilisateur
+const createUser = asyncHandler(async (req, res) => {
+  const { isValid, message } = validateFields(req.body, ['username', 'email', 'password']);
+  if (!isValid) return res.status(400).json({ message });
+
+  const { username, email, password } = req.body;
+
+  const existsMessage = await checkUserExists(email, username);
+  if (existsMessage) return res.status(400).json({ message: existsMessage });
+
+  const passwordValidation = validatePassword(password);
+  if (!passwordValidation.isValid) {
+    return res.status(400).json({ message: passwordValidation.message });
+  }
+
+  const newUser = await User.create({
+    username,
+    email: email.toLowerCase(),
+    password: await hashPassword(password)
   });
-  logUserAction('registered', user._id, req.body.email);
-  
-  res.status(201).json(formatUserResponse(user));
+
+  generateToken(res, newUser._id);
+  res.status(201).json(formatUserResponse(newUser));
 });
 
-// @desc    Connecter un utilisateur
-// @route   POST /api/users/login
-// @access  Public
-export const loginUser = asyncHandler(async (req, res) => {
+// Connexion utilisateur
+const loginUser = asyncHandler(async (req, res) => {
+  const { isValid, message } = validateFields(req.body, ['email', 'password']);
+  if (!isValid) return res.status(400).json({ message });
+
   const { email, password } = req.body;
-  const user = await User.findOne({ email }).select('+password');
-  
+
+  const user = await User.findOne({ 
+    email: { $regex: new RegExp(`^${email}$`, 'i') } 
+  }).select('+password');
+
   if (!user || !(await user.matchPassword(password))) {
-    throw new APIError(ERROR_MESSAGES.USER.INVALID_CREDENTIALS, 401);
+    return res.status(401).json({ message: "Email ou mot de passe invalide" });
   }
-  
-  const token = user.getSignedJwtToken();
-  res.cookie('token', token, {
+
+  generateToken(res, user._id);
+  res.json(formatUserResponse(user));
+});
+
+// Déconnexion utilisateur
+const logoutUser = asyncHandler(async (req, res) => {
+  res.cookie('jwt', '', {
     httpOnly: true,
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    expires: new Date(0),
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
   });
-  logUserAction('logged in', user._id, email);
-  
-  res.json(formatUserResponse(user));
+  res.json({ message: "Déconnexion réussie" });
 });
 
-// @desc    Déconnecter l'utilisateur
-// @route   POST /api/users/logout
-// @access  Private
-export const logoutCurrentUser = asyncHandler(async (req, res) => {
-  res.cookie('token', 'none', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
-  });
-  logUserAction('logged out', req.user._id);
+// Obtenir le profil utilisateur
+const getUserProfile = asyncHandler(async (req, res) => {
+  const cacheKey = `user_profile_${req.user._id}`;
+  const cachedUser = await cache.get(cacheKey);
   
-  res.status(204).send();
-});
+  if (cachedUser) {
+    return res.json(cachedUser);
+  }
 
-// @desc    Obtenir le profil utilisateur
-// @route   GET /api/users/profile
-// @access  Private
-export const getCurrentUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
-  res.json(formatUserResponse(user));
-});
-
-// @desc    Mettre à jour le profil
-// @route   PUT /api/users/profile
-// @access  Private
-export const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
-  
+  const user = await User.findById(req.user._id).lean();
   if (!user) {
-    throw new APIError(ERROR_MESSAGES.USER.NOT_FOUND('Utilisateur'), 404);
+    return res.status(404).json({ message: "Utilisateur introuvable" });
   }
 
-  // Vérifier le mot de passe actuel
-  const isPasswordValid = await user.matchPassword(req.body.currentPassword);
-  if (!isPasswordValid) {
-    throw new APIError(ERROR_MESSAGES.USER.PASSWORD.INVALID, 401);
+  const formattedUser = formatUserResponse(user);
+  await cache.set(cacheKey, formattedUser, CACHE_TTL);
+  res.json(formattedUser);
+});
+
+// Mettre à jour le profil utilisateur
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const { username, email, shippingAddress } = req.body;
+  
+  const existsMessage = await checkUserExists(email, username, req.user._id);
+  if (existsMessage) return res.status(400).json({ message: existsMessage });
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return res.status(404).json({ message: "Utilisateur introuvable" });
   }
 
-  // Mise à jour des champs
-  if (req.body.username) user.username = req.body.username;
-  if (req.body.email) user.email = req.body.email;
+  if (username) user.username = username;
+  if (email) user.email = email.toLowerCase();
+  if (shippingAddress) user.shippingAddress = shippingAddress;
 
   const updatedUser = await user.save();
-
-  res.json({
-    _id: updatedUser._id,
-    username: updatedUser.username,
-    email: updatedUser.email,
-    isAdmin: updatedUser.isAdmin
-  });
+  await cache.del(`user_profile_${req.user._id}`);
+  res.json(formatUserResponse(updatedUser));
 });
 
-// @desc    Mettre à jour l'adresse de livraison
-// @route   PUT /api/users/profile/shipping
-// @access  Private
-export const updateShippingAddress = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.user._id, req.body, {
-    new: true,
-    runValidators: true
-  });
-  logUserAction('updated shipping address', user._id);
+// Changer le mot de passe
+const changeUserPassword = asyncHandler(async (req, res) => {
+  const { isValid, message } = validateFields(req.body, ['currentPassword', 'newPassword']);
+  if (!isValid) return res.status(400).json({ message });
+
+  const { currentPassword, newPassword } = req.body;
   
-  res.json(formatUserResponse(user));
+  const user = await User.findById(req.user._id).select('+password');
+  if (!user || !(await user.matchPassword(currentPassword))) {
+    return res.status(401).json({ message: "Mot de passe actuel invalide" });
+  }
+
+  const passwordValidation = validatePassword(newPassword);
+  if (!passwordValidation.isValid) {
+    return res.status(400).json({ message: passwordValidation.message });
+  }
+
+  user.password = await hashPassword(newPassword);
+  await user.save();
+
+  res.json({ message: "Mot de passe modifié avec succès" });
 });
 
-// @desc    Obtenir tous les utilisateurs
-// @route   GET /api/users
-// @access  Admin
-export const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find();
-  logUserAction('retrieved all users', req.user._id);
+// Admin: Obtenir tous les utilisateurs avec pagination
+const getAllUsers = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+  const skip = (page - 1) * limit;
+
+  const cacheKey = `users_list_${page}_${limit}`;
+  const cachedUsers = await cache.get(cacheKey);
   
-  res.json(users.map(formatUserResponse));
+  if (cachedUsers) {
+    return res.json(cachedUsers);
+  }
+
+  const [users, total] = await Promise.all([
+    User.find({})
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    User.countDocuments()
+  ]);
+
+  const result = {
+    users: users.map(formatUserResponse),
+    page,
+    pages: Math.ceil(total / limit),
+    total
+  };
+
+  await cache.set(cacheKey, result, CACHE_TTL);
+  res.json(result);
 });
 
-// @desc    Obtenir un utilisateur par ID
-// @route   GET /api/users/:id
-// @access  Admin
-export const getUserById = asyncHandler(async (req, res) => {
+// Admin: Obtenir un utilisateur par ID
+const getUserById = asyncHandler(async (req, res) => {
+  const cacheKey = `user_${req.params.id}`;
+  const cachedUser = await cache.get(cacheKey);
+  
+  if (cachedUser) {
+    return res.json(cachedUser);
+  }
+
+  const user = await User.findById(req.params.id).lean();
+  if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+
+  const formattedUser = formatUserResponse(user);
+  await cache.set(cacheKey, formattedUser, CACHE_TTL);
+  res.json(formattedUser);
+});
+
+// Admin: Mettre à jour un utilisateur
+const updateUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  res.json(formatUserResponse(user));
-});
+  if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
 
-// @desc    Mettre à jour un utilisateur
-// @route   PUT /api/users/:id
-// @access  Admin
-export const updateUserById = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  const { username, email, isAdmin } = req.body;
   
-  logUserAction('updated by admin', user._id, null, req.user._id);
-  res.json(formatUserResponse(user));
+  const existsMessage = await checkUserExists(email, username, req.params.id);
+  if (existsMessage) return res.status(400).json({ message: existsMessage });
+
+  user.username = username || user.username;
+  user.email = email ? email.toLowerCase() : user.email;
+  user.isAdmin = isAdmin ?? user.isAdmin;
+
+  const updatedUser = await user.save();
+  await Promise.all([
+    cache.del(`user_${req.params.id}`),
+    cache.del(`user_profile_${req.params.id}`),
+    cache.del(/^users_list_/)
+  ]);
+  
+  res.json(formatUserResponse(updatedUser));
 });
 
-// @desc    Supprimer un utilisateur
-// @route   DELETE /api/users/:id
-// @access  Admin
-export const deleteUserById = asyncHandler(async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
-  res.json({ message: ERROR_MESSAGES.USER.DELETED_SUCCESS });
+// Admin: Supprimer un utilisateur
+const deleteUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+  if (user.isAdmin) {
+    return res.status(400).json({ message: "Impossible de supprimer un admin" });
+  }
+
+  await user.deleteOne();
+  await Promise.all([
+    cache.del(`user_${req.params.id}`),
+    cache.del(`user_profile_${req.params.id}`),
+    cache.del(/^users_list_/)
+  ]);
+  
+  res.json({ message: "Utilisateur supprimé" });
 });
+
+// Mettre à jour l'adresse de livraison
+const updateShippingAddress = asyncHandler(async (req, res) => {
+  const { isValid, message } = validateFields(req.body, ['address', 'city', 'postalCode', 'country']);
+  if (!isValid) return res.status(400).json({ message });
+
+  const user = await User.findById(req.user._id);
+  if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+
+  user.shippingAddress = req.body;
+  const updatedUser = await user.save();
+  
+  await cache.del(`user_profile_${req.user._id}`);
+  res.json(formatUserResponse(updatedUser));
+});
+
+// Demander une réinitialisation de mot de passe
+const requestPasswordReset = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email requis" });
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    // Réponse délibérément vague pour la sécurité
+    return res.json({ message: "Si un compte existe avec cet email, un lien de réinitialisation sera envoyé" });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  user.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  user.resetPasswordExpires = Date.now() + PASSWORD_RESET_EXPIRY;
+  await user.save();
+
+  try {
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    await sendEmail({
+      to: user.email,
+      subject: "Réinitialisation de mot de passe",
+      html: `
+        <h1>Réinitialisation de votre mot de passe</h1>
+        <p>Vous avez demandé une réinitialisation de mot de passe.</p>
+        <p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
+        <a href="${resetUrl}">Réinitialiser mon mot de passe</a>
+        <p>Ce lien expirera dans 10 minutes.</p>
+        <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
+      `
+    });
+
+    res.json({ message: "Si un compte existe avec cet email, un lien de réinitialisation sera envoyé" });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    
+    res.status(500).json({ message: "Erreur lors de l'envoi de l'email" });
+  }
+});
+
+// Réinitialiser le mot de passe
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({ message: "Token et nouveau mot de passe requis" });
+  }
+  
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Token invalide ou expiré" });
+  }
+
+  const { isValid, message } = validatePassword(password);
+  if (!isValid) return res.status(400).json({ message });
+
+  user.password = await hashPassword(password);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.json({ message: "Mot de passe réinitialisé avec succès" });
+});
+
+export {
+  createUser,
+  loginUser,
+  logoutUser,
+  getUserProfile,
+  updateUserProfile,
+  changeUserPassword,
+  getAllUsers,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+  updateShippingAddress,
+  requestPasswordReset,
+  resetPassword,
+};

@@ -5,61 +5,29 @@ import {
   createCategory,
   updateCategory,
   removeCategory,
-  listCategory,
-  readCategory,
+  listCategories,
+  getCategoryById,
+  getCategoryBySlug,
 } from "../controllers/categoryController.js";
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
-import { cacheMiddleware, invalidateCache } from "../utils/cache.js";
-import { validateCategory } from "../validators/categoryValidator.js";
+import { authenticate, authorizeAdmin, checkId } from "../core/index.js";
 
 const router = express.Router();
 
-// Middleware pour invalider le cache des catégories
-const invalidateCategoryCache = async (req, res, next) => {
-  try {
-    await invalidateCache(['categories', 'products']); // Invalider aussi le cache des produits car ils peuvent dépendre des catégories
-    if (req.params.id || req.params.categoryId) {
-      const categoryId = req.params.id || req.params.categoryId;
-      await invalidateCache([
-        `category-detail:${categoryId}`,
-        `category-products:${categoryId}`
-      ]);
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
-
 // Routes publiques
-router.get("/", 
-  cacheMiddleware('categories', 1800), 
-  listCategory
-);
+router.get("/", listCategories);
+router
+  .route("/id/:categoryId")
+  .get(checkId, getCategoryById);
+router.get("/slug/:slug", getCategoryBySlug);
 
-router.get("/:id", 
-  cacheMiddleware('category-detail', 1800), 
-  readCategory
-);
-
-// Routes protégées (admin uniquement)
+// Routes admin
 router.use(authenticate, authorizeAdmin);
-
-router.post("/", 
-  validateCategory,
-  invalidateCategoryCache,
-  createCategory
-);
-
-router.put("/:categoryId", 
-  validateCategory,
-  invalidateCategoryCache,
-  updateCategory
-);
-
-router.delete("/:categoryId", 
-  invalidateCategoryCache,
-  removeCategory
-);
+router
+  .route("/")
+  .post(createCategory);
+router
+  .route("/:categoryId")
+  .put(checkId, updateCategory)
+  .delete(checkId, removeCategory);
 
 export default router;

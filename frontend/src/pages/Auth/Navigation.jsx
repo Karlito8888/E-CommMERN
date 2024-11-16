@@ -56,14 +56,14 @@ const Navigation = () => {
         <div className="user-nav">
           {userInfo ? (
             <div className="user-info">
-              <span className="user-name">👋 {userInfo.user.username}</span>
+              <span className="user-name">👋 {userInfo.username}</span>
               <ul
                 className={`user-menu ${
-                  userInfo.user.isAdmin ? "admin-menu" : ""
+                  userInfo.isAdmin ? "admin-menu" : ""
                 }`}
                 role="menu"
               >
-                {userInfo.user.isAdmin && (
+                {userInfo.isAdmin && (
                   <>
                     <NavItem
                       to="/admin/dashboard"

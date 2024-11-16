@@ -1,39 +1,28 @@
 // backend/routes/orderRoutes.js
 
-import express from "express";
-const router = express.Router();
-
+import express from 'express';
 import {
   createOrder,
-  getAllOrders,
-  getUserOrders,
-  findOrderById,
-  markOrderAsPaid,
-  markOrderAsDelivered,
-  getOrderStats
-} from "../controllers/orderController.js";
+  getOrderById,
+  getMyOrders,
+  updateOrderStatus,
+  getOrders
+} from '../controllers/orderController.js';
+import { authenticate, authorizeAdmin } from '../core/index.js';
 
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
+const router = express.Router();
 
-// Routes pour la création et la récupération des commandes
-router
-  .route("/")
-  .post(authenticate, createOrder)
-  .get(authenticate, authorizeAdmin, getAllOrders);
+// Routes protégées (utilisateur connecté)
+router.use(authenticate);
 
-// Route pour récupérer les commandes d'un utilisateur
-router.route("/mine").get(authenticate, getUserOrders);
+router.route('/')
+  .post(createOrder)
+  .get(authorizeAdmin, getOrders);
 
-// Route pour les statistiques des commandes (admin uniquement)
-router.route("/stats").get(authenticate, authorizeAdmin, getOrderStats);
+router.get('/myorders', getMyOrders);
 
-// Routes pour une commande spécifique
-router
-  .route("/:id")
-  .get(authenticate, findOrderById)
-  .put(authenticate, authorizeAdmin, markOrderAsDelivered);
-
-// Route pour le paiement
-router.route("/:id/pay").put(authenticate, markOrderAsPaid);
+router.route('/:id')
+  .get(getOrderById)
+  .put(authorizeAdmin, updateOrderStatus);
 
 export default router;

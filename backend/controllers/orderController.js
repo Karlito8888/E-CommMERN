@@ -1,236 +1,181 @@
-// backend/controllers/orderControllers.js
-import Order from "../models/orderModel.js";
-import Product from "../models/productModel.js";
-import { APIError } from '../middlewares/errorMiddleware.js';
-import PriceService from '../services/priceService.js';
-import { logInfo } from '../utils/logger.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
+// backend/controllers/orderController.js
 
-// Order Creation and Management
+import { asyncHandler, TAX_RATE } from '../core/index.js';
+import Order from '../models/orderModel.js';
+import Product from '../models/productModel.js';
+
+const ORDER_STATUS = {
+  PENDING: 'pending',
+  PAID: 'paid',
+  DELIVERED: 'delivered',
+  CANCELLED: 'cancelled'
+};
+
+const calcTotals = items => {
+  const itemsHT = +items.reduce((sum, { priceHT, qty }) => sum + priceHT * qty, 0).toFixed(2);
+  const shipping = +(itemsHT > 100 ? 0 : 10).toFixed(2);
+  const tax = +(itemsHT * TAX_RATE).toFixed(2);
+  
+  return {
+    itemsHT,
+    shipping,
+    tax,
+    total: +(itemsHT + shipping + tax).toFixed(2)
+  };
+};
+
 const createOrder = asyncHandler(async (req, res) => {
   const { orderItems, shippingAddress, paymentMethod } = req.body;
 
   if (!orderItems?.length) {
-    throw new APIError('Aucun article dans la commande', 400);
+    return res.status(400).json({ message: 'Panier vide' });
   }
 
-  const itemsFromDB = await Product.find({
-    _id: { $in: orderItems.map(x => x._id) }
-  });
+  const products = await Product.find({
+    _id: { $in: orderItems.map(x => x.product) }
+  }, 'name price priceHT stock').lean();
 
-  const dbOrderItems = orderItems.map(itemFromClient => {
-    const matchingItemFromDB = itemsFromDB.find(
-      itemFromDB => itemFromDB._id.toString() === itemFromClient._id
-    );
-
-    if (!matchingItemFromDB) {
-      throw new APIError(`Produit non trouvé: ${itemFromClient._id}`, 404);
-    }
+  const items = orderItems.map(item => {
+    const product = products.find(p => p._id.toString() === item.product);
+    if (!product) throw new Error(`Produit introuvable: ${item.product}`);
+    if (product.stock < item.qty) throw new Error(`Stock insuffisant: ${product.name}`);
 
     return {
-      ...itemFromClient,
-      product: itemFromClient._id,
-      price: matchingItemFromDB.price,
-      _id: undefined
+      product: product._id,
+      name: product.name,
+      qty: item.qty,
+      price: product.price,
+      priceHT: product.priceHT
     };
   });
 
-  const prices = PriceService.calculateOrderPrices(dbOrderItems);
+  const { itemsHT, shipping, tax, total } = calcTotals(items);
 
-  const order = new Order({
-    orderItems: dbOrderItems,
+  const order = await Order.create({
     user: req.user._id,
+    orderItems: items,
     shippingAddress,
     paymentMethod,
-    ...prices
+    totalHT: itemsHT,
+    shippingPrice: shipping,
+    totalTax: tax,
+    totalPrice: total,
+    status: ORDER_STATUS.PENDING
   });
 
-  const createdOrder = await order.save();
-  logInfo('Nouvelle commande créée', { 
-    orderId: createdOrder._id,
-    userId: req.user._id,
-    total: prices.totalPrice
-  });
-
-  res.status(201).json({
-    success: true,
-    order: createdOrder
-  });
+  await order.updateProductStock();
+  res.status(201).json(order);
 });
 
-// Obtenir toutes les commandes (admin)
-const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({})
-    .populate('user', 'id name email')
-    .sort('-createdAt');
-
-  const totalAmount = orders.reduce(
-    (sum, order) => sum + Number(order.totalPrice),
-    0
-  );
-
-  res.json({
-    success: true,
-    count: orders.length,
-    totalAmount: PriceService.formatPrice(totalAmount),
-    orders
-  });
-});
-
-// Obtenir les commandes d'un utilisateur
-const getUserOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id })
-    .sort('-createdAt');
-
-  res.json({
-    success: true,
-    orders
-  });
-});
-
-// Trouver une commande par ID
-const findOrderById = asyncHandler(async (req, res) => {
+const getOrderById = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id)
-    .populate('user', 'name email');
+    .populate('user', 'name email')
+    .lean()
+    .cache(300);
 
   if (!order) {
-    throw new APIError('Commande non trouvée', 404);
+    return res.status(404).json({ message: 'Commande introuvable' });
   }
 
-  res.json({
-    success: true,
-    order
-  });
+  // Vérification des droits d'accès
+  if (!req.user.isAdmin && order.user._id.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ message: 'Accès refusé' });
+  }
+
+  res.json(order);
 });
 
-// Marquer une commande comme payée
-const markOrderAsPaid = asyncHandler(async (req, res) => {
+const getMyOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ user: req.user._id })
+    .select('-__v')
+    .sort('-createdAt')
+    .lean()
+    .cache(300);
+
+  res.json(orders);
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+
+  if (!Object.values(ORDER_STATUS).includes(status)) {
+    return res.status(400).json({ message: 'Statut invalide' });
+  }
+
   const order = await Order.findById(req.params.id);
-
   if (!order) {
-    throw new APIError('Commande non trouvée', 404);
+    return res.status(404).json({ message: 'Commande introuvable' });
   }
 
-  if (order.isPaid) {
-    throw new APIError('Commande déjà payée', 400);
-  }
+  order.status = status;
+  if (status === ORDER_STATUS.PAID) order.paidAt = Date.now();
+  if (status === ORDER_STATUS.DELIVERED) order.deliveredAt = Date.now();
 
-  order.isPaid = true;
-  order.paidAt = Date.now();
-  order.paymentResult = {
-    id: req.body.id,
-    status: req.body.status,
-    update_time: req.body.update_time,
-    email_address: req.body.payer.email_address,
-  };
-
-  const updatedOrder = await order.save();
-  logInfo('Commande marquée comme payée', { 
-    orderId: order._id,
-    paymentId: req.body.id 
-  });
-
-  res.json({
-    success: true,
-    order: updatedOrder
-  });
+  await order.save();
+  res.json({ message: 'Statut mis à jour', status });
 });
 
-// Marquer une commande comme livrée
-const markOrderAsDelivered = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
+const getOrders = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
 
-  if (!order) {
-    throw new APIError('Commande non trouvée', 404);
-  }
-
-  if (order.isDelivered) {
-    throw new APIError('Commande déjà livrée', 400);
-  }
-
-  order.isDelivered = true;
-  order.deliveredAt = Date.now();
-
-  const updatedOrder = await order.save();
-  logInfo('Commande marquée comme livrée', { orderId: order._id });
-
-  res.json({
-    success: true,
-    order: updatedOrder
-  });
-});
-
-// Statistiques des commandes
-const getOrderStats = asyncHandler(async (req, res) => {
-  const stats = await Order.aggregate([
-    {
-      $facet: {
-        totalOrders: [{ $count: 'count' }],
-        totalSales: [
-          { $match: { isPaid: true } },
-          { $group: { _id: null, total: { $sum: '$totalPrice' } } }
-        ],
-        salesByDate: [
-          { $match: { isPaid: true } },
-          {
-            $group: {
-              _id: { 
-                $dateToString: { 
-                  format: '%Y-%m-%d', 
-                  date: '$paidAt' 
-                } 
-              },
-              total: { $sum: '$totalPrice' },
-              totalHT: { $sum: '$itemsPrice' },
-              totalTVA: { $sum: '$taxPrice' }
-            }
-          },
-          { $sort: { '_id': -1 } },
-          { $limit: 7 }
-        ],
-        taxStats: [
-          {
-            $group: {
-              _id: '$taxRate',
-              count: { $sum: 1 },
-              totalHT: { $sum: '$itemsPrice' },
-              totalTVA: { $sum: '$taxPrice' }
-            }
-          }
-        ]
-      }
-    }
+  const [orders, total] = await Promise.all([
+    Order.find()
+      .select('-__v')
+      .populate('user', 'name email')
+      .sort('-createdAt')
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .cache(300),
+    Order.countDocuments().cache(300)
   ]);
 
-  const formattedStats = {
-    totalOrders: stats[0].totalOrders[0]?.count || 0,
-    totalSales: PriceService.formatPrice(stats[0].totalSales[0]?.total || 0),
-    salesByDate: stats[0].salesByDate.map(day => ({
-      date: day._id,
-      total: PriceService.formatPrice(day.total),
-      totalHT: PriceService.formatPrice(day.totalHT),
-      totalTVA: PriceService.formatPrice(day.totalTVA)
-    })),
-    taxStats: stats[0].taxStats.map(tax => ({
-      rate: `${(tax._id * 100).toFixed(1)}%`,
-      count: tax.count,
-      totalHT: PriceService.formatPrice(tax.totalHT),
-      totalTVA: PriceService.formatPrice(tax.totalTVA)
-    }))
-  };
+  res.json({
+    orders,
+    page,
+    pages: Math.ceil(total / limit),
+    total
+  });
+});
+
+const getStats = asyncHandler(async (req, res) => {
+  const [totals, daily] = await Promise.all([
+    Order.aggregate([{
+      $group: {
+        _id: null,
+        orders: { $sum: 1 },
+        sales: { $sum: '$totalPrice' },
+        avg: { $avg: '$totalPrice' }
+      }
+    }]).cache(300),
+
+    Order.aggregate([
+      { $match: { status: ORDER_STATUS.PAID } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$paidAt' } },
+          orders: { $sum: 1 },
+          sales: { $sum: '$totalPrice' }
+        }
+      },
+      { $sort: { _id: -1 } },
+      { $limit: 30 }
+    ]).cache(300)
+  ]);
 
   res.json({
-    success: true,
-    stats: formattedStats
+    totals: totals[0] || { orders: 0, sales: 0, avg: 0 },
+    daily
   });
 });
 
 export {
   createOrder,
-  getAllOrders,
-  getUserOrders,
-  findOrderById,
-  markOrderAsPaid,
-  markOrderAsDelivered,
-  getOrderStats
+  getOrderById,
+  getMyOrders,
+  updateOrderStatus,
+  getOrders,
+  getStats
 };

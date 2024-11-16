@@ -1,68 +1,123 @@
 // backend/controllers/categoryController.js
 
 import Category from "../models/categoryModel.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
+import { asyncHandler } from "../core/index.js";
+import slugify from "slugify";
 
+// Format de réponse standard pour les catégories
+const formatCategory = cat => ({
+  _id: cat._id,
+  name: cat.name,
+  slug: cat.slug,
+  productsCount: cat.productsCount
+});
+
+// Créer une nouvelle catégorie
 const createCategory = asyncHandler(async (req, res) => {
   const { name } = req.body;
-  if (!name) {
-    return res.status(400).json({ error: "Le nom est requis" });
+  if (!name?.trim()) {
+    return res.status(400).json({ message: "Le nom est requis" });
   }
 
-  const existingCategory = await Category.findOne({ name });
+  const existingCategory = await Category.findOne({ 
+    name: { $regex: new RegExp(`^${name}$`, 'i') } 
+  }).lean();
+  
   if (existingCategory) {
-    return res.status(400).json({ error: "La catégorie existe déjà" });
+    return res.status(400).json({ message: "Cette catégorie existe déjà" });
   }
 
-  const category = await new Category({ name }).save();
-  res.status(201).json(category);
+  const category = await Category.create({ 
+    name,
+    slug: slugify(name, { lower: true, strict: true })
+  });
+
+  res.status(201).json(formatCategory(category));
 });
 
+// Mettre à jour une catégorie
 const updateCategory = asyncHandler(async (req, res) => {
   const { name } = req.body;
-  const { categoryId } = req.params;
+  if (!name?.trim()) {
+    return res.status(400).json({ message: "Le nom est requis" });
+  }
 
-  const category = await Category.findById(categoryId);
+  const existingCategory = await Category.findOne({ 
+    name: { $regex: new RegExp(`^${name}$`, 'i') },
+    _id: { $ne: req.params.categoryId }
+  }).lean();
+  
+  if (existingCategory) {
+    return res.status(400).json({ message: "Cette catégorie existe déjà" });
+  }
+
+  const category = await Category.findByIdAndUpdate(
+    req.params.categoryId,
+    { 
+      name,
+      slug: slugify(name, { lower: true, strict: true })
+    },
+    { new: true }
+  ).lean();
+  
   if (!category) {
-    return res.status(404).json({ error: "Catégorie introuvable" });
+    return res.status(404).json({ message: "Catégorie introuvable" });
   }
-
-  const duplicateCategory = await Category.findOne({ name });
-  if (duplicateCategory && duplicateCategory._id.toString() !== categoryId) {
-    return res.status(400).json({ error: "Ce nom de catégorie existe déjà" });
-  }
-
-  category.name = name;
-  const updatedCategory = await category.save();
-  res.status(200).json(updatedCategory);
+  
+  res.json(formatCategory(category));
 });
 
+// Supprimer une catégorie
 const removeCategory = asyncHandler(async (req, res) => {
-  const removed = await Category.findByIdAndDelete(req.params.categoryId);
-  if (!removed) {
-    return res.status(404).json({ error: "Catégorie introuvable" });
-  }
-  res.status(200).json({ message: "Catégorie supprimée avec succès" });
-});
-
-const listCategory = asyncHandler(async (req, res) => {
-  const all = await Category.find({});
-  res.status(200).json(all);
-});
-
-const readCategory = asyncHandler(async (req, res) => {
-  const category = await Category.findById(req.params.id);
+  const category = await Category.findById(req.params.categoryId).lean();
+  
   if (!category) {
-    return res.status(404).json({ error: "Catégorie introuvable" });
+    return res.status(404).json({ message: "Catégorie introuvable" });
   }
-  res.status(200).json(category);
+
+  if (category.productsCount > 0) {
+    return res.status(400).json({ 
+      message: "Impossible de supprimer une catégorie avec des produits" 
+    });
+  }
+  
+  await Category.deleteOne({ _id: req.params.categoryId });
+  res.json({ message: "Catégorie supprimée", _id: category._id });
+});
+
+// Lister toutes les catégories
+const listCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.find()
+    .select('name slug productsCount')
+    .sort({ name: 1 })
+    .lean()
+    .cache(300); // Cache 5 minutes
+    
+  res.json(categories.map(formatCategory));
+});
+
+// Obtenir une catégorie par ID ou slug
+const getCategory = asyncHandler(async (req, res) => {
+  const query = req.params.categoryId ? 
+    { _id: req.params.categoryId } : 
+    { slug: req.params.slug };
+
+  const category = await Category.findOne(query)
+    .select('name slug productsCount')
+    .lean()
+    .cache(300);
+  
+  if (!category) {
+    return res.status(404).json({ message: "Catégorie introuvable" });
+  }
+  
+  res.json(formatCategory(category));
 });
 
 export {
   createCategory,
   updateCategory,
   removeCategory,
-  listCategory,
-  readCategory,
+  listCategories,
+  getCategory
 };
-

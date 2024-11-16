@@ -8,7 +8,7 @@ dotenv.config(); // Charge les variables d'environnement
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Connectez-vous à MongoDB
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGO_URI);
 
 // Modèle MongoDB pour les produits
 import Product from "./models/productModel.js"; // Modèle correspondant à votre produit
@@ -70,3 +70,4 @@ const syncProducts = async () => {
 
 // Appel de la fonction de synchronisation
 syncProducts();
+

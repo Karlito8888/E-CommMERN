@@ -1,34 +1,42 @@
 // backend/routes/paymentRoutes.js
 
 import express from "express";
-import stripe from "../config/stripeConfig.js";
-import logger from '../utils/logger.js';
-import { 
-  handleStripeError, 
-  validateCartItems, 
-  generateIdempotencyKey,
-  updateProductStock 
-} from '../utils/stripeUtils.js';
+import dotenv from "dotenv";
+import Stripe from "stripe";
+import { authenticate } from "../core/index.js";
+
+// Configuration de Stripe
+dotenv.config();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
-logger.info("Payment routes initialized");
+// Middleware de logging pour le développement
+const logRequest = (req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Payment Route: ${req.method} ${req.path}`);
+    if (req.body) console.log("Request data:", req.body);
+  }
+  next();
+};
 
+router.use(logRequest);
+router.use(authenticate); // Protection de toutes les routes de paiement
+
+// Créer une session de paiement Stripe
 router.post("/create-checkout-session", async (req, res) => {
-  logger.info("Creating checkout session", { 
-    customerEmail: req.body.customerEmail,
-    itemCount: req.body.cartItems?.length 
-  });
-
   try {
-    const { cartItems, totalPrice, shippingAddress, customerEmail } = req.body;
+    const { cartItems, shippingAddress, customerEmail } = req.body;
 
-    // Valider les articles du panier
-    await validateCartItems(cartItems);
+    // Validation des données d'entrée
+    if (!cartItems?.length) {
+      return res.status(400).json({
+        message: "Le panier est vide"
+      });
+    }
 
-    const idempotencyKey = generateIdempotencyKey();
-    
-    const session = await stripe.checkout.sessions.create({
+    // Configuration de base de la session Stripe
+    const sessionConfig = {
       payment_method_types: ["card"],
       line_items: cartItems.map((item) => ({
         price_data: {
@@ -36,165 +44,208 @@ router.post("/create-checkout-session", async (req, res) => {
           product_data: {
             name: item.name,
             images: [item.image],
+            description: `Prix HT: ${item.priceHT}€ | TVA: ${item.taxAmount}€`
           },
-          unit_amount: Math.round(item.price * 100),
+          unit_amount: Math.round(item.price * 100), // Prix TTC en centimes
+          tax_behavior: 'inclusive', // Prix TTC
         },
         quantity: item.qty,
       })),
       mode: "payment",
-      payment_method_options: {
-        card: {
-          request_three_d_secure: 'any', // Force 3D Secure quand disponible
-        },
-      },
-      shipping_address_collection: {
-        allowed_countries: ["FR"],
-      },
-      customer_email: customerEmail,
       success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/placeorder`,
+      cancel_url: `${process.env.CLIENT_URL}/cart`,
+      customer_email: customerEmail || req.user.email,
       metadata: {
-        shippingAddress: JSON.stringify(shippingAddress),
-        totalPrice: totalPrice,
-        cartItems: JSON.stringify(cartItems)
-      },
-    }, {
-      idempotencyKey
-    });
+        userId: req.user.id,
+        shippingAddress: JSON.stringify(shippingAddress)
+      }
+    };
 
-    logger.info("Checkout session created", { 
-      sessionId: session.id,
-      totalPrice 
-    });
+    // Création de la session
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
-    res.json({ sessionUrl: session.url });
-  } catch (err) {
-    const { status, message } = handleStripeError(err);
-    res.status(status).json({ message });
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('Erreur Stripe:', error);
+    res.status(500).json({
+      message: "Erreur lors de la création de la session de paiement"
+    });
   }
 });
 
-// Route pour le webhook Stripe
+// Endpoint pour récupérer les détails d'une session et proposer la création de compte
+router.get("/session/:sessionId", async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.params.sessionId, {
+      expand: ['customer', 'shipping_details', 'custom_fields', 'line_items']
+    });
+
+    // Si l'utilisateur est déjà client Stripe (donc inscrit), ne pas proposer la création de compte
+    if (session.customer) {
+      return res.json({ 
+        session,
+        canCreateAccount: false
+      });
+    }
+
+    // Préparer les données pour la création de compte
+    const accountData = {
+      email: session.customer_details.email,
+      name: session.customer_details.name,
+      phone: session.customer_details.phone,
+      address: {
+        street: session.shipping_details?.address?.line1,
+        city: session.shipping_details?.address?.city,
+        postalCode: session.shipping_details?.address?.postal_code,
+        country: session.shipping_details?.address?.country || 'FR',
+      },
+      newsletter: session.custom_fields.find(f => f.key === 'newsletter_subscription')?.value || false,
+      orderDetails: {
+        orderId: session.id,
+        amount: session.amount_total,
+        items: session.line_items.data,
+        date: new Date(session.created * 1000)
+      }
+    };
+
+    res.json({
+      session,
+      canCreateAccount: true,
+      accountData
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération de la session",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Endpoint pour créer un compte utilisateur après le paiement
+router.post("/create-account-after-payment", async (req, res) => {
+  try {
+    const { 
+      sessionId, 
+      password,
+      newsletter,
+      acceptTerms 
+    } = req.body;
+
+    if (!password || !acceptTerms) {
+      return res.status(400).json({ 
+        message: "Informations manquantes pour la création du compte" 
+      });
+    }
+
+    // Récupérer les détails de la session Stripe
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['customer', 'shipping_details', 'custom_fields']
+    });
+
+    // Vérifier que l'utilisateur n'a pas déjà un compte
+    const User = require('../models/userModel');
+    const existingUser = await User.findOne({ email: session.customer_details.email });
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: "Un compte existe déjà avec cette adresse email" 
+      });
+    }
+
+    // Créer un client Stripe pour le nouvel utilisateur
+    const customer = await stripe.customers.create({
+      email: session.customer_details.email,
+      name: session.customer_details.name,
+      phone: session.customer_details.phone,
+      shipping: {
+        address: {
+          line1: session.shipping_details?.address?.line1,
+          city: session.shipping_details?.address?.city,
+          postal_code: session.shipping_details?.address?.postal_code,
+          country: session.shipping_details?.address?.country || 'FR',
+        },
+        name: session.customer_details.name,
+      }
+    });
+
+    // Créer l'utilisateur dans la base de données
+    const userData = {
+      email: session.customer_details.email,
+      name: session.customer_details.name,
+      phone: session.customer_details.phone,
+      password,
+      address: {
+        street: session.shipping_details?.address?.line1,
+        city: session.shipping_details?.address?.city,
+        postalCode: session.shipping_details?.address?.postal_code,
+        country: session.shipping_details?.address?.country || 'FR',
+      },
+      newsletter: newsletter || false,
+      stripeCustomerId: customer.id,
+      orderHistory: [session.id],
+      acceptTerms: true
+    };
+
+    const newUser = new User(userData);
+    await newUser.save();
+
+    // Générer un token JWT pour l'authentification automatique
+    const token = newUser.generateAuthToken();
+
+    res.json({
+      message: "Compte créé avec succès",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        name: newUser.name,
+      },
+      token
+    });
+
+  } catch (err) {
+    console.error("Erreur lors de la création du compte:", err);
+    res.status(500).json({
+      message: "Erreur lors de la création du compte",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Webhook pour gérer les événements Stripe
 router.post("/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   try {
-    const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    logger.info('Webhook received', { type: event.type });
+    const event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
 
     switch (event.type) {
       case 'checkout.session.completed':
         const session = event.data.object;
         
-        // Vérifier si les métadonnées du panier existent
-        if (session.metadata && session.metadata.cartItems) {
-          // Mettre à jour le stock
-          const cartItems = JSON.parse(session.metadata.cartItems);
-          await updateProductStock(cartItems);
-          
-          logger.info('Payment successful and stock updated', { 
-            sessionId: session.id,
-            customer: session.customer_email 
-          });
-        } else {
-          logger.info('Payment successful (test event - no cart items)', { 
-            sessionId: session.id,
-            customer: session.customer_email 
-          });
-        }
-        break;
-
-      case 'charge.failed':
-        const failedCharge = event.data.object;
-        const errorDetails = {
-          chargeId: failedCharge.id,
-          amount: (failedCharge.amount / 100).toFixed(2),
-          currency: failedCharge.currency.toUpperCase(),
-          failureCode: failedCharge.failure_code,
-          failureMessage: getLocalizedErrorMessage(failedCharge.failure_code, failedCharge.failure_message),
-          outcome: failedCharge.outcome
-        };
-
-        logger.warn('Charge failed', errorDetails);
+        // Enregistrer la commande dans la base de données
+        // TODO: Implémenter la logique de sauvegarde de commande
+        console.log('Commande complétée:', session.id);
+        
         break;
 
       case 'payment_intent.payment_failed':
         const paymentIntent = event.data.object;
-        const failureMessage = paymentIntent.last_payment_error?.message || 'Unknown error';
-        const failureCode = paymentIntent.last_payment_error?.code || 'unknown';
-        
-        const paymentErrorDetails = {
-          intentId: paymentIntent.id,
-          customerId: paymentIntent.customer,
-          amount: (paymentIntent.amount / 100).toFixed(2),
-          currency: paymentIntent.currency.toUpperCase(),
-          errorCode: failureCode,
-          errorMessage: getLocalizedErrorMessage(failureCode, failureMessage),
-          requires3DS: paymentIntent.status === 'requires_action',
-          last_payment_error: paymentIntent.last_payment_error,
-          authentication_status: paymentIntent.last_payment_error?.payment_method?.card?.three_d_secure_usage
-        };
-
-        logger.warn('Payment failed', paymentErrorDetails);
-
-        // Si nous avons des métadonnées de produits, on pourrait les libérer ici
-        if (paymentIntent.metadata && paymentIntent.metadata.cartItems) {
-          logger.info('Releasing held inventory', {
-            intentId: paymentIntent.id
-          });
-          // Logique pour libérer l'inventaire réservé si nécessaire
-        }
+        console.error('Échec du paiement:', paymentIntent.id);
         break;
+
+      default:
+        console.log(`Event non géré: ${event.type}`);
     }
 
     res.json({ received: true });
   } catch (err) {
-    logger.error('Webhook error', { error: err.message });
+    console.error('Erreur webhook:', err.message);
     res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
 
-// Fonction utilitaire pour obtenir des messages d'erreur localisés
-function getLocalizedErrorMessage(code, defaultMessage) {
-  const errorMessages = {
-    'card_declined': 'Votre carte a été refusée. Veuillez vérifier vos informations ou utiliser une autre carte.',
-    'insufficient_funds': 'Fonds insuffisants sur la carte. Veuillez utiliser une autre carte.',
-    'expired_card': 'Cette carte est expirée. Veuillez utiliser une autre carte.',
-    'incorrect_cvc': 'Le code CVC est incorrect. Veuillez vérifier et réessayer.',
-    'processing_error': 'Une erreur est survenue lors du traitement du paiement. Veuillez réessayer.',
-    'lost_card': 'Cette carte a été signalée comme perdue. Veuillez utiliser une autre carte.',
-    'stolen_card': 'Cette carte a été signalée comme volée. Veuillez utiliser une autre carte.',
-    'authentication_required': 'Une authentification 3D Secure est requise. Veuillez suivre les instructions de votre banque.',
-    'authentication_failed': 'L\'authentification 3D Secure a échoué. Veuillez réessayer ou contacter votre banque.',
-    'three_d_secure_redirect': 'Redirection vers l\'authentification 3D Secure...',
-    'default': 'Une erreur est survenue lors du paiement. Veuillez réessayer ou contacter le support.'
-  };
-
-  // Gestion spécifique des erreurs 3D Secure
-  if (code?.includes('3ds')) {
-    return errorMessages['authentication_required'];
-  }
-
-  return errorMessages[code] || errorMessages['default'] || defaultMessage;
-}
-
-// Route pour récupérer la session
-router.get("/session/:sessionId", async (req, res) => {
-  const { sessionId } = req.params;
-
-  try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    logger.info('Session retrieved', { sessionId });
-    res.json(session);
-  } catch (err) {
-    const { status, message } = handleStripeError(err);
-    logger.error('Session retrieval error', { 
-      sessionId,
-      error: err.message 
-    });
-    res.status(status).json({ message });
-  }
-});
-
+export { stripe }; // Exporter l'instance Stripe pour une utilisation dans d'autres fichiers
 export default router;
