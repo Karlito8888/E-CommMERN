@@ -1,60 +1,96 @@
-// Generic localStorage utility functions
-export const getItem = (key) => {
-  return localStorage.getItem(key);
-};
-
-export const setItem = (key, value) => {
-  localStorage.setItem(key, value);
-};
-
-export const removeItem = (key) => {
-  localStorage.removeItem(key);
-};
-
-// Redux state persistence
-export const loadState = () => {
-  try {
-    const serializedState = localStorage.getItem('reduxState');
-    if (serializedState === null) {
-      return undefined;
+/**
+ * Wrapper pour localStorage avec gestion d'erreurs et typage
+ */
+class LocalStorage {
+  static get(key, defaultValue = null) {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : defaultValue;
+    } catch (error) {
+      console.error(`Erreur lors de la lecture de ${key}:`, error);
+      return defaultValue;
     }
-    return JSON.parse(serializedState);
-  } catch (err) {
-    console.error('Error loading state:', err);
-    return undefined;
   }
-};
 
-export const saveState = (state) => {
-  try {
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem('reduxState', serializedState);
-  } catch (err) {
-    console.error('Error saving state:', err);
+  static set(key, value) {
+    try {
+      const serialized = JSON.stringify(value);
+      localStorage.setItem(key, serialized);
+      return true;
+    } catch (error) {
+      console.error(`Erreur lors de l'écriture de ${key}:`, error);
+      return false;
+    }
   }
-};
 
-// Add a product to a localStorage
-export const addFavoriteToLocalStorage = (product) => {
-  const favorites = getFavoritesFromLocalStorage();
-  if (!favorites.some((p) => p._id === product._id)) {
+  static remove(key) {
+    try {
+      localStorage.removeItem(key);
+      return true;
+    } catch (error) {
+      console.error(`Erreur lors de la suppression de ${key}:`, error);
+      return false;
+    }
+  }
+
+  static clear() {
+    try {
+      localStorage.clear();
+      return true;
+    } catch (error) {
+      console.error('Erreur lors du nettoyage du localStorage:', error);
+      return false;
+    }
+  }
+}
+
+/**
+ * Gestion des favoris dans le localStorage
+ */
+export const FavoritesStorage = {
+  KEY: 'favorites',
+
+  getItems() {
+    return LocalStorage.get(this.KEY, []);
+  },
+
+  set(favorites) {
+    return LocalStorage.set(this.KEY, favorites);
+  },
+
+  addItem(product) {
+    const favorites = this.getItems();
     favorites.push(product);
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+    return this.set(favorites);
+  },
+
+  removeItem(productId) {
+    const favorites = this.getItems().filter(item => item._id !== productId);
+    return this.set(favorites);
+  },
+
+  clear() {
+    return LocalStorage.remove(this.KEY);
   }
 };
 
-// Remove  product from a localStorage
-export const removeFavoriteFromLocalStorage = (productId) => {
-  const favorites = getFavoritesFromLocalStorage();
-  const updateFavorites = favorites.filter(
-    (product) => product._id !== productId
-  );
+/**
+ * Gestion du state Redux
+ */
+export const ReduxStorage = {
+  KEY: 'reduxState',
 
-  localStorage.setItem("favorites", JSON.stringify(updateFavorites));
+  loadState() {
+    return LocalStorage.get(this.KEY, undefined);
+  },
+
+  saveState(state) {
+    return LocalStorage.set(this.KEY, state);
+  },
+
+  clearState() {
+    return LocalStorage.remove(this.KEY);
+  }
 };
 
-// Retrive favorites from a localStorage
-export const getFavoritesFromLocalStorage = () => {
-  const favoritesJSON = localStorage.getItem("favorites");
-  return favoritesJSON ? JSON.parse(favoritesJSON) : [];
-};
+export default LocalStorage;

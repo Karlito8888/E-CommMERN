@@ -1,59 +1,182 @@
-// frontend/src/redux/cartSlice.js
+// frontend/src/redux/features/cart/cartSlice.js
 
 import { createSlice } from "@reduxjs/toolkit";
-import { updateCart } from "../../../Utils/cartUtils";
+import { CartCalculator } from "../../../Utils/cartUtils";
+import { cartApi } from "./cartApiSlice";
 
-const initialState = localStorage.getItem("cart")
-  ? JSON.parse(localStorage.getItem("cart"))
-  : { cartItems: [], shippingAddress: {} };
+const initialState = {
+  items: [],
+  shippingAddress: {},
+  itemsPrice: 0,
+  shippingPrice: 0,
+  taxPrice: 0,
+  totalPrice: 0,
+  loading: false,
+  error: null,
+};
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
     addToCart: (state, action) => {
-      const { user, rating, numReviews, reviews, ...item } = action.payload;
-      const existItem = state.cartItems.find((x) => x._id === item._id);
+      const newItem = action.payload;
+      
+      if (!CartCalculator.validateCartItem(newItem)) {
+        state.error = "Article invalide";
+        return;
+      }
 
-      if (existItem) {
-        state.cartItems = state.cartItems.map((x) =>
-          x._id === existItem._id ? item : x
+      const existingItem = state.items.find((x) => x.product === newItem.product);
+
+      if (existingItem) {
+        existingItem.quantity = Math.min(
+          newItem.quantity,
+          existingItem.countInStock || Infinity
         );
       } else {
-        state.cartItems = [...state.cartItems, item];
+        state.items.push(newItem);
       }
-      updateCart(state);
+
+      // Recalculer les totaux
+      const totals = CartCalculator.calculateTotals(state.items);
+      Object.assign(state, totals);
+      state.error = null;
+
+      // Préparer pour le stockage local
+      state.items = CartCalculator.prepareCartForStorage(state.items);
     },
 
     removeFromCart: (state, action) => {
-      state.cartItems = state.cartItems.filter((x) => x._id !== action.payload);
-      updateCart(state);
+      state.items = state.items.filter((x) => x.product !== action.payload);
+      
+      // Recalculer les totaux
+      const totals = CartCalculator.calculateTotals(state.items);
+      Object.assign(state, totals);
+      state.error = null;
+    },
+
+    updateCartItemQuantity: (state, action) => {
+      const { productId, quantity } = action.payload;
+      const item = state.items.find((x) => x.product === productId);
+      
+      if (item) {
+        if (quantity > 0 && quantity <= (item.countInStock || Infinity)) {
+          item.quantity = quantity;
+          // Recalculer les totaux
+          const totals = CartCalculator.calculateTotals(state.items);
+          Object.assign(state, totals);
+          state.error = null;
+        } else {
+          state.error = "Quantité invalide";
+        }
+      }
     },
 
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
-      updateCart(state);
+      state.error = null;
     },
 
-    clearCartItems: (state) => {
-      state.cartItems = [];
-      updateCart(state);
+    clearCart: (state) => {
+      state.items = [];
+      const totals = CartCalculator.calculateTotals([]);
+      Object.assign(state, totals);
+      state.error = null;
     },
 
     resetCart: (state) => {
-      state.cartItems = [];
-      state.shippingAddress = {};
-      updateCart(state); 
+      Object.assign(state, initialState);
     },
+
+    setCartError: (state, action) => {
+      state.error = action.payload;
+    },
+
+    setCartLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+  },
+  
+  // Gérer les actions asynchrones du cartApi
+  extraReducers: (builder) => {
+    builder
+      // GetCart
+      .addMatcher(
+        cartApi.endpoints.getCart.matchPending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        cartApi.endpoints.getCart.matchFulfilled,
+        (state, { payload }) => {
+          state.loading = false;
+          state.items = CartCalculator.prepareCartForStorage(payload.items);
+          const totals = CartCalculator.calculateTotals(payload.items);
+          Object.assign(state, totals);
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        cartApi.endpoints.getCart.matchRejected,
+        (state, { error }) => {
+          state.loading = false;
+          state.error = error.message;
+        }
+      )
+      // SyncCart
+      .addMatcher(
+        cartApi.endpoints.syncCart.matchPending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        cartApi.endpoints.syncCart.matchFulfilled,
+        (state, { payload }) => {
+          state.loading = false;
+          state.items = CartCalculator.prepareCartForStorage(payload.items);
+          const totals = CartCalculator.calculateTotals(payload.items);
+          Object.assign(state, totals);
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        cartApi.endpoints.syncCart.matchRejected,
+        (state, { error }) => {
+          state.loading = false;
+          state.error = error.message;
+        }
+      );
   },
 });
 
 export const {
   addToCart,
   removeFromCart,
+  updateCartItemQuantity,
   saveShippingAddress,
-  clearCartItems,
+  clearCart,
   resetCart,
+  setCartError,
+  setCartLoading,
 } = cartSlice.actions;
+
+// Sélecteurs
+export const selectCartItems = (state) => state.cart.items;
+export const selectCartItemById = (state, productId) => 
+  state.cart.items.find(item => item.product === productId);
+export const selectCartTotals = (state) => ({
+  itemsPrice: state.cart.itemsPrice,
+  shippingPrice: state.cart.shippingPrice,
+  taxPrice: state.cart.taxPrice,
+  totalPrice: state.cart.totalPrice,
+});
+export const selectShippingAddress = (state) => state.cart.shippingAddress;
+export const selectCartError = (state) => state.cart.error;
+export const selectCartLoading = (state) => state.cart.loading;
 
 export default cartSlice.reducer;

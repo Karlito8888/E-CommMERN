@@ -111,6 +111,17 @@ const getTopProducts = asyncHandler(async (req, res) => {
   res.json(products.map(formatProduct));
 });
 
+const getTopRatedProducts = asyncHandler(async (req, res) => {
+  const limit = Number(req.query.limit) || 3;
+
+  const products = await Product.find({})
+    .sort({ rating: -1 })
+    .limit(limit)
+    .lean();
+
+  res.json(products);
+});
+
 const createProduct = asyncHandler(async (req, res) => {
   const { name, price, description, brand, category, stock } = req.body;
 
@@ -187,6 +198,7 @@ export {
   getProduct,
   getProductsByCategory,
   getTopProducts,
+  getTopRatedProducts,
   createProduct,
   updateProduct,
   deleteProduct

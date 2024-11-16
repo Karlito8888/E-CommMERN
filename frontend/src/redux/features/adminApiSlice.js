@@ -1,48 +1,123 @@
 // frontend/src/redux/features/adminApiSlice.js
+import { apiSlice } from './apiSlice';
+import { USERS_URL, ORDERS_URL, PRODUCT_URL, CATEGORY_URL } from '../constants';
 
-import { apiSlice } from "./apiSlice";
-import { USERS_URL } from "../constants";
-
-// Définition des points de terminaison pour les utilisateurs (avec autorisation admin)
 export const adminApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Obtenir tous les utilisateurs
+    // Gestion des utilisateurs
     getUsers: builder.query({
-      query: () => ({
-        url: USERS_URL,
-      }),
-      providesTags: ["User"],
+      query: () => USERS_URL,
+      providesTags: ['User'],
     }),
-    // Supprimer un utilisateur par ID
+
+    getUserDetails: builder.query({
+      query: (userId) => `${USERS_URL}/${userId}`,
+      providesTags: ['User'],
+    }),
+
+    updateUser: builder.mutation({
+      query: ({ userId, ...data }) => ({
+        url: `${USERS_URL}/${userId}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+
     deleteUser: builder.mutation({
-      query: (id) => ({
-        url: `${USERS_URL}/${id}`,
-        method: "DELETE",
+      query: (userId) => ({
+        url: `${USERS_URL}/${userId}`,
+        method: 'DELETE',
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ['User'],
     }),
-    // Obtenir un utilisateur par ID
-    getUserById: builder.query({
-      query: (id) => `${USERS_URL}/${id}`,
-      providesTags: (result, error, id) => [{ type: "User", id }],
+
+    // Gestion des commandes
+    getAllOrders: builder.query({
+      query: () => ORDERS_URL,
+      providesTags: ['Order'],
     }),
-    // Mettre à jour un utilisateur par ID
-    updateUserById: builder.mutation({
-      query: ({ id, ...updatedUser }) => ({
-        url: `${USERS_URL}/${id}`,
-        method: "PUT",
-        body: updatedUser,
+
+    updateOrderStatus: builder.mutation({
+      query: ({ orderId, ...data }) => ({
+        url: `${ORDERS_URL}/${orderId}`,
+        method: 'PUT',
+        body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "User", id }],
+      invalidatesTags: ['Order'],
+    }),
+
+    // Gestion des produits
+    createProduct: builder.mutation({
+      query: (data) => ({
+        url: PRODUCT_URL,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Product'],
+    }),
+
+    updateProduct: builder.mutation({
+      query: ({ productId, ...data }) => ({
+        url: `${PRODUCT_URL}/${productId}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Product'],
+    }),
+
+    deleteProduct: builder.mutation({
+      query: (productId) => ({
+        url: `${PRODUCT_URL}/${productId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Product'],
+    }),
+
+    // Gestion des catégories
+    createCategory: builder.mutation({
+      query: (data) => ({
+        url: CATEGORY_URL,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Category'],
+    }),
+
+    updateCategory: builder.mutation({
+      query: ({ categoryId, ...data }) => ({
+        url: `${CATEGORY_URL}/${categoryId}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Category'],
+    }),
+
+    deleteCategory: builder.mutation({
+      query: (categoryId) => ({
+        url: `${CATEGORY_URL}/${categoryId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Category'],
     }),
   }),
 });
 
-// Export des hooks générés par les points de terminaison
 export const {
+  // Users
   useGetUsersQuery,
+  useGetUserDetailsQuery,
+  useUpdateUserMutation,
   useDeleteUserMutation,
-  useGetUserByIdQuery,
-  useUpdateUserByIdMutation,
+  // Orders
+  useGetAllOrdersQuery,
+  useUpdateOrderStatusMutation,
+  // Products
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
+  // Categories
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
 } = adminApiSlice;
-

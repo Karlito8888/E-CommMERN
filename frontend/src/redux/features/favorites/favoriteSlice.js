@@ -1,27 +1,51 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { FavoritesStorage } from "../../../Utils/localStorage";
+
+// Charger l'état initial depuis le localStorage
+const initialState = FavoritesStorage.getItems();
 
 const favoriteSlice = createSlice({
   name: "favorites",
-  initialState: [],
+  initialState,
   reducers: {
     addToFavorites: (state, action) => {
-      // Checkif the product is not already favorites
-      if (!state.some((product) => product._id === action.payload._id)) {
-        state.push(action.payload);
+      const product = action.payload;
+      if (!state.some((item) => item._id === product._id)) {
+        state.push(product);
+        // Synchroniser avec localStorage
+        FavoritesStorage.addItem(product);
       }
     },
     removeFromFavorites: (state, action) => {
-      // Remove the product with the matching ID
-      return state.filter((product) => product._id !== action.payload._id);
+      const productId = action.payload._id;
+      const newState = state.filter((product) => product._id !== productId);
+      // Synchroniser avec localStorage
+      FavoritesStorage.removeItem(productId);
+      return newState;
     },
     setFavorites: (state, action) => {
-      // Set the favorites from localStorage
-      return action.payload;
+      const favorites = action.payload;
+      // Synchroniser avec localStorage
+      FavoritesStorage.set(favorites);
+      return favorites;
+    },
+    clearFavorites: (state) => {
+      // Synchroniser avec localStorage
+      FavoritesStorage.clear();
+      return [];
     },
   },
 });
 
-export const { addToFavorites, removeFromFavorites, setFavorites } =
-  favoriteSlice.actions;
-export const selectFavoriteProduct = (state) => state.favorites;
+export const { 
+  addToFavorites, 
+  removeFromFavorites, 
+  setFavorites,
+  clearFavorites 
+} = favoriteSlice.actions;
+
+export const selectFavoriteProducts = (state) => state.favorites;
+export const selectIsFavorite = (productId) => (state) => 
+  state.favorites.some(product => product._id === productId);
+
 export default favoriteSlice.reducer;
