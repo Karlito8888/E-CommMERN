@@ -5,39 +5,112 @@ import Category from '../models/categoryModel.js';
 import Product from '../models/productModel.js';
 import Order from '../models/orderModel.js';
 import Cart from '../models/cartModel.js';
+import slugify from 'slugify';
+
+const dropCollectionIndexes = async (collection) => {
+  try {
+    await collection.dropIndexes();
+  } catch (error) {
+    // Ignorer l'erreur si la collection n'existe pas encore
+    if (error.code !== 26) {
+      throw error;
+    }
+  }
+};
+
+const cleanupData = async () => {
+  console.log('🧹 Cleaning up data before creating indexes...');
+
+  // Nettoyer les catégories avec des slugs nuls ou invalides
+  const categories = await Category.find({ $or: [
+    { slug: null },
+    { slug: '' },
+    { slug: { $exists: false } }
+  ]});
+
+  for (const category of categories) {
+    if (!category.name) {
+      await Category.deleteOne({ _id: category._id });
+    } else {
+      category.slug = slugify(category.name, { lower: true, strict: true });
+      await category.save();
+    }
+  }
+
+  // Supprimer les doublons de slug dans les catégories
+  const slugCounts = await Category.aggregate([
+    { $group: { 
+      _id: "$slug", 
+      count: { $sum: 1 },
+      docs: { $push: "$$ROOT" }
+    }},
+    { $match: { count: { $gt: 1 } }}
+  ]);
+
+  for (const group of slugCounts) {
+    // Garder le premier document et mettre à jour les autres
+    const [keep, ...duplicates] = group.docs;
+    for (const dup of duplicates) {
+      const category = await Category.findById(dup._id);
+      if (category) {
+        category.slug = `${slugify(category.name, { lower: true, strict: true })}-${category._id.toString().slice(-4)}`;
+        await category.save();
+      }
+    }
+  }
+};
 
 export const setupIndexes = async () => {
   try {
-    // Index utilisateurs
-    await User.collection.createIndex({ email: 1 }, { unique: true });
-    await User.collection.createIndex({ isAdmin: 1 });
-    await User.collection.createIndex({ email: 1, username: 1 });
+    console.log('🔄 Setting up database indexes...');
 
-    // Index catégories
-    await Category.collection.createIndex({ name: 1 }, { unique: true });
-    await Category.collection.createIndex({ slug: 1 }, { unique: true });
+    // Supprimer tous les index existants
+    await Promise.all([
+      dropCollectionIndexes(User.collection),
+      dropCollectionIndexes(Category.collection),
+      dropCollectionIndexes(Product.collection),
+      dropCollectionIndexes(Order.collection),
+      dropCollectionIndexes(Cart.collection),
+    ]);
 
-    // Index produits
-    await Product.collection.createIndex({ category: 1 });
-    await Product.collection.createIndex({ name: 'text', brand: 'text', description: 'text' });
-    await Product.collection.createIndex({ price: 1 });
-    await Product.collection.createIndex({ rating: -1 });
-    await Product.collection.createIndex({ createdAt: -1 });
+    // Nettoyer les données avant de créer les index
+    await cleanupData();
 
-    // Index commandes
-    await Order.collection.createIndex({ user: 1 });
-    await Order.collection.createIndex({ 'orderItems.product': 1 });
-    await Order.collection.createIndex({ 'paymentResult.id': 1 }, { sparse: true });
-    await Order.collection.createIndex({ status: 1 });
-    await Order.collection.createIndex({ user: 1, createdAt: -1 });
-    await Order.collection.createIndex({ status: 1, createdAt: -1 });
+    // Créer les nouveaux index
+    await Promise.all([
+      // Index utilisateurs
+      User.collection.createIndex({ email: 1 }, { unique: true }),
+      User.collection.createIndex({ isAdmin: 1 }),
+      User.collection.createIndex({ email: 1, username: 1 }),
 
-    // Index panier
-    await Cart.collection.createIndex({ user: 1 }, { unique: true });
+      // Index catégories
+      Category.collection.createIndex({ name: 1 }, { unique: true }),
+      Category.collection.createIndex({ slug: 1 }, { unique: true }),
+
+      // Index produits
+      Product.collection.createIndex({ category: 1 }),
+      Product.collection.createIndex(
+        { name: 'text', brand: 'text', description: 'text' }
+      ),
+      Product.collection.createIndex({ price: 1 }),
+      Product.collection.createIndex({ rating: -1 }),
+      Product.collection.createIndex({ createdAt: -1 }),
+
+      // Index commandes
+      Order.collection.createIndex({ user: 1 }),
+      Order.collection.createIndex({ 'orderItems.product': 1 }),
+      Order.collection.createIndex({ 'paymentResult.id': 1 }, { sparse: true }),
+      Order.collection.createIndex({ status: 1 }),
+      Order.collection.createIndex({ user: 1, createdAt: -1 }),
+      Order.collection.createIndex({ status: 1, createdAt: -1 }),
+
+      // Index panier
+      Cart.collection.createIndex({ user: 1 }, { unique: true }),
+    ]);
 
     console.log('✅ Database indexes setup complete');
   } catch (error) {
-    console.error('Error setting up indexes:', error);
+    console.error('❌ Error setting up indexes:', error.message);
     throw error;
   }
 };
