@@ -8,13 +8,11 @@ import {
   validatePassword,
   sendEmail,
   hashPassword,
-  cache,
   createTransporter
 } from "../core/index.js";
 import crypto from 'crypto';
 
 // Constants
-const CACHE_TTL = 300; // 5 minutes
 const PASSWORD_RESET_EXPIRY = 10 * 60 * 1000; // 10 minutes
 
 // Format de réponse standard pour les utilisateurs
@@ -94,7 +92,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 // Déconnexion utilisateur
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutCurrentUser = asyncHandler(async (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
     expires: new Date(0),
@@ -105,26 +103,17 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 // Obtenir le profil utilisateur
-const getUserProfile = asyncHandler(async (req, res) => {
-  const cacheKey = `user_profile_${req.user._id}`;
-  const cachedUser = await cache.get(cacheKey);
-  
-  if (cachedUser) {
-    return res.json(cachedUser);
-  }
-
+const getCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).lean();
   if (!user) {
     return res.status(404).json({ message: "Utilisateur introuvable" });
   }
 
-  const formattedUser = formatUserResponse(user);
-  await cache.set(cacheKey, formattedUser, CACHE_TTL);
-  res.json(formattedUser);
+  res.json(formatUserResponse(user));
 });
 
 // Mettre à jour le profil utilisateur
-const updateUserProfile = asyncHandler(async (req, res) => {
+const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   const { username, email, shippingAddress } = req.body;
   
   const existsMessage = await checkUserExists(email, username, req.user._id);
@@ -140,7 +129,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (shippingAddress) user.shippingAddress = shippingAddress;
 
   const updatedUser = await user.save();
-  await cache.del(`user_profile_${req.user._id}`);
   res.json(formatUserResponse(updatedUser));
 });
 
@@ -173,13 +161,6 @@ const getAllUsers = asyncHandler(async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 10, 50);
   const skip = (page - 1) * limit;
 
-  const cacheKey = `users_list_${page}_${limit}`;
-  const cachedUsers = await cache.get(cacheKey);
-  
-  if (cachedUsers) {
-    return res.json(cachedUsers);
-  }
-
   const [users, total] = await Promise.all([
     User.find({})
       .select('-password')
@@ -197,25 +178,20 @@ const getAllUsers = asyncHandler(async (req, res) => {
     total
   };
 
-  await cache.set(cacheKey, result, CACHE_TTL);
   res.json(result);
 });
 
 // Admin: Obtenir un utilisateur par ID
 const getUserById = asyncHandler(async (req, res) => {
-  const cacheKey = `user_${req.params.id}`;
-  const cachedUser = await cache.get(cacheKey);
-  
-  if (cachedUser) {
-    return res.json(cachedUser);
+  const user = await User.findById(req.params.id)
+    .select('-password')
+    .lean();
+
+  if (!user) {
+    return res.status(404).json({ message: "Utilisateur non trouvé" });
   }
 
-  const user = await User.findById(req.params.id).lean();
-  if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-
-  const formattedUser = formatUserResponse(user);
-  await cache.set(cacheKey, formattedUser, CACHE_TTL);
-  res.json(formattedUser);
+  res.json(formatUserResponse(user));
 });
 
 // Admin: Mettre à jour un utilisateur
@@ -233,12 +209,6 @@ const updateUserById = asyncHandler(async (req, res) => {
   user.isAdmin = isAdmin ?? user.isAdmin;
 
   const updatedUser = await user.save();
-  await Promise.all([
-    cache.del(`user_${req.params.id}`),
-    cache.del(`user_profile_${req.params.id}`),
-    cache.del(/^users_list_/)
-  ]);
-  
   res.json(formatUserResponse(updatedUser));
 });
 
@@ -251,12 +221,6 @@ const deleteUserById = asyncHandler(async (req, res) => {
   }
 
   await user.deleteOne();
-  await Promise.all([
-    cache.del(`user_${req.params.id}`),
-    cache.del(`user_profile_${req.params.id}`),
-    cache.del(/^users_list_/)
-  ]);
-  
   res.json({ message: "Utilisateur supprimé" });
 });
 
@@ -270,8 +234,6 @@ const updateShippingAddress = asyncHandler(async (req, res) => {
 
   user.shippingAddress = req.body;
   const updatedUser = await user.save();
-  
-  await cache.del(`user_profile_${req.user._id}`);
   res.json(formatUserResponse(updatedUser));
 });
 
@@ -354,9 +316,9 @@ const resetPassword = asyncHandler(async (req, res) => {
 export {
   createUser,
   loginUser,
-  logoutUser,
-  getUserProfile,
-  updateUserProfile,
+  logoutCurrentUser,
+  getCurrentUserProfile,
+  updateCurrentUserProfile,
   changeUserPassword,
   getAllUsers,
   getUserById,

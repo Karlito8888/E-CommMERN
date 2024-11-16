@@ -1,11 +1,11 @@
-import { useGetTopProductsQuery } from "../redux/features/productApiSlice";
+import { useGetTopRatedProductsQuery } from "../redux/features/productApiSlice";
 import Loader from "./Loader";
 import SmallProduct from "../pages/Products/SmallProduct";
 import ProductCarousel from "../pages/Products/ProductCarousel";
 import Message from "./Message";
 
 const Podium = () => {
-  const { data, isLoading, error } = useGetTopProductsQuery();
+  const { data, isLoading, error } = useGetTopRatedProductsQuery();
 
   if (isLoading) {
     return <Loader />;
@@ -22,7 +22,11 @@ const Podium = () => {
   const topProducts = data?.data || [];
 
   if (!topProducts.length) {
-    return <Message variant="info">Aucun produit top n'est disponible pour le moment.</Message>;
+    return (
+      <Message variant="info">
+        Aucun produit top n'est disponible pour le moment.
+      </Message>
+    );
   }
 
   return (

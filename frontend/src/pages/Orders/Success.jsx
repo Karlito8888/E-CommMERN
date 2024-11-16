@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useGetSessionQuery } from "../../redux/features/services/paymentService";
 import { useDispatch } from "react-redux";
-import { clearCartItems } from "../../redux/features/cart/cartSlice";
+import { clearCart } from "../../redux/features/cart/cartSlice";
 
 const Success = () => {
   const location = useLocation();
@@ -20,7 +20,7 @@ const Success = () => {
   // Efface les éléments du panier après un achat réussi
   useEffect(() => {
     if (data && !isLoading) {
-      dispatch(clearCartItems());
+      dispatch(clearCart());
     }
     if (error) {
       console.error("Erreur lors de la récupération de la session :", error);

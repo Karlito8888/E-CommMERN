@@ -16,7 +16,7 @@ import {
   requestPasswordReset,
   resetPassword,
 } from '../controllers/userController.js';
-import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js';
+import { authenticate, authorizeAdmin } from '../core/index.js';
 
 const router = express.Router();
 

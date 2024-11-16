@@ -8,7 +8,7 @@ import {
 } from "../redux/features/shop/shopSlice";
 import Loader from "../components/Loader";
 import ProductCard from "./Products/ProductCard";
-import { useFetchCategoriesQuery } from "../redux/features/categoriesApiSlice";
+import { useGetCategoriesQuery } from "../redux/features/categoriesApiSlice";
 import { 
   useGetFilteredProductsQuery, 
   useGetProductsQuery,
@@ -24,7 +24,7 @@ const Shop = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 24;
 
-  const categoriesQuery = useFetchCategoriesQuery();
+  const categoriesQuery = useGetCategoriesQuery();
   const brandsQuery = useGetAllBrandsQuery();
   const allProductsQuery = useGetProductsQuery({
     page: currentPage,

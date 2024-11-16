@@ -12,10 +12,14 @@ import {
   FaStar,
   FaStore,
 } from "react-icons/fa";
-import { useGetTopProductsQuery } from "../../redux/features/productApiSlice";
+import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
 
 const ProductCarousel = () => {
-  const { data: products = [], isLoading, error } = useGetTopProductsQuery();
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useGetTopRatedProductsQuery();
 
   const settings = {
     dots: false,
@@ -105,4 +109,3 @@ const ProductCarousel = () => {
 };
 
 export default ProductCarousel;
-

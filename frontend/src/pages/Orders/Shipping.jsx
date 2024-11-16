@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { saveShippingAddress } from "../../redux/features/cart/cartSlice";
 import ProgressSteps from "../../components/ProgressSteps";
-import { useProfileQuery } from "../../redux/features/usersApiSlice";
+import { useGetProfileQuery } from "../../redux/features/usersApiSlice";
 
 const Shipping = () => {
   const cart = useSelector((state) => state.cart);
@@ -19,11 +19,7 @@ const Shipping = () => {
   const navigate = useNavigate();
 
   // Utilisation du hook pour obtenir le profil de l'utilisateur actuel
-  const {
-    data: userProfile,
-    isLoading,
-    error,
-  } = useProfileQuery();
+  const { data: userProfile, isLoading, error } = useGetProfileQuery();
 
   useEffect(() => {
     if (userProfile && userProfile.user && userProfile.user.shippingAddress) {

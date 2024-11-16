@@ -47,6 +47,23 @@ export const adminApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['Order'],
     }),
 
+    deliverOrder: builder.mutation({
+      query: (orderId) => ({
+        url: `${ORDERS_URL}/${orderId}/deliver`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['Order'],
+    }),
+
+    payOrder: builder.mutation({
+      query: ({ orderId, details }) => ({
+        url: `${ORDERS_URL}/${orderId}/pay`,
+        method: 'PUT',
+        body: details,
+      }),
+      invalidatesTags: ['Order'],
+    }),
+
     // Gestion des produits
     createProduct: builder.mutation({
       query: (data) => ({
@@ -70,6 +87,15 @@ export const adminApiSlice = apiSlice.injectEndpoints({
       query: (productId) => ({
         url: `${PRODUCT_URL}/${productId}`,
         method: 'DELETE',
+      }),
+      invalidatesTags: ['Product'],
+    }),
+
+    uploadImage: builder.mutation({
+      query: (data) => ({
+        url: `${PRODUCT_URL}/upload`,
+        method: 'POST',
+        body: data,
       }),
       invalidatesTags: ['Product'],
     }),
@@ -109,13 +135,19 @@ export const {
   useGetUserDetailsQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  
   // Orders
   useGetAllOrdersQuery,
   useUpdateOrderStatusMutation,
+  useDeliverOrderMutation,
+  usePayOrderMutation,
+  
   // Products
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useUploadImageMutation,
+  
   // Categories
   useCreateCategoryMutation,
   useUpdateCategoryMutation,

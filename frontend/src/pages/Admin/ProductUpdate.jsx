@@ -1,22 +1,25 @@
 // frontend/src/pages/ProductUpdate.jsx
 
+import React from "react";
 import { useState, useEffect } from "react";
 import AdminMenu from "./AdminMenu";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
+  useGetProductByIdQuery,
+} from "../../redux/features/productApiSlice";
+import {
   useDeleteProductMutation,
-  useGetProductQuery,
   useUpdateProductMutation,
   useUploadImageMutation,
-} from "../../redux/features/productApiSlice";
-import { useFetchCategoriesQuery } from "../../redux/features/categoriesApiSlice";
+} from "../../redux/features/adminApiSlice";
+import { useGetCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 
 const ProductUpdate = () => {
   const navigate = useNavigate();
   const { _id: productId } = useParams();
-  const { data: productData } = useGetProductQuery(productId);
-  const { data: categories = [] } = useFetchCategoriesQuery();
+  const { data: productData } = useGetProductByIdQuery(productId);
+  const { data: categories = [] } = useGetCategoriesQuery();
 
   const [product, setProduct] = useState({
     image: "",
@@ -29,9 +32,9 @@ const ProductUpdate = () => {
     stock: 0,
   });
 
-  const [uploadProductImage] = useUploadImageMutation();
   const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
+  const [uploadProductImage] = useUploadImageMutation();
 
   useEffect(() => {
     if (productData && productData.data) {

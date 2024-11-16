@@ -16,7 +16,7 @@ import HeartIcon from "./HeartIcon";
 // import Ratings from "./Ratings";
 import ProductTabs from "./ProductTabs";
 import { addToCart } from "../../redux/features/cart/cartSlice";
-import { useCreateReviewMutation, useGetProductQuery } from "../../redux/features/productApiSlice";
+import { useCreateReviewMutation, useGetProductByIdQuery } from "../../redux/features/productApiSlice";
 
 const ProductDetails = () => {
   const { id: productId } = useParams();
@@ -32,7 +32,7 @@ const ProductDetails = () => {
     isLoading,
     refetch,
     error,
-  } = useGetProductQuery(productId);
+  } = useGetProductByIdQuery(productId);
 
   const { userInfo } = useSelector((state) => state.auth);
 

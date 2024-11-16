@@ -5,8 +5,8 @@ import AdminMenu from "./AdminMenu";
 import {
   useCreateProductMutation,
   useUploadImageMutation,
-} from "../../redux/features/productApiSlice";
-import { useFetchCategoriesQuery } from "../../redux/features/categoriesApiSlice";
+} from "../../redux/features/adminApiSlice";
+import { useGetCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 
 const ProductCreate = () => {
   const initialFormValues = {
@@ -25,7 +25,7 @@ const ProductCreate = () => {
   const navigate = useNavigate();
   const [uploadProductImage] = useUploadImageMutation();
   const [createProduct] = useCreateProductMutation();
-  const { data: categories } = useFetchCategoriesQuery();
+  const { data: categories } = useGetCategoriesQuery();
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;

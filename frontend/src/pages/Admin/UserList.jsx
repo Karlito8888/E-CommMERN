@@ -5,7 +5,7 @@ import Loader from "../../components/Loader";
 import {
   useDeleteUserMutation,
   useGetUsersQuery,
-  useUpdateUserByIdMutation,
+  useUpdateUserMutation,
   // useGetUserByIdQuery,
 } from "../../redux/features/adminApiSlice.js";
 import { toast } from "react-toastify";
@@ -18,7 +18,7 @@ const UserList = () => {
   const [editableUserId, setEditableUserId] = useState(null);
   const [editableUserName, setEditableUserName] = useState("");
   const [editableUserEmail, setEditableUserEmail] = useState("");
-  const [updateUser] = useUpdateUserByIdMutation();
+  const [updateUser] = useUpdateUserMutation();
 
   useEffect(() => {
     refetch();

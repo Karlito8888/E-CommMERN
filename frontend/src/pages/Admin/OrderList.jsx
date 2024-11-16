@@ -1,11 +1,11 @@
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
 import { Link } from "react-router-dom";
-import { useGetOrdersQuery } from "../../redux/features/orderApiSlice";
+import { useGetAllOrdersQuery } from "../../redux/features/adminApiSlice";
 import AdminMenu from "./AdminMenu";
 
 const OrderList = () => {
-  const { data: orders, isLoading, error } = useGetOrdersQuery();
+  const { data: orders, isLoading, error } = useGetAllOrdersQuery();
 
   return (
     <>

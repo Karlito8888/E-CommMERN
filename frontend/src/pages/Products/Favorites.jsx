@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
-import { selectFavoriteProduct } from "../../redux/features/favorites/favoriteSlice";
+import { selectFavoriteProducts } from "../../redux/features/favorites/favoriteSlice";
 import Product from "./Product";
 
 const Favoris = () => {
   // Récupération des produits favoris depuis le store Redux
-  const favoris = useSelector(selectFavoriteProduct);
+  const favoris = useSelector(selectFavoriteProducts);
 
   return (
     <div className="favoris-container">

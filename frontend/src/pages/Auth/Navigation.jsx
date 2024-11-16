@@ -19,7 +19,7 @@ import Users from "./icons/users.svg";
 
 const Navigation = () => {
   const { userInfo } = useSelector((state) => state.auth);
-  const { cartItems } = useSelector((state) => state.cart);
+  const { items } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logoutApiCall] = useLogoutMutation();
@@ -34,7 +34,7 @@ const Navigation = () => {
     }
   };
 
-  const totalCartItems = cartItems.reduce((a, c) => a + c.qty, 0);
+  const totalCartItems = items?.reduce((a, c) => a + c.quantity, 0) || 0;
 
   return (
     <aside>

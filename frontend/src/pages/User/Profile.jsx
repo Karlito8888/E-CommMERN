@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import { setCredentials } from "../../redux/features/auth/authSlice";
 import {
-  useProfileQuery,
+  useGetProfileQuery,
   useUpdateProfileMutation,
 } from "../../redux/features/usersApiSlice";
 import InputField from "../../components/auth/InputField";
@@ -12,7 +12,7 @@ import SubmitButton from "../../components/auth/SubmitButton";
 
 const Profile = () => {
   const { data: userProfile, isLoading: loadingProfile } =
-    useProfileQuery();
+    useGetProfileQuery();
   // console.log("userProfile:", userProfile);
   const [username, setUserName] = useState(userProfile?.user?.username || "");
   const [email, setEmail] = useState(userProfile?.user?.email || "");

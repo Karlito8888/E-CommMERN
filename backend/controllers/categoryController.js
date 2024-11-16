@@ -90,22 +90,25 @@ const listCategories = asyncHandler(async (req, res) => {
   const categories = await Category.find()
     .select('name slug productsCount')
     .sort({ name: 1 })
-    .lean()
-    .cache(300); // Cache 5 minutes
+    .lean();
     
   res.json(categories.map(formatCategory));
 });
 
-// Obtenir une catégorie par ID ou slug
-const getCategory = asyncHandler(async (req, res) => {
-  const query = req.params.categoryId ? 
-    { _id: req.params.categoryId } : 
-    { slug: req.params.slug };
+// Obtenir une catégorie par ID
+const getCategoryById = asyncHandler(async (req, res) => {
+  const category = await Category.findById(req.params.categoryId).lean();
+  
+  if (!category) {
+    return res.status(404).json({ message: "Catégorie introuvable" });
+  }
+  
+  res.json(formatCategory(category));
+});
 
-  const category = await Category.findOne(query)
-    .select('name slug productsCount')
-    .lean()
-    .cache(300);
+// Obtenir une catégorie par slug
+const getCategoryBySlug = asyncHandler(async (req, res) => {
+  const category = await Category.findOne({ slug: req.params.slug }).lean();
   
   if (!category) {
     return res.status(404).json({ message: "Catégorie introuvable" });
@@ -119,5 +122,6 @@ export {
   updateCategory,
   removeCategory,
   listCategories,
-  getCategory
+  getCategoryById,
+  getCategoryBySlug,
 };

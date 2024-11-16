@@ -7,6 +7,9 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductReview,
+  getFilteredProducts,
+  getAllBrands,
 } from '../controllers/productController.js';
 import { authenticate, authorizeAdmin } from '../core/index.js';
 import { upload, processImage } from './uploadRoutes.js';
@@ -23,8 +26,21 @@ router
   .get(getTopRatedProducts);
 
 router
+  .route('/filter')
+  .post(getFilteredProducts);
+
+router
+  .route('/brands')
+  .get(getAllBrands);
+
+router
   .route('/:id')
   .get(getProductById);
+
+// Route pour les reviews (protégée utilisateur)
+router
+  .route('/:id/reviews')
+  .post(authenticate, createProductReview);
 
 // Routes protégées Admin
 router.use(authenticate, authorizeAdmin);

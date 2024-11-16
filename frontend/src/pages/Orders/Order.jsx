@@ -7,10 +7,9 @@ import { toast } from "react-toastify";
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
 import {
-  useDeliverOrderMutation,
-  useGetOrderDetailsQuery,
-  usePayOrderMutation,
+  useGetOrderDetailsQuery
 } from "../../redux/features/orderApiSlice";
+import { useDeliverOrderMutation, usePayOrderMutation } from "../../redux/features/adminApiSlice";
 
 const Order = () => {
   const { id: orderId } = useParams();

@@ -4,7 +4,6 @@ import Product from '../models/productModel.js';
 import { asyncHandler } from '../core/index.js';
 
 const PRODUCT_FIELDS = 'name price description image thumbnail brand category stock rating numReviews';
-const CACHE_TTL = 300; // 5 minutes
 
 const formatProduct = product => ({
   _id: product._id,
@@ -38,9 +37,8 @@ const getProducts = asyncHandler(async (req, res) => {
       .sort(sort)
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean()
-      .cache(CACHE_TTL),
-    Product.countDocuments(query).cache(CACHE_TTL)
+      .lean(),
+    Product.countDocuments(query)
   ]);
 
   res.json({
@@ -64,18 +62,16 @@ const searchProducts = asyncHandler(async (req, res) => {
     .select(PRODUCT_FIELDS)
     .sort({ score: { $meta: 'textScore' } })
     .limit(20)
-    .lean()
-    .cache(CACHE_TTL);
+    .lean();
 
   res.json(products.map(formatProduct));
 });
 
-const getProduct = asyncHandler(async (req, res) => {
+const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
     .select(PRODUCT_FIELDS)
     .populate('category', 'name')
-    .lean()
-    .cache(CACHE_TTL);
+    .lean();
 
   if (!product) {
     return res.status(404).json({ message: 'Produit introuvable' });
@@ -91,35 +87,71 @@ const getProductsByCategory = asyncHandler(async (req, res) => {
   })
     .select(PRODUCT_FIELDS)
     .sort('-rating')
-    .lean()
-    .cache(CACHE_TTL);
-
-  res.json(products.map(formatProduct));
-});
-
-const getTopProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({ 
-    rating: { $gte: 4 },
-    stock: { $gt: 0 }
-  })
-    .select(PRODUCT_FIELDS)
-    .sort('-rating -numReviews')
-    .limit(4)
-    .lean()
-    .cache(CACHE_TTL);
+    .lean();
 
   res.json(products.map(formatProduct));
 });
 
 const getTopRatedProducts = asyncHandler(async (req, res) => {
-  const limit = Number(req.query.limit) || 3;
-
-  const products = await Product.find({})
-    .sort({ rating: -1 })
+  const limit = Math.min(parseInt(req.query.limit) || 3, 10);
+  
+  const products = await Product.find({ 
+    rating: { $gt: 4 },
+    numReviews: { $gt: 0 }
+  })
+    .select(PRODUCT_FIELDS)
+    .sort('-rating')
     .limit(limit)
     .lean();
 
-  res.json(products);
+  res.json(products.map(formatProduct));
+});
+
+const getFilteredProducts = asyncHandler(async (req, res) => {
+  const { categories, brands, priceRange, rating, page = 1, limit = 12 } = req.body;
+  
+  const query = {};
+  
+  if (categories?.length) {
+    query.category = { $in: categories };
+  }
+  
+  if (brands?.length) {
+    query.brand = { $in: brands };
+  }
+  
+  if (priceRange) {
+    query.price = {
+      $gte: priceRange[0] || 0,
+      $lte: priceRange[1] || Number.MAX_VALUE
+    };
+  }
+  
+  if (rating) {
+    query.rating = { $gte: rating };
+  }
+
+  const [products, total] = await Promise.all([
+    Product.find(query)
+      .select(PRODUCT_FIELDS)
+      .sort('-createdAt')
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    Product.countDocuments(query)
+  ]);
+
+  res.json({
+    products: products.map(formatProduct),
+    page,
+    pages: Math.ceil(total / limit),
+    total
+  });
+});
+
+const getAllBrands = asyncHandler(async (req, res) => {
+  const brands = await Product.distinct('brand');
+  res.json(brands.sort());
 });
 
 const createProduct = asyncHandler(async (req, res) => {
@@ -192,14 +224,47 @@ const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
+const createProductReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    return res.status(404).json({ message: 'Produit introuvable' });
+  }
+
+  const alreadyReviewed = product.reviews.find(
+    (r) => r.user.toString() === req.user._id.toString()
+  );
+
+  if (alreadyReviewed) {
+    return res.status(400).json({ message: 'Produit déjà évalué' });
+  }
+
+  const review = {
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+    user: req.user._id,
+  };
+
+  product.reviews.push(review);
+  product.updateRating();
+  
+  await product.save();
+  res.status(201).json({ message: 'Avis ajouté' });
+});
+
 export {
   getProducts,
+  getProductById,
   searchProducts,
-  getProduct,
   getProductsByCategory,
-  getTopProducts,
   getTopRatedProducts,
+  getFilteredProducts,
+  getAllBrands,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  createProductReview
 };

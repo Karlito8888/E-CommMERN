@@ -1,20 +1,13 @@
 import Chart from "react-apexcharts";
-import { useGetUsersQuery } from "../../redux/features/adminApiSlice";
-import {
-  useGetTotalOrdersQuery,
-  useGetTotalSalesByDateQuery,
-  useGetTotalSalesQuery,
-} from "../../redux/features/orderApiSlice";
+import { useGetUsersQuery, useGetAllOrdersQuery } from "../../redux/features/adminApiSlice";
 import { useState, useEffect } from "react";
 import AdminMenu from "./AdminMenu";
 import OrderList from "./OrderList";
 import Loader from "../../components/Loader";
 
 const AdminDashboard = () => {
-  const { data: sales, isLoading } = useGetTotalSalesQuery();
   const { data: customers, isLoading: loading } = useGetUsersQuery();
-  const { data: orders, isLoading: loadingTwo } = useGetTotalOrdersQuery();
-  const { data: salesDetail } = useGetTotalSalesByDateQuery();
+  const { data: orders, isLoading: loadingTwo } = useGetAllOrdersQuery();
 
   const [state, setState] = useState({
     options: {

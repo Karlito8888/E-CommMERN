@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Ratings from "./Ratings";
 import SmallProduct from "./SmallProduct";
 import Loader from "../../components/Loader";
-import { useGetTopProductsQuery } from "../../redux/features/productApiSlice";
+import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
 
 const ProductTabs = ({
   loadingProductReview,
@@ -15,7 +15,7 @@ const ProductTabs = ({
   setComment,
   product,
 }) => {
-  const { data, isLoading } = useGetTopProductsQuery();
+  const { data, isLoading } = useGetTopRatedProductsQuery();
   const [activeTab, setActiveTab] = useState(1);
 
   if (isLoading) {

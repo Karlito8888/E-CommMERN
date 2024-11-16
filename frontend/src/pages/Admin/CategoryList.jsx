@@ -1,18 +1,22 @@
 import { useState, useEffect } from "react";
+import { useGetCategoriesQuery } from "../../redux/features/categoriesApiSlice.js";
 import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
-  useFetchCategoriesQuery,
-} from "../../redux/features/categoriesApiSlice.js";
-
+} from "../../redux/features/adminApiSlice.js";
 import { toast } from "react-toastify";
 import CategoryForm from "../../components/CategoryForm";
 import Modal from "../../components/Modal";
 import AdminMenu from "./AdminMenu";
 
 const CategoryList = () => {
-  const { data: categories, error, isLoading, refetch } = useFetchCategoriesQuery();
+  const {
+    data: categories,
+    error,
+    isLoading,
+    refetch,
+  } = useGetCategoriesQuery();
   const [name, setName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [updatingName, setUpdatingName] = useState("");
@@ -87,9 +91,9 @@ const CategoryList = () => {
     }
   };
 
-   if (isLoading) {
-     return <div aria-live="polite">Loading...</div>;
-   }
+  if (isLoading) {
+    return <div aria-live="polite">Loading...</div>;
+  }
 
   return (
     <div className="category-list">
@@ -138,7 +142,7 @@ const CategoryList = () => {
             handleSubmit={handleUpdateCategory}
             buttonText="Modifier"
             handleDelete={handleDeleteCategory}
-            isLoading={isUpdating || isDeleting} 
+            isLoading={isUpdating || isDeleting}
           />
         </Modal>
       </div>

@@ -6,9 +6,10 @@ export const productApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Endpoints publics
     getProducts: builder.query({
-      query: (queryParams = '') => ({
-        url: `${PRODUCT_URL}${queryParams}`,
+      query: (params = {}) => ({
+        url: PRODUCT_URL,
         method: 'GET',
+        params,
       }),
       providesTags: ['Product'],
       keepUnusedDataFor: 5 * 60, // Cache pendant 5 minutes
@@ -31,6 +32,34 @@ export const productApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Product'],
       keepUnusedDataFor: 10 * 60, // Cache pendant 10 minutes car change moins souvent
     }),
+
+    getFilteredProducts: builder.query({
+      query: (filters) => ({
+        url: `${PRODUCT_URL}/filter`,
+        method: 'POST',
+        body: filters,
+      }),
+      providesTags: ['Product'],
+    }),
+
+    getAllBrands: builder.query({
+      query: () => ({
+        url: `${PRODUCT_URL}/brands`,
+        method: 'GET',
+      }),
+      providesTags: ['Product'],
+      keepUnusedDataFor: 30 * 60, // Cache pendant 30 minutes car change rarement
+    }),
+
+    // Endpoints authentifiés
+    createReview: builder.mutation({
+      query: ({ productId, rating, comment }) => ({
+        url: `${PRODUCT_URL}/${productId}/reviews`,
+        method: 'POST',
+        body: { rating, comment },
+      }),
+      invalidatesTags: ['Product'],
+    }),
   }),
 });
 
@@ -38,4 +67,7 @@ export const {
   useGetProductsQuery,
   useGetProductByIdQuery,
   useGetTopRatedProductsQuery,
+  useGetFilteredProductsQuery,
+  useGetAllBrandsQuery,
+  useCreateReviewMutation,
 } = productApiSlice;

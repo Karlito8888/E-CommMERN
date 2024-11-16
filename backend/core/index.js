@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import bcrypt from 'bcryptjs';
 import User from "../models/userModel.js";
+import { setupIndexes } from './setupIndexes.js';
 
 // ====== Constants ======
 export const TAX_RATE = 0.20; // TVA 20%
@@ -24,13 +25,20 @@ export const connectDB = async () => {
   }
 
   try {
+    mongoose.set('debug', process.env.NODE_ENV === 'development');
+    mongoose.set('autoIndex', false);
+
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
     });
     
+    console.log(`Successfully connected to MongoDB: ${conn.connection.name} 👍`);
+
+    // Configurer les index de la base de données
+    await setupIndexes();
+
     // Optimisations MongoDB
-    mongoose.set('debug', process.env.NODE_ENV === 'development');
     mongoose.set('toJSON', { 
       virtuals: true,
       transform: (_, converted) => {
@@ -39,11 +47,8 @@ export const connectDB = async () => {
         return converted;
       }
     });
-
-    console.log(`Successfully connected to MongoDB: ${conn.connection.name} 👍`);
   } catch (error) {
-    console.error(`ERROR: ${error.message}`);
-    console.error(error.stack);
+    console.error(`Error: ${error.message}`);
     process.exit(1);
   }
 };
