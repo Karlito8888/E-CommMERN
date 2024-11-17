@@ -4,14 +4,15 @@ import Message from "../components/Message";
 import Podium from "../components/Podium";
 import Product from "./Products/Product";
 import { useGetProductsQuery } from "../redux/features/productApiSlice";
+import ProductCarousel from "./Products/ProductCarousel";
 
 const Home = () => {
   const { keyword } = useParams();
   const { data, isLoading, isError } = useGetProductsQuery({ keyword });
 
-  
-  // Accéder aux produits via data.data au lieu de data.products
-  const products = data?.data.products || [];
+  // Access the products array from the paginated response
+  const products = data?.products || [];
+  console.log("products", products);
 
   if (isLoading) {
     return <Loader />;
@@ -26,27 +27,21 @@ const Home = () => {
   }
 
   return (
-    <>
-      {!keyword ? <Podium /> : null}
       <div className="home-container">
-        <h1 className="home-title">Produits Spéciaux</h1>
-
-        <Link to="/shop" className="shop-button">
-          Boutique
-        </Link>
+        {!keyword ? <Podium /> : null}
+        <div className="carousel-section">
+          <ProductCarousel />
+        </div>
+        <div className="products-container">
+          {products.length > 0 ? (
+            products.map((product) => (
+              <Product key={product._id} product={product} />
+            ))
+          ) : (
+            <Message variant="warning">Aucun produit trouvé</Message>
+          )}
+        </div>
       </div>
-      <div className="products-container">
-        {products.length > 0 ? (
-          products.map((product) => (
-            <div key={product._id}>
-              <Product product={product} />
-            </div>
-          ))
-        ) : (
-          <Message variant="warning">Aucun produit trouvé</Message>
-        )}
-      </div>
-    </>
   );
 };
 

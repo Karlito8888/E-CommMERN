@@ -1,0 +1,168 @@
+.podium-section {
+//   padding: 2rem;
+width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  
+//   .podium-title {
+//     display: flex;
+//     align-items: center;
+//     gap: 0.5rem;
+//     font-size: 1.5rem;
+//     font-weight: bold;
+//     margin-bottom: 2rem;
+    
+//     .title-icon {
+//       color: gold;
+//     }
+//   }
+  
+  .podium-container {
+    width: 100%;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+    border-radius: 1rem;
+    
+    .podium-layout {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 1.5rem;
+      // min-height: 400px;
+      padding: 2rem;
+      
+      .podium-position {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: calc(33.33% - 1rem);
+        max-width: 300px;
+        transition: transform 0.3s ease;
+    
+        &:hover {
+          transform: translateY(-10px);
+        }
+    
+        .product-rank {
+          width: 100%;
+          background: white;
+          border-radius: 1rem;
+          padding: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          position: relative;
+          margin-bottom: 1rem;
+        }
+    
+        .rank-badge {
+          position: absolute;
+          top: -15px;
+          left: -15px;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 1;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    
+          .rank-icon {
+            font-size: 1.2rem;
+            color: white;
+          }
+    
+          .rank-label {
+            font-size: 0.7rem;
+            color: white;
+            font-weight: bold;
+          }
+        }
+      }
+    
+      // Position spécifique pour chaque place
+      .position-0 { // Premier
+        order: 2;
+        transform: translateY(-20px);
+      }
+    
+      .position-1 { // Deuxième
+        order: 1;
+      }
+    
+      .position-2 { // Troisième
+        order: 3;
+        transform: translateY(20px);
+      }
+    
+      .product-stats {
+        margin-top: 1rem;
+        text-align: center;
+        
+        .rating-info {
+          display: flex;
+          justify-content: center;
+          align-items: baseline;
+          gap: 0.25rem;
+          
+          .rating-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f59e0b;
+          }
+          
+          .rating-max {
+            color: #6b7280;
+          }
+        }
+        
+        .reviews-count {
+          font-size: 0.9rem;
+          color: #6b7280;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .carousel-section {
+    width: 100%;
+    margin-top: 3rem;
+  }
+
+
+
+  // Responsive
+  @media (max-width: 768px) {
+    .podium-layout {
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      padding: 1rem;
+    }
+
+    .podium-position {
+      width: 100%;
+      max-width: 280px;
+
+      &.position-0 {
+        order: 1;
+        transform: none;
+      }
+
+      &.position-1 {
+        order: 2;
+      }
+
+      &.position-2 {
+        order: 3;
+      }
+    }
+
+    .podium-block {
+      height: 100px !important;
+    }
+  }
+}

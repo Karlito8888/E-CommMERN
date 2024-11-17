@@ -1,5 +1,3 @@
-// frontend/src/pages/Products/productCarousel.jsx
-
 import Message from "../../components/Message";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -13,16 +11,13 @@ import {
   FaStore,
 } from "react-icons/fa";
 import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
+import { Link } from "react-router-dom";
 
 const ProductCarousel = () => {
-  const {
-    data: products = [],
-    isLoading,
-    error,
-  } = useGetTopRatedProductsQuery();
+  const { data, isLoading, error } = useGetTopRatedProductsQuery();
 
   const settings = {
-    dots: false,
+    dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 1,
@@ -30,80 +25,90 @@ const ProductCarousel = () => {
     arrows: true,
     autoplay: true,
     autoplaySpeed: 3000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+        },
+      },
+    ],
   };
+
+  if (isLoading) return null;
+  
+  if (error) {
+    return (
+      <Message variant="danger">
+        {error?.data?.message || error.error}
+      </Message>
+    );
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return <Message variant="info">Aucun produit à afficher</Message>;
+  }
 
   return (
     <div className="product-carousel">
-      {isLoading ? null : error ? (
-        <Message variant="danger">
-          {error?.data?.message || error.error}
-        </Message>
-      ) : (
-        Array.isArray(products) && (
-          <Slider {...settings} className="slider-container">
-            {products.map(
-              ({
-                image,
-                _id,
-                name,
-                price,
-                description,
-                brand,
-                createdAt,
-                numReviews,
-                rating,
-                quantity,
-                stock,
-              }) => (
-                <div key={_id}>
-                  <img
-                    src={image}
-                    alt={name}
-                    className="slider-image"
-                    loading="lazy"
-                  />
-                  <div className="product-details">
-                    <div className="product-info">
-                      <h2 className="product-title">{name}</h2>
-                      <p className="product-price">$ {price}</p>
-                      <p className="product-description">
-                        {description.substring(0, 170)} ...
-                      </p>
-                    </div>
-                    <div className="product-meta">
-                      <div className="brand-details">
-                        <h1 className="meta-item">
-                          <FaStore className="icon" /> Brand: {brand}
-                        </h1>
-                        <h1 className="meta-item">
-                          <FaClock className="icon" /> Added:{" "}
-                          {moment(createdAt).fromNow()}
-                        </h1>
-                        <h1 className="meta-item">
-                          <FaStar className="icon" /> Reviews: {numReviews}
-                        </h1>
-                      </div>
-                      <div className="stock-details">
-                        <h1 className="meta-item">
-                          <FaStar className="icon" /> Ratings:{" "}
-                          {Math.round(rating)}
-                        </h1>
-                        <h1 className="meta-item">
-                          <FaShoppingCart className="icon" /> Quantity:{" "}
-                          {quantity}
-                        </h1>
-                        <h1 className="meta-item">
-                          <FaBox className="icon" /> In Stock: {stock}
-                        </h1>
-                      </div>
-                    </div>
+      <Slider {...settings} className="slider-container">
+        {data.map(({
+          image,
+          _id,
+          name,
+          price,
+          description,
+          brand,
+          createdAt,
+          numReviews,
+          rating,
+          stock,
+        }) => (
+          <div key={_id} className="carousel-slide">
+            <Link to={`/product/${_id}`} className="slide-content">
+              <img
+                src={image}
+                alt={name}
+                className="slider-image"
+                loading="lazy"
+              />
+              <div className="product-details">
+                <div className="product-info">
+                  <h2 className="product-title">{name}</h2>
+                  <p className="product-price">{price.toFixed(2)}€</p>
+                  <p className="product-description">
+                    {description.length > 170 
+                      ? `${description.substring(0, 170)}...` 
+                      : description}
+                  </p>
+                </div>
+                <div className="product-meta">
+                  <div className="brand-details">
+                    <span className="meta-item">
+                      <FaStore className="icon" /> {brand}
+                    </span>
+                    <span className="meta-item">
+                      <FaClock className="icon" /> {moment(createdAt).fromNow()}
+                    </span>
+                    <span className="meta-item">
+                      <FaStar className="icon" /> {numReviews} avis
+                    </span>
+                  </div>
+                  <div className="stock-details">
+                    <span className="meta-item">
+                      <FaStar className="icon" /> Note: {rating.toFixed(1)}
+                    </span>
+                    <span className="meta-item">
+                      <FaBox className="icon" /> Stock: {stock}
+                    </span>
                   </div>
                 </div>
-              )
-            )}
-          </Slider>
-        )
-      )}
+              </div>
+            </Link>
+          </div>
+        ))}
+      </Slider>
     </div>
   );
 };

@@ -13,7 +13,7 @@ const SmallProduct = ({ product }) => {
         <Link to={`/product/${product._id}`}>
           <h2 className="product-header">
             <div>{product.name}</div>
-            <span className="product-price">${product.price}</span>
+            <span className="product-price">{product.price}€</span>
           </h2>
         </Link>
       </div>

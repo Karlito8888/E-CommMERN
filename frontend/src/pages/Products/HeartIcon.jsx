@@ -6,12 +6,14 @@ import { addFavoriteToLocalStorage, getFavoritesFromLocalStorage, removeFavorite
 
 const HeartIcon = ({ product }) => {
   const dispatch = useDispatch();
-  const favorites = useSelector((state) => state.favorites) || [];
-  const isFavorite = favorites.some((p) => p._id === product._id);
+  const favorites = useSelector((state) => state.favorites);
+  const isFavorite = Array.isArray(favorites) && favorites.some((p) => p._id === product._id);
 
   useEffect(() => {
     const favoritesFromLocalStorage = getFavoritesFromLocalStorage();
-    dispatch(setFavorites(favoritesFromLocalStorage));
+    if (favoritesFromLocalStorage) {
+      dispatch(setFavorites(favoritesFromLocalStorage));
+    }
   }, [dispatch]);
 
   const toggleFavorites = () => {
@@ -36,4 +38,3 @@ const HeartIcon = ({ product }) => {
 };
 
 export default HeartIcon;
-
