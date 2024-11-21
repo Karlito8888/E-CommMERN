@@ -1,5 +1,12 @@
 // Home.scss
 
 .home-container {
- width: 100%;
+  width: 100%;
+
+  .products-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
 }

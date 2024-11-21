@@ -1,167 +1,203 @@
 @use "../../base/variables" as *;
 
+// Variables spécifiques à la navigation
+$nav-width-collapsed: 40px;
+$nav-width-expanded: 200px;
+$nav-transition-duration: 0.3s;
+$nav-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+$nav-item-height: 40px;
+$nav-icon-size: 22px;
+
+// Mixins
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin nav-item-hover {
+  background-color: $primary-color;
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+// Base de la navigation
 aside {
   position: fixed;
-  top: 0;
   left: 0;
-  width: 160px; // Largeur initiale pour afficher uniquement les images
+  top: 0;
   height: 100vh;
-  background-color: #333; // Gris foncé
-  transition: width 0.3s ease; // Transition pour l'animation de largeur
-  overflow: hidden;
+  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+  width: $nav-width-collapsed;
+  transition: all $nav-transition-duration $nav-transition-timing;
+  overflow-x: hidden;
+  overflow-y: auto;
   z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 
-  &:hover {
-    width: 200px; // Largeur lors du survol
+  &::-webkit-scrollbar {
+    width: 0;
   }
 
-  nav {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    padding: 20px 0;
+  // État déplié
+  &:hover {
+    width: $nav-width-expanded;
 
-    .main-nav,
-    .user-nav .guest-nav {
-      list-style: none;
-      flex: 1;
+    .nav-link {
+      padding: 0.75rem 1rem;
 
-      .nav-item {
-        margin: 0.5rem 0;
-        position: relative;
-
-        .nav-link {
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-          color: $text-color;
-          padding: 0.5rem;
-          border-radius: 4px;
-          transition: background-color 0.1s ease;
-
-          &:hover {
-            background-color: $primary-color;
-            color: white;
-          }
-
-          img {
-            margin-right: 0.5rem;
-          }
-
-          span {
-            margin-top: 7px;
-          }
-        }
-
-        .cart-quantity-indicator {
-          position: absolute;
-          top: 0;
-          right: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        .quantity-badge {
-          padding: 2px 6px; /* équivalent à Tailwind `px-1 py-0` */
-          font-size: 0.875rem; /* équivalent à `text-sm` */
-          color: white; /* équivalent à `text-white` */
-          background-color: #ff79da; /* couleur personnalisée pour `bg-pink-500` */
-          border-radius: 9999px; /* pour créer un cercle complet */
-        }
+      span {
+        display: inline;
+        opacity: 1;
+        margin-left: 0;
       }
     }
 
+    .user-name {
+      display: block;
+      opacity: 0.8;
+      padding-left: 1rem;
+    }
+  }
+
+  // Images et icônes
+  img {
+    filter: brightness(0) invert(1);
+  }
+
+  // Navigation principale
+  nav {
+    @include flex-column;
+    height: 100%;
+    padding-block: 1.5rem;
+
+    // Sections principales
+    .main-nav,
+    .user-nav .guest-nav {
+      @include flex-column;
+      gap: 0.75rem;
+      list-style: none;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .main-nav {
+      margin-bottom: 2rem;
+    }
+
+    // Section utilisateur
     .user-nav {
-      margin-top: auto; // Place les éléments de navigation utilisateur en bas
-      margin-top: 1rem;
+      margin-top: auto;
+      width: 100%;
 
       .user-info {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        width: 100%;
 
         .user-name {
-          color: white;
-          font-weight: bold;
-          margin-bottom: 0.5rem;
-          font-size: 1.1rem;
+          display: none;
+          opacity: 0;
+          color: $text-color-light;
+          font-size: 0.9rem;
+          margin-bottom: 1.5rem;
+          white-space: nowrap;
+          font-weight: 500;
+          transition: opacity 0.5s ease;
+          text-align: left;
         }
 
         .user-menu {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
+          @include flex-column;
+          gap: 0.75rem;
+          width: 100%;
+          align-items: flex-start;
 
-          .nav-item {
-            display: flex;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: background-color 0.1s ease;
-
-            &:hover {
-              background-color: $primary-color;
-              color: white;
-            }
-
-            .nav-link {
-              display: flex;
-              align-items: center;
-              padding: 0.5rem;
-
-              img {
-                margin-right: 0.5rem;
-              }
-
-              span {
-                margin-top: 7px;
-              }
-            }
-          }
-
-          .nav-item a[href="/profile"] {
-            margin-top: 50px;
-          }
-
-          .logout-button {
-            background: none;
-            border: none;
-            color: $text-color;
-            cursor: pointer;
-            text-align: left;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: background-color 0.1s ease;
-
-            &:hover {
-              background-color: $primary-color;
-              color: white;
-            }
+          &.admin-menu {
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
           }
         }
       }
 
       .guest-nav {
-        .nav-link {
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-          color: $text-color;
-          padding: 0.5rem;
-          border-radius: 4px;
-          transition: background-color 0.1s ease;
-
-          &:hover {
-            background-color: $primary-color;
-            color: white;
-          }
-
-          img {
-            margin-right: 0.5rem;
-          }
-        }
+        @include flex-column;
+        gap: 0.75rem;
+        width: 100%;
+        align-items: flex-start;
       }
     }
+  }
+}
+
+// Items de navigation
+.nav-item {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0.5rem;
+    width: 100%;
+    color: $text-color-light;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all $nav-transition-duration $nav-transition-timing;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    opacity: 0.8;
+
+    &:hover {
+      @include nav-item-hover;
+
+      .nav-icon {
+        transform: scale(1.1);
+      }
+    }
+
+    .nav-icon {
+      width: $nav-icon-size;
+      height: $nav-icon-size;
+      min-width: $nav-icon-size;
+      transition: transform 0.2s ease;
+    }
+
+    span {
+      display: none;
+      opacity: 0;
+      font-weight: 500;
+      letter-spacing: $base-letter-spacing;
+      color: $text-color-light;
+      transition: opacity 0.5s ease;
+      text-align: left;
+    }
+  }
+}
+
+// Badge du panier
+.cart-quantity-indicator {
+  position: relative;
+  margin-left: auto;
+
+  .quantity-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: $secondary-color;
+    color: #fff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 }

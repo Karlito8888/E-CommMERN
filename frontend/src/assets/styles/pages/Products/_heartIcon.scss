@@ -1,7 +1,7 @@
 .heart-icon {
   position: absolute;
-  bottom: 0.5rem; // correspond à top-2
-  left: 1.25rem; // correspond à right-5
+  top: 0.5rem; // correspond à top-2
+  right: 0.5rem; // correspond à right-5
   cursor: pointer;
 
   &.favorite {

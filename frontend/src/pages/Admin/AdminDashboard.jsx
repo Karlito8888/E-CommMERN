@@ -3,11 +3,16 @@ import { useGetUsersQuery, useGetAllOrdersQuery } from "../../redux/features/adm
 import { useState, useEffect } from "react";
 import AdminMenu from "./AdminMenu";
 import OrderList from "./OrderList";
-import Loader from "../../components/Loader";
 
 const AdminDashboard = () => {
-  const { data: customers, isLoading: loading } = useGetUsersQuery();
-  const { data: orders, isLoading: loadingTwo } = useGetAllOrdersQuery();
+  const { data: customers, isLoading: loadingUsers } = useGetUsersQuery();
+  const { data: ordersData, isLoading: loadingOrders } = useGetAllOrdersQuery();
+
+  // État local pour les statistiques de vente
+  const [salesStats, setSalesStats] = useState({
+    totalSales: 0,
+    salesByDate: []
+  });
 
   const [state, setState] = useState({
     options: {
@@ -20,6 +25,9 @@ const AdminDashboard = () => {
       colors: ["#00E396"],
       dataLabels: {
         enabled: true,
+        formatter: function (val) {
+          return `$${val.toFixed(2)}`;
+        }
       },
       stroke: {
         curve: "smooth",
@@ -42,9 +50,14 @@ const AdminDashboard = () => {
       },
       yaxis: {
         title: {
-          text: "Sales",
+          text: "Sales ($)",
         },
         min: 0,
+        labels: {
+          formatter: function (val) {
+            return `$${val.toFixed(2)}`;
+          }
+        }
       },
       legend: {
         position: "top",
@@ -57,29 +70,57 @@ const AdminDashboard = () => {
     series: [{ name: "Sales", data: [] }],
   });
 
+  // Calcul des statistiques de vente quand les commandes sont chargées
   useEffect(() => {
-    if (salesDetail) {
-      // console.log("salesDetail:", salesDetail);
-      const formattedSalesDate = salesDetail.map((item) => ({
-        x: item._id,
-        // y: item.totalSales,
-         y: parseFloat(item.totalSales.toString()) || 0,  // Conversion en nombre
-      }));
+    if (ordersData?.orders) {
+      // Calculer le total des ventes
+      const total = ordersData.orders.reduce((sum, order) => {
+        const orderTotal = Number(order.totalPrice) || 0;
+        return sum + orderTotal;
+      }, 0);
+      
+      // Grouper les ventes par date
+      const salesByDate = ordersData.orders.reduce((acc, order) => {
+        const date = new Date(order.createdAt).toLocaleDateString();
+        const orderTotal = Number(order.totalPrice) || 0;
+        acc[date] = (acc[date] || 0) + orderTotal;
+        return acc;
+      }, {});
 
-      setState((prevState) => ({
+      // Convertir en format pour le graphique
+      const formattedSales = Object.entries(salesByDate)
+        .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+        .map(([date, total]) => ({
+          x: date,
+          y: Number(total.toFixed(2))
+        }));
+
+      setSalesStats({
+        totalSales: Number(total.toFixed(2)),
+        salesByDate: formattedSales
+      });
+    }
+  }, [ordersData]);
+
+  // Mise à jour du graphique quand les statistiques changent
+  useEffect(() => {
+    if (salesStats.salesByDate.length > 0) {
+      setState(prevState => ({
         ...prevState,
         options: {
           ...prevState.options,
           xaxis: {
-            categories: formattedSalesDate.map((item) => item.x),
+            ...prevState.options.xaxis,
+            categories: salesStats.salesByDate.map(item => item.x),
           },
         },
-        series: [
-          { name: "Sales", data: formattedSalesDate.map((item) => item.y) },
-        ],
+        series: [{
+          name: "Sales",
+          data: salesStats.salesByDate.map(item => item.y)
+        }],
       }));
     }
-  }, [salesDetail]);
+  }, [salesStats]);
 
   return (
     <>
@@ -89,41 +130,39 @@ const AdminDashboard = () => {
         <div className="stat-cards">
           <div className="stat-card">
             <div className="stat-card__currency">$</div>
-            <p className="stat-card__label">Sales</p>
+            <p className="stat-card__label">Total Sales</p>
             <h1 className="stat-card__value">
-              {isLoading ? <Loader /> : sales.totalSales.toFixed(2)}
+              {typeof salesStats.totalSales === 'number' ? salesStats.totalSales.toFixed(2) : '0.00'}
             </h1>
           </div>
 
           <div className="stat-card">
-            <div className="stat-card__currency">$</div>
             <p className="stat-card__label">Customers</p>
             <h1 className="stat-card__value">
-              {isLoading ? <Loader /> : customers?.length}
+              {customers?.length || 0}
             </h1>
           </div>
 
           <div className="stat-card">
-            <div className="stat-card__currency">$</div>
-            <p className="stat-card__label">All Orders</p>
+            <p className="stat-card__label">Orders</p>
             <h1 className="stat-card__value">
-              {isLoading ? <Loader /> : orders?.totalOrders}
+              {ordersData?.total || 0}
             </h1>
           </div>
         </div>
 
-        <div className="chart-container">
+        <div className="sales-chart">
           <Chart
             options={state.options}
             series={state.series}
-            // type="bar"
             type="line"
-            width="70%"
+            height={350}
           />
         </div>
 
-        <div className="order-list-container">
-          <OrderList />
+        <div className="recent-orders">
+          <h2>Recent Orders</h2>
+          <OrderList orders={ordersData?.orders?.slice(0, 5) || []} hideMenu={true} />
         </div>
       </section>
     </>

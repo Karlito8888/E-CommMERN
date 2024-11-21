@@ -20,8 +20,6 @@ const formatProduct = product => ({
 });
 
 const getProducts = asyncHandler(async (req, res) => {
-  const page = Math.max(1, parseInt(req.query.page) || 1);
-  const limit = Math.min(50, parseInt(req.query.limit) || 12);
   const sort = { [req.query.sort || 'createdAt']: req.query.order === 'asc' ? 1 : -1 };
 
   const query = {};
@@ -31,21 +29,14 @@ const getProducts = asyncHandler(async (req, res) => {
   if (req.query.brand) query.brand = req.query.brand;
   if (req.query.inStock) query.stock = { $gt: 0 };
 
-  const [products, total] = await Promise.all([
-    Product.find(query)
-      .select(PRODUCT_FIELDS)
-      .sort(sort)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean(),
-    Product.countDocuments(query)
-  ]);
+  const products = await Product.find(query)
+    .select(PRODUCT_FIELDS)
+    .sort(sort)
+    .lean();
 
   res.json({
     products: products.map(formatProduct),
-    page,
-    pages: Math.ceil(total / limit),
-    total
+    total: products.length
   });
 });
 

@@ -1,22 +1,89 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/auth/authSlice.js";
 import { useLogoutMutation } from "../../redux/features/usersApiSlice";
-import NavItem from "../../components/auth/NavItems.jsx";
-import Cart from "./icons/cart.svg";
-import Heart from "./icons/heart.svg";
-import Home from "./icons/home.svg";
-import Login from "./icons/login.svg";
-import Shopping from "./icons/shop.svg";
-import Register from "./icons/subscribe.svg";
-import Logout from "./icons/logout.svg";
-import Profile from "./icons/profile.svg";
-import Bag from "./icons/bag-check.svg";
-import Categories from "./icons/categories.svg";
-import Dashboard from "./icons/dashboard.svg";
-import Products from "./icons/products.svg";
-import Users from "./icons/users.svg";
 
+// Icons import
+import {
+  Cart,
+  Heart,
+  Home,
+  Login,
+  Shopping,
+  Register,
+  Logout,
+  Profile,
+  Bag,
+  Categories,
+  Dashboard,
+  Products,
+  Users,
+} from "./icons";
+
+// Navigation items configuration
+const mainNavItems = [
+  { to: "/", icon: Home, label: "Accueil" },
+  { to: "/shop", icon: Shopping, label: "Shop" },
+  { to: "/cart", icon: Cart, label: "Panier", showBadge: true },
+  { to: "/favorite", icon: Heart, label: "Mes favoris" },
+];
+
+const adminNavItems = [
+  { to: "/admin/dashboard", icon: Dashboard, label: "Dashboard" },
+  { to: "/admin/productlist", icon: Products, label: "Produits" },
+  { to: "/admin/categorylist", icon: Categories, label: "Categories" },
+  { to: "/admin/orderlist", icon: Bag, label: "Commandes" },
+  { to: "/admin/userlist", icon: Users, label: "Users", className: "admin-users-nav" },
+];
+
+const userNavItems = [
+  { to: "/profile", icon: Profile, label: "Profil" },
+];
+
+const guestNavItems = [
+  { to: "/login", icon: Login, label: "Se connecter" },
+  { to: "/register", icon: Register, label: "S'inscrire" },
+];
+
+// NavItem Component
+const NavItem = ({ to, icon, label, onClick, children, className }) => {
+  const navItemClass = `nav-item ${className || ''}`.trim();
+  
+  const content = (
+    <>
+      <img src={icon} alt={label} className="nav-icon" loading="lazy" />
+      <span>{label}</span>
+      {children}
+    </>
+  );
+
+  return (
+    <li className={navItemClass} role="none">
+      {to ? (
+        <Link to={to} className="nav-link" role="menuitem">
+          {content}
+        </Link>
+      ) : (
+        <button onClick={onClick} className="nav-link" role="menuitem">
+          {content}
+        </button>
+      )}
+    </li>
+  );
+};
+
+// Cart Badge Component
+const CartBadge = ({ quantity }) => {
+  if (quantity <= 0) return null;
+  
+  return (
+    <span className="cart-quantity-indicator">
+      <span className="quantity-badge">{quantity}</span>
+    </span>
+  );
+};
+
+// Main Navigation Component
 const Navigation = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { items } = useSelector((state) => state.cart);
@@ -36,72 +103,51 @@ const Navigation = () => {
 
   const totalCartItems = items?.reduce((a, c) => a + c.quantity, 0) || 0;
 
+  const renderMainNav = () => (
+    <ul className="main-nav" role="menubar">
+      {mainNavItems.map(({ to, icon, label, showBadge }) => (
+        <NavItem key={to} to={to} icon={icon} label={label}>
+          {showBadge && <CartBadge quantity={totalCartItems} />}
+        </NavItem>
+      ))}
+    </ul>
+  );
+
+  const renderAdminNav = () => (
+    <>
+      {adminNavItems.map(({ to, icon, label, className }) => (
+        <NavItem key={to} to={to} icon={icon} label={label} className={className} />
+      ))}
+    </>
+  );
+
+  const renderUserNav = () => (
+    <div className="user-info">
+      <span className="user-name">👋 {userInfo.username}</span>
+      <ul className={`user-menu ${userInfo.isAdmin ? "admin-menu" : ""}`} role="menu">
+        {userInfo.isAdmin && renderAdminNav()}
+        {userNavItems.map(({ to, icon, label }) => (
+          <NavItem key={to} to={to} icon={icon} label={label} />
+        ))}
+        <NavItem onClick={logoutHandler} icon={Logout} label="Déconnexion" />
+      </ul>
+    </div>
+  );
+
+  const renderGuestNav = () => (
+    <ul className="guest-nav" role="menu">
+      {guestNavItems.map(({ to, icon, label }) => (
+        <NavItem key={to} to={to} icon={icon} label={label} />
+      ))}
+    </ul>
+  );
+
   return (
     <aside>
       <nav role="navigation">
-        <ul className="main-nav" role="menubar">
-          <NavItem to="/" icon={Home} label="Accueil" />
-          <NavItem to="/shop" icon={Shopping} label="Shop" />
-          <NavItem to="/cart" icon={Cart} label="Panier">
-            {totalCartItems > 0 && (
-              <span className="cart-quantity-indicator">
-                <span className="quantity-badge">{totalCartItems}</span>
-              </span>
-            )}
-          </NavItem>
-
-          <NavItem to="/favorite" icon={Heart} label="Mes favoris" />
-        </ul>
-
+        {renderMainNav()}
         <div className="user-nav">
-          {userInfo ? (
-            <div className="user-info">
-              <span className="user-name">👋 {userInfo.username}</span>
-              <ul
-                className={`user-menu ${
-                  userInfo.isAdmin ? "admin-menu" : ""
-                }`}
-                role="menu"
-              >
-                {userInfo.isAdmin && (
-                  <>
-                    <NavItem
-                      to="/admin/dashboard"
-                      icon={Dashboard}
-                      label="Dashboard"
-                    />
-                    <NavItem
-                      to="/admin/productlist"
-                      icon={Products}
-                      label="Produits"
-                    />
-                    <NavItem
-                      to="/admin/categorylist"
-                      icon={Categories}
-                      label="Categories"
-                    />
-                    <NavItem
-                      to="/admin/orderlist"
-                      icon={Bag}
-                      label="Commandes"
-                    />
-                    <NavItem to="/admin/userlist" icon={Users} label="Users" />
-                  </>
-                )}
-                <NavItem to="/profile" icon={Profile} label="Profil" />
-                <NavItem
-                  onClick={logoutHandler}
-                  icon={Logout}
-                  label="Déconnexion"
-                />
-              </ul>
-            </div>
-          ) : (
-            <ul className="guest-nav" role="menu">
-              <NavItem to="/login" icon={Login} label="Se connecter" />
-              <NavItem to="/register" icon={Register} label="S'inscrire" />
-            </ul>
-          )}
+          {userInfo ? renderUserNav() : renderGuestNav()}
         </div>
       </nav>
     </aside>

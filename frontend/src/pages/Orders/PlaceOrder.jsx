@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 import { useCreateCheckoutSessionMutation } from "../../redux/features/services/paymentService";
 import Message from "../../components/Message";
 import ProgressSteps from "../../components/ProgressSteps";
-import Loader from "../../components/Loader";
 import { getItem } from "../../Utils/localStorage";
 
 const PlaceOrder = () => {
@@ -157,7 +156,7 @@ const PlaceOrder = () => {
             Procéder au paiement
           </button>
 
-          {isLoading && <Loader />}
+          {isLoading && <div>Chargement...</div>}
         </div>
       </div>
     </>

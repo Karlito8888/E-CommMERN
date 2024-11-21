@@ -1,4 +1,4 @@
-@use 'variables' as *;
+@use "variables" as *;
 
 *,
 *::before,
@@ -21,16 +21,31 @@ body {
   font-size: $base-font-size;
   font-family: $base-font-family;
   letter-spacing: $base-letter-spacing;
+  overflow-x: hidden;
   overflow-x: clip;
+  background-color: $background-color-light;
+  color: $text-color-dark;
+  transition: background-color 0.3s, color 0.3s;
+
+  &.dark-mode {
+    background-color: $background-color-dark;
+    color: $text-color-light;
+
+    aside {
+      background-color: $background-color-light;
+      color: $text-color-dark;
+    }
+  }
 }
 
 #root {
   height: 100%;
+  width: 100%;
 }
 
 main {
   width: 100%;
-  padding-left: $main-padding-left;
+  padding: 60px 40px 0 80px;
 }
 
 ul {
@@ -40,9 +55,26 @@ ul {
 a {
   text-decoration: none;
   transition: color $transition-default;
-  color: $text-color;
+  color: $text-color-light;
 }
 
 span {
-  color: $text-color;
+  color: $text-color-light;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }

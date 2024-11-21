@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import Loader from "../../components/Loader";
 import { setCredentials } from "../../redux/features/auth/authSlice";
 import {
   useGetProfileQuery,
@@ -56,7 +55,7 @@ const Profile = () => {
         <div className="form-container">
           <h2 className="form-title">Mettre à jour vos infos personnelles</h2>
           {loadingProfile ? (
-            <Loader />
+            <div>Loading...</div>
           ) : (
             <form onSubmit={submitHandler}>
               <InputField
@@ -101,7 +100,7 @@ const Profile = () => {
                   Mes commandes
                 </a>
               </div>
-              {loadingUpdateProfile && <Loader />}
+              {loadingUpdateProfile && <div>Loading...</div>}
             </form>
           )}
         </div>
@@ -111,4 +110,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

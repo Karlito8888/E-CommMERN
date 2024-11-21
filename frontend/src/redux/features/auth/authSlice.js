@@ -29,8 +29,7 @@ const authSlice = createSlice({
 export const { setCredentials, logout, updateUserInfo } = authSlice.actions;
 
 // Selectors
-export const selectCurrentUser = (state) => state.auth.userInfo;
 export const selectIsAuthenticated = (state) => Boolean(state.auth.userInfo);
-export const selectIsAdmin = (state) => state.auth.userInfo?.isAdmin || false;
+export const selectIsAdmin = (state) => Boolean(state.auth.userInfo?.isAdmin);
 
 export default authSlice.reducer;

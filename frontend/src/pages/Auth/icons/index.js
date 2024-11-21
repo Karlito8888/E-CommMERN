@@ -1,0 +1,13 @@
+export { default as Cart } from "./cart.svg";
+export { default as Heart } from "./heart.svg";
+export { default as Home } from "./home.svg";
+export { default as Login } from "./login.svg";
+export { default as Shopping } from "./shop.svg";
+export { default as Register } from "./subscribe.svg";
+export { default as Logout } from "./logout.svg";
+export { default as Profile } from "./profile.svg";
+export { default as Bag } from "./bag-check.svg";
+export { default as Categories } from "./categories.svg";
+export { default as Dashboard } from "./dashboard.svg";
+export { default as Products } from "./products.svg";
+export { default as Users } from "./users.svg";

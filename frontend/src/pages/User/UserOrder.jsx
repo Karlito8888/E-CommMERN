@@ -1,5 +1,4 @@
 import Message from "../../components/Message";
-import Loader from "../../components/Loader";
 import { useGetMyOrdersQuery } from "../../redux/api/orderApiSlice";
 
 const UserOrder = () => {
@@ -10,7 +9,7 @@ const UserOrder = () => {
       <h2 className="user-order-title">My Orders</h2>
 
       {isLoading ? (
-        <Loader />
+        <div>Loading...</div>
       ) : error ? (
         <Message variant="danger">{error?.data?.error || error.error}</Message>
       ) : (
@@ -70,4 +69,3 @@ const UserOrder = () => {
 };
 
 export default UserOrder;
-

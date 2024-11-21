@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Ratings from "./Ratings";
 import SmallProduct from "./SmallProduct";
-import Loader from "../../components/Loader";
 import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
 
 const ProductTabs = ({
@@ -19,7 +18,7 @@ const ProductTabs = ({
   const [activeTab, setActiveTab] = useState(1);
 
   if (isLoading) {
-    return <Loader />;
+    return <div>Loading...</div>;
   }
 
   const handleTabClick = (tabNumber) => {
@@ -139,7 +138,7 @@ const ProductTabs = ({
         {activeTab === 3 && (
           <section className="product-tabs__related-products">
             {!data ? (
-              <Loader />
+              <div>Loading...</div>
             ) : (
               data.map((product) => (
                 <div key={product._id}>

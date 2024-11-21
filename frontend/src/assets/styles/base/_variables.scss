@@ -1,8 +1,10 @@
 // Colors
 $primary-color: #ffffff34;
-$secondary-color: #2ecc71;
-$background-color: #f4f4f4;
-$text-color: #ffffff;
+$secondary-color: pink;
+$background-color-light: #f4f4f4;
+$background-color-dark: #333333;
+$text-color-light: #ffffff;
+$text-color-dark: #333333;
 
 // Typography
 $base-font-size: 16px;
@@ -11,7 +13,13 @@ $base-letter-spacing: 1px;
 
 // Layout
 $max-width: 1920px;
+$nav-width-collapsed: 40px;
+$nav-width-expanded: 250px;
 $main-padding-left: 260px;
+$nav-padding: 10px;
+$nav-margin: 10px;
 
 // Transitions
+$nav-transition-duration: 0.3s;
+$nav-transition-timing: ease;
 $transition-default: 0.3s ease;

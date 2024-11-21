@@ -1,6 +1,5 @@
 .small-product {
   width: 100%;
-  margin-left: 2rem;
   padding: 0.75rem;
   color: black !important;
   position: relative;
@@ -30,12 +29,6 @@
         margin-right: 0.5rem;
         padding: 0.25rem 0.625rem;
         border-radius: 9999px;
-
-        // Dark mode
-        .dark & {
-          background-color: #5e0d14;
-          color: #ffc1b6;
-        }
       }
     }
   }

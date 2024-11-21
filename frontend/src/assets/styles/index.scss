@@ -1,6 +1,8 @@
 // Base styles
-@use "./base/variables";
+@use "./base/variables" as *;
 @use "./base/reset";
+@use "./base/animations";
+@use "./settings";
 
 // Components
 @use "./components/auth/inputField";
@@ -12,6 +14,11 @@
 @use "./components/modal";
 @use "./components/podium";
 @use "./components/progessSteps";
+
+// Pages
+@use "./pages/cart";
+@use "./pages/home";
+@use "./pages/shop";
 
 // Pages - Admin
 @use "./pages/Admin/adminDashboard";
@@ -47,3 +54,4 @@
 
 // Pages - User
 @use "./pages/User/profile";
+@use "./pages/User/userOrder";

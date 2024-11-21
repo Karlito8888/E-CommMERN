@@ -6,7 +6,6 @@ import {
   setChecked,
   setRadio,
 } from "../redux/features/shop/shopSlice";
-import Loader from "../components/Loader";
 import ProductCard from "./Products/ProductCard";
 import { useGetCategoriesQuery } from "../redux/features/categoriesApiSlice";
 import { 
@@ -103,10 +102,6 @@ const Shop = () => {
 
   // Calcul du nombre total de pages
   const totalPages = Math.ceil((productsData?.total || 0) / productsPerPage);
-
-  if (categoriesQuery.isLoading || isLoading || brandsQuery.isLoading) {
-    return <Loader />;
-  }
 
   if (categoriesQuery.error || error || brandsQuery.error) {
     return (

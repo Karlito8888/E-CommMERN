@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaTrash, FaEdit, FaCheck, FaTimes } from "react-icons/fa";
 import Message from "../../components/Message";
-import Loader from "../../components/Loader";
 import {
   useDeleteUserMutation,
   useGetUsersQuery,
@@ -60,7 +59,7 @@ const UserList = () => {
     <div className="user-list-container">
       <h1 className="user-list-title">Users</h1>
       {isLoading ? (
-        <Loader />
+        <div>Loading...</div>
       ) : error ? (
         <Message variant="danger">
           {error?.data?.message || error.error}

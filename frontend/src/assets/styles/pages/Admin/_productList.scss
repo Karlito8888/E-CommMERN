@@ -55,7 +55,7 @@
 
             .product-name {
               font-size: 1.5rem;
-              color: $text-color;
+              color: $text-color-light;
             }
 
             .product-date {
@@ -96,7 +96,7 @@
 
             .product-price {
               font-size: 1.2rem;
-              color: $text-color;
+              color: $text-color-light;
               font-weight: bold;
             }
           }
@@ -115,6 +115,6 @@
 .error {
   text-align: center;
   font-size: 1.5rem;
-  color: $text-color;
+  color: $text-color-light;
   margin-top: 20px;
 }

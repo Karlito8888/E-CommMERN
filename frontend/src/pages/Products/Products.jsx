@@ -7,7 +7,6 @@ import {
   useCreateReviewMutation,
 } from "../../redux/api/productApiSlice";
 import Rating from "./Rating";
-import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { addToCart } from "../../redux/features/cart/cartSlice";
 import {
@@ -71,7 +70,7 @@ const Product = () => {
         </Link>
       </div>
       {isLoading ? (
-        <Loader />
+        <div>Loading...</div>
       ) : error ? (
         <Message variant="danger">
           {error?.data?.message || error.error}

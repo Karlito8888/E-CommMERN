@@ -6,7 +6,6 @@ import { useRegisterMutation } from "../../redux/features/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice.js";
 import InputField from "../../components/auth/InputField.jsx";
 import SubmitButton from "../../components/auth/SubmitButton.jsx";
-// import Loader from "../../components/Loader";
 
 const Register = () => {
   // État du formulaire

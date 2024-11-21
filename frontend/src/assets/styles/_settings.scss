@@ -1,33 +1,4 @@
-// Variables de couleurs
-$primary-color: #ffffff34;// Couleur primaire
-$secondary-color: #2ecc71; // Couleur secondaire
-$background-color: #f4f4f4; // Couleur d'arrière-plan
-$text-color: #ffffff; // Couleur du texte
 
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  height: 100%;
-  scroll-behavior: smooth;
-}
-
-body {
-  height: 100%;
-  width: 100%;
-  max-width: 1920px;
-  margin-inline: auto;
-  font-size: 16px;
-  font-family: "Nimbus Mono PS", "Courier New", monospace;
-  letter-spacing: 1px;
-  overflow-x: hidden;
-  overflow-x: clip;
-}
 
 // [data-theme="dark"] {
 //   background-color: var(--color-bg-dark);
@@ -38,29 +9,6 @@ body {
 //   background-color: var(--color-bg-light);
 //   color: var(--color-text-light);
 // }
-
-#root {
-  height: 100%;
-}
-
-main {
-  width: 100%;
-  padding-left: 260px;
-}
-
-ul {
-  list-style-type: none;
-}
-
-a {
-  text-decoration: none;
-  transition: color 0.3s ease;
-  color: white;
-}
-
-span {
-  color: white;
-}
 
 // [data-theme="dark"] a,
 // [data-theme="dark"] .menu-icon {
@@ -84,23 +32,3 @@ span {
 // [data-theme="light"] .logo-cv {
 //   filter: invert(14%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(92%) contrast(90%);
 // }
-
-button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-family: "Nimbus Mono PS", "Courier New", monospace;
-  letter-spacing: 1px;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}

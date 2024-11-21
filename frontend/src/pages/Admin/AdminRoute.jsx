@@ -1,15 +1,15 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Loader from "../../components/Loader";
 
 const AdminRoute = () => {
   const { userInfo, loading } = useSelector((state) => state.auth);
 
+  // Si en cours de chargement, retourner null pour éviter un flash de redirection
   if (loading) {
-    return <Loader />; // Vous pouvez remplacer cela par un loader ou un spinner
+    return null;
   }
 
-  return userInfo && userInfo.user.isAdmin ? (
+  return userInfo && userInfo.isAdmin ? (
     <Outlet />
   ) : (
     <Navigate to="/login" replace />

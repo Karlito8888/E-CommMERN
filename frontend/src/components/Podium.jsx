@@ -1,5 +1,4 @@
 import { useGetTopRatedProductsQuery } from "../redux/features/productApiSlice";
-import Loader from "./Loader";
 import SmallProduct from "../pages/Products/SmallProduct";
 import Message from "./Message";
 import { FaTrophy, FaMedal, FaAward } from "react-icons/fa";
@@ -13,10 +12,6 @@ const RANK_ICONS = {
 
 const Podium = () => {
   const { data, isLoading, error } = useGetTopRatedProductsQuery();
-
-  if (isLoading) {
-    return <Loader />;
-  }
 
   if (error) {
     return (

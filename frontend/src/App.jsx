@@ -1,16 +1,20 @@
 import { Outlet } from "react-router-dom";
-import Navigation from "./pages/Auth/Navigation";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Navigation from "./pages/Auth/Navigation";
+import Header from "./components/Header";
 
-export default function App() {
+const App = () => {
   return (
     <>
-      <ToastContainer autoClose={2000} />
+      <Header />
       <Navigation />
-      <main className="main">
-        <Outlet />
+        <main className="main">
+          <Outlet />
       </main>
+      <ToastContainer autoClose={2000} />
     </>
   );
-}
+};
+
+export default App;

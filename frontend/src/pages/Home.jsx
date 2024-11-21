@@ -1,5 +1,4 @@
-import { Link, useParams } from "react-router-dom";
-import Loader from "../components/Loader";
+import { useParams } from "react-router-dom";
 import Message from "../components/Message";
 import Podium from "../components/Podium";
 import Product from "./Products/Product";
@@ -12,11 +11,7 @@ const Home = () => {
 
   // Access the products array from the paginated response
   const products = data?.products || [];
-  console.log("products", products);
-
-  if (isLoading) {
-    return <Loader />;
-  }
+  // console.log("products", products);
 
   if (isError) {
     return (
@@ -32,7 +27,7 @@ const Home = () => {
         <div className="carousel-section">
           <ProductCarousel />
         </div>
-        <div className="products-container">
+        <div className="products-section">
           {products.length > 0 ? (
             products.map((product) => (
               <Product key={product._id} product={product} />

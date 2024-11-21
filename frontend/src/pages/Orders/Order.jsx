@@ -5,7 +5,6 @@ import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Message from "../../components/Message";
-import Loader from "../../components/Loader";
 import {
   useGetOrderDetailsQuery
 } from "../../redux/features/orderApiSlice";
@@ -31,7 +30,7 @@ const Order = () => {
   };
 
   return isLoading ? (
-    <Loader />
+    <div>Loading...</div>
   ) : error ? (
     <Message variant="danger">{error.data.message}</Message>
   ) : (
@@ -131,7 +130,7 @@ const Order = () => {
           </div>
         </div>
 
-        {loadingDeliver && <Loader />}
+        {loadingDeliver && <div>Loading...</div>}
         {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
           <button
             type="button"

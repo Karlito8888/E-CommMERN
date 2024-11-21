@@ -1,6 +1,7 @@
 // backend/models/userModel.js
 
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = mongoose.Schema(
   {
@@ -54,6 +55,11 @@ const userSchema = mongoose.Schema(
 );
 
 userSchema.index({ email: 1, username: 1 });
+
+// Méthode pour comparer les mots de passe
+userSchema.methods.matchPassword = async function(enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 

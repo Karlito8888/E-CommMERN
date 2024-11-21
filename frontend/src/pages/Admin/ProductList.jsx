@@ -5,12 +5,13 @@ import { useGetProductsQuery as useMongoProductsQuery } from "../../redux/featur
 import AdminMenu from "./AdminMenu";
 
 const ProductList = () => {
-  // Récupération des produits de MongoDB
+  // Récupération de tous les produits (sans pagination)
   const {
     data: mongoData,
     isLoading: isLoadingMongo,
     isError: isErrorMongo,
-  } = useMongoProductsQuery();
+  } = useMongoProductsQuery({ limit: 1000 }); // Une grande limite pour avoir tous les produits
+
   const mongoProducts = mongoData?.products || [];
 
   // Gestion des chargements et erreurs

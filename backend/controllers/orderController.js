@@ -70,8 +70,7 @@ const createOrder = asyncHandler(async (req, res) => {
 const getOrderById = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id)
     .populate('user', 'name email')
-    .lean()
-    .cache(300);
+    .lean();
 
   if (!order) {
     return res.status(404).json({ message: 'Commande introuvable' });
@@ -89,8 +88,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({ user: req.user._id })
     .select('-__v')
     .sort('-createdAt')
-    .lean()
-    .cache(300);
+    .lean();
 
   res.json(orders);
 });
@@ -127,9 +125,8 @@ const getOrders = asyncHandler(async (req, res) => {
       .sort('-createdAt')
       .skip(skip)
       .limit(limit)
-      .lean()
-      .cache(300),
-    Order.countDocuments().cache(300)
+      .lean(),
+    Order.countDocuments()
   ]);
 
   res.json({

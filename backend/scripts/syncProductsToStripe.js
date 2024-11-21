@@ -11,7 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 mongoose.connect(process.env.MONGO_URI);
 
 // Modèle MongoDB pour les produits
-import Product from "./models/productModel.js"; // Modèle correspondant à votre produit
+import Product from "../models/productModel.js"; // Correction du chemin d'importation
 
 // Fonction utilitaire pour obtenir l'URL de l'image
 const getImageUrl = (imagePath) => {
@@ -26,48 +26,69 @@ const getImageUrl = (imagePath) => {
 // Fonction principale de synchronisation
 const syncProducts = async () => {
   try {
+    console.log("Début de la synchronisation avec Stripe...");
+    
     // Récupérer tous les produits dans MongoDB
     const products = await Product.find({});
+    console.log(`${products.length} produits trouvés dans MongoDB`);
+
+    let successCount = 0;
+    let errorCount = 0;
 
     for (const product of products) {
-      // Créez un produit Stripe
-      const stripeProduct = await stripe.products.create({
-        name: product.name,
-        description: product.description,
-        images: [getImageUrl(product.image)], // Utiliser la fonction utilitaire
-        metadata: {
-          brand: product.brand,
-          category_id: product.category.toString(),
-          stock: product.stock.toString(),
-          rating: product.rating.toString(),
-          numReviews: product.numReviews.toString(),
-        },
-      });
+      try {
+        // Créez un produit Stripe
+        const stripeProduct = await stripe.products.create({
+          name: product.name,
+          description: product.description,
+          images: [getImageUrl(product.image)], // Utiliser la fonction utilitaire
+          metadata: {
+            brand: product.brand || '',
+            category_id: product.category ? product.category.toString() : '',
+            stock: (product.countInStock || 0).toString(), // Utiliser countInStock au lieu de stock
+            rating: (product.rating || 0).toString(),
+            numReviews: (product.numReviews || 0).toString(),
+          },
+        });
 
-      // Mettre à jour le produit MongoDB avec l'ID du produit Stripe
-      product.stripeProductId = stripeProduct.id; // Assurez-vous d'ajouter ce champ dans votre modèle MongoDB
-      await product.save();
+        // Créez un prix pour chaque produit Stripe
+        const price = await stripe.prices.create({
+          product: stripeProduct.id,
+          unit_amount: Math.round(product.price * 100), // Convertir en centimes
+          currency: 'eur',
+        });
 
-      // Créez un prix pour chaque produit Stripe
-      const priceInCents = Math.round(product.price * 100); // Utilisation de Math.round pour éviter les erreurs de précision
-      await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: priceInCents, // Utilisez priceInCents ici
-        currency: product.currency.toLowerCase(),
-      });
+        // Mettre à jour le produit MongoDB avec les IDs Stripe
+        await Product.updateOne(
+          { _id: product._id },
+          { 
+            $set: {
+              stripeProductId: stripeProduct.id,
+              stripePriceId: price.id
+            }
+          }
+        );
 
-      console.log(`Produit synchronisé : ${product.name}`);
+        successCount++;
+        if (successCount % 10 === 0) {
+          console.log(`${successCount} produits synchronisés...`);
+        }
+      } catch (error) {
+        console.error(`Erreur lors de la synchronisation du produit ${product.name}:`, error.message);
+        errorCount++;
+      }
     }
 
-    console.log("Tous les produits ont été synchronisés avec Stripe.");
+    console.log("\nSynchronisation terminée !");
+    console.log(`Succès: ${successCount} produits`);
+    console.log(`Erreurs: ${errorCount} produits`);
+
   } catch (error) {
-    console.error("Erreur de synchronisation : ", error);
+    console.error("Erreur lors de la synchronisation :", error);
   } finally {
-    // Fermez la connexion à la base de données
-    mongoose.connection.close();
+    mongoose.disconnect();
   }
 };
 
 // Appel de la fonction de synchronisation
 syncProducts();
-

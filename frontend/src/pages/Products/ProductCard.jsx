@@ -18,7 +18,7 @@ const ProductCard = ({ p }) => {
   }
 
   return (
-    <div className="product-card">
+    <div className="product-card-shop">
       <section className="product-card-image">
         <Link to={`/product/${p._id}`}>
           <span className="brand-tag">{p?.brand}</span>
