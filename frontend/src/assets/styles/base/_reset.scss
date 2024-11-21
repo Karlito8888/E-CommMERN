@@ -45,7 +45,11 @@ body {
 
 main {
   width: 100%;
-  padding: 60px 40px 0 80px;
+  padding-top: 60px;
+  padding-left: clamp(3.125rem, 2.2727rem + 3.4091vw, 5rem);
+  //50px-400px/80px-1280px
+  padding-right: clamp(0.625rem, -0.2273rem + 3.4091vw, 2.5rem);
+  //10px-400px/40px-1280px
 }
 
 ul {

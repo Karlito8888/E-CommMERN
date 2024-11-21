@@ -49,6 +49,7 @@ aside {
         display: inline;
         opacity: 1;
         margin-left: 0;
+        padding-top: 7px;
       }
     }
 
@@ -152,6 +153,27 @@ aside {
     font-size: 0.9rem;
     opacity: 0.8;
 
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease;
+
+      &.active {
+        filter: invert(73%) sepia(40%) saturate(7075%) hue-rotate(308deg) brightness(101%) contrast(97%);
+      }
+    }
+
+    span {
+      display: none;
+      opacity: 0;
+      margin-left: 1rem;
+      transition: all 0.3s ease;
+
+      // &.active {
+      //   color: $secondary-color;
+      // }
+    }
+
     &:hover {
       @include nav-item-hover;
 
@@ -159,22 +181,12 @@ aside {
         transform: scale(1.1);
       }
     }
+  }
 
-    .nav-icon {
-      width: $nav-icon-size;
-      height: $nav-icon-size;
-      min-width: $nav-icon-size;
-      transition: transform 0.2s ease;
-    }
-
-    span {
-      display: none;
-      opacity: 0;
-      font-weight: 500;
-      letter-spacing: $base-letter-spacing;
-      color: $text-color-light;
-      transition: opacity 0.5s ease;
-      text-align: left;
+  // Styles pour le hover et l'état actif
+  &:hover{
+    .nav-link {
+      background-color: rgba(255, 255, 255, 0.1);
     }
   }
 }

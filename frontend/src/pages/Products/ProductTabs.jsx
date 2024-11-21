@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Ratings from "./Ratings";
 import SmallProduct from "./SmallProduct";
 import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
+import Rating from "../../components/Rating";
 
 const ProductTabs = ({
   loadingProductReview,
@@ -126,7 +126,7 @@ const ProductTabs = ({
                     </p>
                   </div>
                   <p className="my-4">{review.comment}</p>
-                  <Ratings value={review.rating} />
+                  <Rating value={review.rating} />
                 </div>
               ))}
             </div>

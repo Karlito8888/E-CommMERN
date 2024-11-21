@@ -39,17 +39,18 @@
 
     .logo {
       text-decoration: none;
-      
+
       h1 {
         color: $text-color-dark;
         font-size: 1.5rem;
         font-weight: 700;
         line-height: 1;
         padding-top: 10px;
-        background: linear-gradient(90deg, 
-          $secondary-color 0%,
-          rgb(255, 148, 166) 65%,
-          rgb(255, 102, 127) 100%
+        background: linear-gradient(
+          90deg,
+          $secondary-color,
+          pink,
+          $secondary-color
         );
         background-clip: text;
         -webkit-background-clip: text;
@@ -90,36 +91,28 @@
   .header-right {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
 
+    .theme-toggle,
     .header-icon-link {
-      position: relative;
-      color: $text-color-dark;
-      padding: 0.5rem;
-      border-radius: 50%;
-      transition: all 0.2s ease;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      
-      &:hover {
-        background: rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
-      }
-    }
-
-    .theme-toggle {
       background: none;
       border: none;
       cursor: pointer;
-      padding: 0.5rem;
+      padding: 8px;
       border-radius: 50%;
-      color: $text-color-dark;
-      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+
+      svg {
+        width: 24px;
+        height: 24px;
+        color: $text-color-dark;
+      }
 
       &:hover {
-        background: rgba(0, 0, 0, 0.05);
-        transform: rotate(15deg);
+        background-color: rgba(0, 0, 0, 0.05);
       }
     }
 
@@ -224,19 +217,14 @@
     }
 
     .header-right {
+      .theme-toggle,
       .header-icon-link {
-        color: white;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.1);
+        svg {
+          color: white;
         }
-      }
-
-      .theme-toggle {
-        color: white;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background-color: rgba(255, 255, 255, 0.1);
         }
       }
 
@@ -304,8 +292,9 @@
     .header-right {
       gap: 0.8rem;
 
-      .theme-toggle {
-        padding: 0.4rem;
+      .theme-toggle,
+      .header-icon-link {
+        padding: 6px;
       }
 
       .user-menu-trigger {

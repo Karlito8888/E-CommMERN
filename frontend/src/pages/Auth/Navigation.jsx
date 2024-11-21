@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/auth/authSlice.js";
 import { useLogoutMutation } from "../../redux/features/usersApiSlice";
@@ -47,12 +47,19 @@ const guestNavItems = [
 
 // NavItem Component
 const NavItem = ({ to, icon, label, onClick, children, className }) => {
-  const navItemClass = `nav-item ${className || ''}`.trim();
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  const navItemClass = `nav-item ${className || ''} ${isActive ? 'active' : ''}`.trim();
   
   const content = (
     <>
-      <img src={icon} alt={label} className="nav-icon" loading="lazy" />
-      <span>{label}</span>
+      <img 
+        src={icon} 
+        alt={label} 
+        className={`nav-icon ${isActive ? 'active' : ''}`} 
+        loading="lazy" 
+      />
+      <span className={isActive ? 'active' : ''}>{label}</span>
       {children}
     </>
   );

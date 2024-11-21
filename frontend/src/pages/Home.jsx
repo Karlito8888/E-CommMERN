@@ -8,10 +8,7 @@ import ProductCarousel from "./Products/ProductCarousel";
 const Home = () => {
   const { keyword } = useParams();
   const { data, isLoading, isError } = useGetProductsQuery({ keyword });
-
-  // Access the products array from the paginated response
   const products = data?.products || [];
-  // console.log("products", products);
 
   if (isError) {
     return (
@@ -22,21 +19,35 @@ const Home = () => {
   }
 
   return (
-      <div className="home-container">
-        {!keyword ? <Podium /> : null}
-        <div className="carousel-section">
-          <ProductCarousel />
-        </div>
-        <div className="products-section">
-          {products.length > 0 ? (
-            products.map((product) => (
+    <div className="home-container">
+      {!keyword && (
+        <>
+          <Podium />
+          <div className="carousel-section">
+            <ProductCarousel />
+          </div>
+        </>
+      )}
+      
+      <div className="products-section">
+        <h2>{keyword ? `Résultats pour "${keyword}"` : "Tous nos produits"}</h2>
+        {isLoading ? (
+          <div className="products-grid">
+            {[...Array(8)].map((_, index) => (
+              <div key={index} className="product-skeleton"></div>
+            ))}
+          </div>
+        ) : products.length > 0 ? (
+          <div className="products-grid">
+            {products.map((product) => (
               <Product key={product._id} product={product} />
-            ))
-          ) : (
-            <Message variant="warning">Aucun produit trouvé</Message>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <Message variant="warning">Aucun produit trouvé</Message>
+        )}
       </div>
+    </div>
   );
 };
 

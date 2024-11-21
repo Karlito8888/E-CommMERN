@@ -1,13 +1,88 @@
+@use "../base/variables" as *;
+
 .podium-section {
   width: 100%;
-  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    width: 100%;
+    max-width: 1080px;
+    font-style: italic;
+    font-size: clamp(0.9rem, 0.5364rem + 1.4545vw, 1.7rem);
+    //0.9rem-400px/1.7-1280px
+    margin-bottom: 1rem;
+    color: $text-color-dark;
+    text-align: left;
+  }
+
+  // Styles pour le skeleton loading
+  &.loading {
+    .podium-container {
+      width: 100%;
+      max-width: 1080px;
+      .podium-position {
+        .product-rank {
+          .skeleton {
+            background: linear-gradient(90deg, 
+              #f0f0f0 25%, 
+              #e0e0e0 50%, 
+              #f0f0f0 75%
+            );
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+            border-radius: 4px;
+
+            &.image {
+              width: 100%;
+              height: 200px;
+              margin-bottom: 1rem;
+            }
+
+            &.title {
+              width: 80%;
+              height: 24px;
+              margin-bottom: 0.5rem;
+            }
+
+            &.price {
+              width: 40%;
+              height: 20px;
+              margin-bottom: 0.5rem;
+            }
+
+            &.rating {
+              width: 60%;
+              height: 16px;
+            }
+          }
+        }
+
+        // Ajuster les hauteurs pour chaque position
+        &.position-0 .product-rank {
+          height: 380px;
+        }
+
+        &.position-1 .product-rank {
+          height: 340px;
+        }
+
+        &.position-2 .product-rank {
+          height: 320px;
+        }
+      }
+    }
+  }
 
   .podium-container {
     width: 100%;
+    max-width: 1080px;
     margin: 2rem 0;
     padding: 2rem;
-    background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+    background: linear-gradient(to bottom, #f8fafc, #ffbbd661);
     border-radius: 1rem;
+    transition: all 0.3s ease;
 
     .podium-layout {
       width: 100%;
@@ -15,7 +90,6 @@
       justify-content: center;
       align-items: flex-end;
       gap: 1.5rem;
-      // min-height: 400px;
       padding: 2rem;
 
       .podium-position {
@@ -32,10 +106,10 @@
         .product-rank {
           width: 100%;
           background: white;
-          // border-radius: 1rem;
           padding: 1rem;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
           position: relative;
+          transition: all 0.3s ease;
         }
 
         .rank-badge {
@@ -84,30 +158,40 @@
       }
 
       .product-stats {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
         margin-top: 1rem;
-        text-align: center;
 
-        .rating-info {
+        .product-rating {
           display: flex;
-          justify-content: center;
-          align-items: baseline;
           gap: 0.25rem;
-
-          .rating-value {
+          
+          .star {
             font-size: 1.2rem;
-            font-weight: bold;
-            color: #f59e0b;
-          }
+            transition: color 0.3s ease;
 
-          .rating-max {
-            color: #6b7280;
+            &.filled {
+              color: $secondary-color;
+            }
+
+            &.half {
+              color: $secondary-color;
+            }
+
+            &.empty {
+              color: transparent;
+            }
+            // &.empty {
+            //   color: lighten($secondary-color, 30%);
+            // }
           }
         }
 
         .reviews-count {
           font-size: 0.9rem;
-          color: #6b7280;
-          margin-top: 0.25rem;
+          color: $text-color-light;
         }
       }
     }
@@ -146,6 +230,82 @@
 
     .podium-block {
       height: 100px !important;
+    }
+  }
+}
+
+// Animation du skeleton
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+// Mode sombre
+.dark-mode {
+  .podium-section {
+    h2 {
+      color: $text-color-light;
+    }
+    
+    &.loading {
+      .podium-container {
+        .podium-position {
+          .product-rank {
+            .skeleton {
+              background: linear-gradient(90deg, 
+                #2a2a2a 25%, 
+                #333333 50%, 
+                #2a2a2a 75%
+              );
+            }
+          }
+        }
+      }
+    }
+
+    .podium-container {
+      background: linear-gradient(to bottom, #1a1a1a,  #fb27a32c);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+
+      .podium-position {
+        .product-rank {
+          background: #333333;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+          color: #ffffff;
+        }
+
+        &:hover {
+          .product-rank {
+            background: #404040;
+          }
+        }
+      }
+
+      .product-stats {
+        .product-rating {
+          .star {
+            &.filled {
+              color: #fbbf24; // Orange plus clair pour meilleur contraste
+            }
+
+            &.half {
+              color: #fbbf24; // Orange plus clair pour meilleur contraste
+            }
+
+            &.empty {
+              color: transparent;
+            }
+          }
+        }
+
+        .reviews-count {
+          color: #9ca3af; // Gris plus clair
+        }
+      }
     }
   }
 }
