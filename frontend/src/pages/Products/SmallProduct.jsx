@@ -1,25 +1,27 @@
 import { Link } from "react-router-dom";
-import HeartIcon from "./HeartIcon";
+import Rating from "../../components/Rating";
 
 const SmallProduct = ({ product }) => {
   return (
-    <div className="small-product">
+    <Link to={`/product/${product._id}`} className="small-product">
       <div className="product-image">
         <img src={product.image} alt={product.name} loading="lazy" />
-        <HeartIcon product={product} />
       </div>
 
       <div className="product-info">
-        <Link to={`/product/${product._id}`}>
-          <h2 className="product-header">
-            <div>{product.name}</div>
-            <span className="product-price">{product.price}€</span>
-          </h2>
-        </Link>
+        <h2 className="product-header">
+          <div>{product.name}</div>
+          <span className="product-price">{product.price}€</span>
+        </h2>
+        <div className="product-stats">
+          <Rating value={product.rating} className="product-rating" />
+          <div className="reviews-count">
+            {product.numReviews} {product.numReviews > 1 ? 'avis' : 'avis'}
+          </div>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
 export default SmallProduct;
-

@@ -8,7 +8,6 @@
 
   h2 {
     width: 100%;
-    max-width: 1080px;
     font-style: italic;
     font-size: clamp(0.9rem, 0.5364rem + 1.4545vw, 1.7rem);
     //0.9rem-400px/1.7-1280px
@@ -21,13 +20,14 @@
   &.loading {
     .podium-container {
       width: 100%;
-      max-width: 1080px;
+      max-width: 1280px;
       .podium-position {
         .product-rank {
           .skeleton {
-            background: linear-gradient(90deg, 
-              #f0f0f0 25%, 
-              #e0e0e0 50%, 
+            background: linear-gradient(
+              90deg,
+              #f0f0f0 25%,
+              #e0e0e0 50%,
               #f0f0f0 75%
             );
             background-size: 1000px 100%;
@@ -77,9 +77,10 @@
 
   .podium-container {
     width: 100%;
-    max-width: 1080px;
+    max-width: 1280px;
     margin: 2rem 0;
-    padding: 2rem;
+    padding: clamp(0.5rem, -0.1818rem + 2.7273vw, 2rem);
+    //0.5rem-400px/2rem-1280px
     background: linear-gradient(to bottom, #f8fafc, #ffbbd661);
     border-radius: 1rem;
     transition: all 0.3s ease;
@@ -90,13 +91,13 @@
       justify-content: center;
       align-items: flex-end;
       gap: 1.5rem;
-      padding: 2rem;
+      padding: clamp(0.5rem, -0.1818rem + 2.7273vw, 2rem);
 
       .podium-position {
         display: flex;
         align-items: center;
         width: 100%;
-        max-width: 300px;
+        max-width: clamp(200px, 25vw, 300px);
         transition: transform 0.3s ease;
 
         &:hover {
@@ -106,7 +107,8 @@
         .product-rank {
           width: 100%;
           background: white;
-          padding: 1rem;
+          // padding: clamp(0.625rem, 0.4545rem + 0.6818vw, 1rem);
+          //10px-400px/16px-1280px
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
           position: relative;
           transition: all 0.3s ease;
@@ -116,8 +118,11 @@
           position: absolute;
           top: -15px;
           left: -15px;
-          width: 50px;
-          height: 50px;
+          width: clamp(2.5rem, 2.2159rem + 1.1364vw, 3.125rem);
+          //40px-400px/50px-1280px
+          // height: 50px;
+          height: auto;
+          aspect-ratio: 1/1;
           border-radius: 50%;
           display: flex;
           flex-direction: column;
@@ -127,12 +132,12 @@
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
           .rank-icon {
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 0.7636rem + 0.5455vw, 1.2rem);
             color: white;
           }
 
           .rank-label {
-            font-size: 0.7rem;
+            font-size: clamp(0.5rem, 0.4091rem + 0.3636vw, 0.7rem);
             color: white;
             font-weight: bold;
           }
@@ -141,57 +146,48 @@
 
       // Position spécifique pour chaque place
       .position-0 {
-        // Premier
         order: 2;
         transform: translateY(-20px);
       }
 
       .position-1 {
-        // Deuxième
         order: 1;
       }
 
       .position-2 {
-        // Troisième
         order: 3;
         transform: translateY(20px);
       }
 
-      .product-stats {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 1rem;
+      @media screen and (max-width: 768px) {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1rem;
+        
+        .podium-position {
+          max-width: 100%;
 
-        .product-rating {
-          display: flex;
-          gap: 0.25rem;
-          
-          .star {
-            font-size: 1.2rem;
-            transition: color 0.3s ease;
-
-            &.filled {
-              color: $secondary-color;
-            }
-
-            &.half {
-              color: $secondary-color;
-            }
-
-            &.empty {
-              color: transparent;
-            }
-            // &.empty {
-            //   color: lighten($secondary-color, 30%);
-            // }
+          &.position-0 {
+            grid-column: 1 / -1;
+            order: 1;
+            transform: translateY(0);
           }
-        }
 
-        .reviews-count {
-          font-size: 0.9rem;
-          color: $text-color-light;
+          &.position-1 {
+            order: 2;
+            transform: translateY(0);
+          }
+
+          &.position-2 {
+            order: 3;
+            transform: translateY(0);
+          }
+
+          .product-rank {
+            height: auto !important;
+            display: flex;
+          }
         }
       }
     }
@@ -199,38 +195,6 @@
 
   .carousel-section {
     width: 100%;
-  }
-
-  // Responsive
-  @media (max-width: 768px) {
-    .podium-layout {
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      padding: 1rem;
-    }
-
-    .podium-position {
-      width: 100%;
-      max-width: 280px;
-
-      &.position-0 {
-        order: 1;
-        transform: none;
-      }
-
-      &.position-1 {
-        order: 2;
-      }
-
-      &.position-2 {
-        order: 3;
-      }
-    }
-
-    .podium-block {
-      height: 100px !important;
-    }
   }
 }
 
@@ -250,15 +214,16 @@
     h2 {
       color: $text-color-light;
     }
-    
+
     &.loading {
       .podium-container {
         .podium-position {
           .product-rank {
             .skeleton {
-              background: linear-gradient(90deg, 
-                #2a2a2a 25%, 
-                #333333 50%, 
+              background: linear-gradient(
+                90deg,
+                #2a2a2a 25%,
+                #333333 50%,
                 #2a2a2a 75%
               );
             }
@@ -268,7 +233,7 @@
     }
 
     .podium-container {
-      background: linear-gradient(to bottom, #1a1a1a,  #fb27a32c);
+      background: linear-gradient(to bottom, #1a1a1a, #fb27a32c);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 
       .podium-position {

@@ -2,7 +2,6 @@ import { useGetTopRatedProductsQuery } from "../redux/features/productApiSlice";
 import SmallProduct from "../pages/Products/SmallProduct";
 import Message from "./Message";
 import { FaTrophy, FaMedal, FaAward } from "react-icons/fa";
-import Rating from "./Rating";
 import { useState, useEffect } from 'react';
 
 const PODIUM_ORDER = [1, 0, 2]; // [2ème, 1er, 3ème]
@@ -118,12 +117,6 @@ const Podium = () => {
                         <span className="rank-label">{label}</span>
                       </div>
                       <SmallProduct product={product} />
-                      <div className="product-stats">
-                        <Rating value={product.rating} className="product-rating" />
-                        <div className="reviews-count">
-                          {product.numReviews} {product.numReviews > 1 ? 'avis' : 'avis'}
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );

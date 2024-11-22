@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { FiSearch, FiBell, FiUser, FiSun, FiMoon } from 'react-icons/fi';
+import { FiSearch, FiUser, FiSun, FiMoon } from 'react-icons/fi';
 import '../assets/styles/components/_header.scss';
 
 const Header = () => {
@@ -59,37 +59,31 @@ const Header = () => {
             {isDarkMode ? <FiSun /> : <FiMoon />}
           </button>
 
-          <button className="header-icon-link">
-            <FiBell />
-          </button>
-
-          {userInfo ? (
-            <div className="user-menu">
-              <button 
-                className="user-menu-trigger"
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                aria-expanded={showUserMenu}
-              >
-                {userInfo.username}
-                <FiUser />
-              </button>
-              
-              {showUserMenu && (
-                <div className="user-menu-dropdown">
-                  <Link to="/profile">Mon profil</Link>
-                  <Link to="/orders">Mes commandes</Link>
-                  {userInfo.isAdmin && (
-                    <Link to="/admin/dashboard">Dashboard Admin</Link>
-                  )}
-                  <hr />
-                  <Link to="/logout">Déconnexion</Link>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link to="/login" className="login-button">
-              Connexion
-            </Link>
+          {userInfo && (
+            <>
+              <div className="user-menu">
+                <button 
+                  className="user-menu-trigger"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  aria-expanded={showUserMenu}
+                >
+                  <span className="username">{userInfo.username}</span>
+                  <FiUser />
+                </button>
+                
+                {showUserMenu && (
+                  <div className="user-menu-dropdown">
+                    <Link to="/profile">Mon profil</Link>
+                    <Link to="/orders">Mes commandes</Link>
+                    {userInfo.isAdmin && (
+                      <Link to="/admin/dashboard">Dashboard Admin</Link>
+                    )}
+                    <hr />
+                    <Link to="/logout">Déconnexion</Link>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>
