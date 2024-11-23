@@ -16,7 +16,7 @@ const SmallProduct = ({ product }) => {
         <div className="product-stats">
           <Rating value={product.rating} className="product-rating" />
           <div className="reviews-count">
-            {product.numReviews} {product.numReviews > 1 ? 'avis' : 'avis'}
+            {product.numReviews} {product.numReviews > 1 ? "avis" : "avis"}
           </div>
         </div>
       </div>

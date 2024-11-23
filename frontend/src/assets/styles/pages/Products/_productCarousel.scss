@@ -1,67 +1,179 @@
-.product-carousel {
-  margin-bottom: 1rem;
-  height: 300px;
+@use "../../base/variables" as *;
 
-  .slider-container {
-    width: 100%;
-    max-width: 56rem;
+.category-carousels {
+  width: 100%;
+  padding: 1rem 0;
+  font-family: $base-font-family;
 
-    @media (max-width: 1024px) {
-      max-width: 50rem;
+  .category-section {
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+
+    h2 {
+      font-size: $base-font-size * 1.5;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      letter-spacing: $base-letter-spacing;
+      color: $text-color-light;
     }
 
-    @media (max-width: 640px) {
-      max-width: 40rem;
+    .slick-slider {
+      margin: 0 -0.5rem;
+
+      .slick-prev {
+        left: -25px;
+      }
+
+      .slick-next {
+        right: -25px;
+      }
     }
   }
 
-  .slider-image {
-    width: 100%;
-    border-radius: 0.5rem;
-    object-fit: cover;
-    height: 30rem;
-  }
+  .carousel-product {
+    padding: 0 0.5rem;
 
-  .product-details {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: space-between;
-
-    .product-info {
-      width: 25rem;
-
-      .product-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
-
-      .product-price {
-        font-size: 1.2rem;
-        margin-top: 0.5rem;
-        color: #333;
-      }
-
-      .product-description {
-        margin-top: 1rem;
-      }
-    }
-
-    .product-meta {
-      width: 20rem;
+    .product-card {
+      background: $primary-color;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      transition: $transition-default;
+      height: 100%;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
 
-      .brand-details,
-      .stock-details {
-        .meta-item {
+      .image-container {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; // Create a 1:1 aspect ratio
+        background: #f0f0f0;
+        overflow: hidden;
+
+        img, .image-placeholder, .image-error, .product-image {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain; // Changed from cover to contain
+          object-position: center;
+        }
+
+        .image-placeholder {
           display: flex;
           align-items: center;
-          margin-bottom: 1.5rem;
+          justify-content: center;
+          background: #f0f0f0;
+          z-index: 1;
 
-          .icon {
-            margin-right: 0.5rem;
-            color: #fff;
+          .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid $secondary-color;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
           }
+        }
+
+        .image-error {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f0f0f0;
+          color: #666;
+          font-size: 0.9rem;
+        }
+
+        .product-image {
+          transition: opacity 0.3s ease-in-out;
+          padding: 0.5rem; // Add padding to prevent image from touching edges
+
+          &.loading {
+            opacity: 0;
+          }
+
+          &.loaded {
+            opacity: 1;
+          }
+        }
+      }
+
+      .product-info {
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        h3 {
+          font-size: $base-font-size;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          color: $text-color-light;
+          letter-spacing: $base-letter-spacing;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .rating {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          color: #ffd700;
+          margin-bottom: 0.5rem;
+          font-size: $base-font-size * 0.9;
+        }
+
+        .price {
+          font-weight: bold;
+          color: $secondary-color;
+          font-size: $base-font-size * 1.1;
+          letter-spacing: $base-letter-spacing;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive adjustments
+@media (max-width: 1024px) {
+  .category-carousels {
+    .carousel-product {
+      .product-card {
+        .image-container {
+          padding-top: 100%; // Maintain aspect ratio
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .category-carousels {
+    .category-section {
+      padding: 0 0.5rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .category-carousels {
+    .carousel-product {
+      .product-card {
+        .image-container {
+          padding-top: 100%; // Maintain aspect ratio
         }
       }
     }

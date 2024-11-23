@@ -2,113 +2,157 @@ import Message from "../../components/Message";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import moment from "moment";
-import {
-  FaBox,
-  FaClock,
-  FaShoppingCart,
-  FaStar,
-  FaStore,
-} from "react-icons/fa";
-import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
+import { FaStar } from "react-icons/fa";
+import { useGetProductsQuery } from "../../redux/features/productApiSlice";
+import { useGetCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 import { Link } from "react-router-dom";
+import { useState, useCallback, useMemo } from "react";
+
+const ProductImage = ({ src, alt }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const handleLoad = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setIsLoading(false);
+    setHasError(true);
+  }, []);
+
+  return (
+    <div className="image-container">
+      {isLoading && (
+        <div className="image-placeholder">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className={`product-image ${isLoading ? 'loading' : 'loaded'}`}
+        onLoad={handleLoad}
+        onError={handleError}
+      />
+      {hasError && (
+        <div className="image-error">
+          <span>Image non disponible</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ProductCarousel = () => {
-  const { data, isLoading, error } = useGetTopRatedProductsQuery();
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useGetCategoriesQuery();
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useGetProductsQuery({});
 
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 1,
+    slidesToShow: 5,
     slidesToScroll: 1,
     arrows: true,
     autoplay: true,
     autoplaySpeed: 3000,
     pauseOnHover: true,
+    cssEase: "linear",
+    swipeToSlide: true,
+    centerMode: false,
     responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 4,
+        },
+      },
       {
         breakpoint: 768,
         settings: {
+          slidesToShow: 3,
+          arrows: false,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 2,
           arrows: false,
         },
       },
     ],
   };
 
-  if (isLoading) return null;
+  const duplicateProducts = useCallback((products, minCount) => {
+    if (products.length === 0) return [];
+    const duplicates = [];
+    while (duplicates.length < minCount) {
+      duplicates.push(...products.map(product => ({
+        ...product,
+        _id: `${product._id}_${Math.floor(duplicates.length / products.length)}`
+      })));
+    }
+    return duplicates;
+  }, []);
+
+  const productsByCategory = useMemo(() => {
+    if (!categories || !productsData) return {};
+
+    return categories.reduce((acc, category) => {
+      const categoryProducts = productsData.products
+        .filter(product => product.category === category._id)
+        .sort((a, b) => b.rating - a.rating);
+      
+      if (categoryProducts.length > 0) {
+        // Dupliquer les produits pour avoir au moins 10 éléments (2 rotations complètes pour 5 slides)
+        const duplicatedProducts = duplicateProducts(categoryProducts, 10);
+        acc[category._id] = {
+          name: category.name,
+          products: duplicatedProducts
+        };
+      }
+      return acc;
+    }, []);
+  }, [categories, productsData, duplicateProducts]);
+
+  if (categoriesLoading || productsLoading) return <div>Chargement...</div>;
   
-  if (error) {
+  if (categoriesError || productsError) {
     return (
       <Message variant="danger">
-        {error?.data?.message || error.error}
+        {categoriesError?.data?.message || productsError?.data?.message || "Une erreur est survenue"}
       </Message>
     );
   }
 
-  if (!Array.isArray(data) || data.length === 0) {
-    return <Message variant="info">Aucun produit à afficher</Message>;
-  }
-
   return (
-    <div className="product-carousel">
-      <Slider {...settings} className="slider-container">
-        {data.map(({
-          image,
-          _id,
-          name,
-          price,
-          description,
-          brand,
-          createdAt,
-          numReviews,
-          rating,
-          stock,
-        }) => (
-          <div key={_id} className="carousel-slide">
-            <Link to={`/product/${_id}`} className="slide-content">
-              <img
-                src={image}
-                alt={name}
-                className="slider-image"
-                loading="lazy"
-              />
-              <div className="product-details">
-                <div className="product-info">
-                  <h2 className="product-title">{name}</h2>
-                  <p className="product-price">{price.toFixed(2)}€</p>
-                  <p className="product-description">
-                    {description.length > 170 
-                      ? `${description.substring(0, 170)}...` 
-                      : description}
-                  </p>
-                </div>
-                <div className="product-meta">
-                  <div className="brand-details">
-                    <span className="meta-item">
-                      <FaStore className="icon" /> {brand}
-                    </span>
-                    <span className="meta-item">
-                      <FaClock className="icon" /> {moment(createdAt).fromNow()}
-                    </span>
-                    <span className="meta-item">
-                      <FaStar className="icon" /> {numReviews} avis
-                    </span>
+    <div className="category-carousels">
+      {Object.entries(productsByCategory).map(([categoryId, { name, products }]) => (
+        <div key={categoryId} className="category-section">
+          <h2>{name}</h2>
+          <Slider {...settings}>
+            {products.map((product) => (
+              <div key={product._id} className="carousel-product">
+                <Link to={`/product/${product._id.split('_')[0]}`}>
+                  <div className="product-card">
+                    <ProductImage src={product.image} alt={product.name} />
+                    <div className="product-info">
+                      <h3>{product.name}</h3>
+                      <div className="rating">
+                        <FaStar /> {product.rating.toFixed(1)}
+                      </div>
+                      <div className="price">{product.price.toFixed(2)} €</div>
+                    </div>
                   </div>
-                  <div className="stock-details">
-                    <span className="meta-item">
-                      <FaStar className="icon" /> Note: {rating.toFixed(1)}
-                    </span>
-                    <span className="meta-item">
-                      <FaBox className="icon" /> Stock: {stock}
-                    </span>
-                  </div>
-                </div>
+                </Link>
               </div>
-            </Link>
-          </div>
-        ))}
-      </Slider>
+            ))}
+          </Slider>
+        </div>
+      ))}
     </div>
   );
 };
