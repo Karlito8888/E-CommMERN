@@ -26,7 +26,7 @@ const ProductImage = ({ src, alt }) => {
       {isLoading && (
         <div className="image-placeholder">
           <div className="loading-spinner"></div>
-        </div>
+      </div>
       )}
       <img
         src={src}
@@ -53,7 +53,7 @@ const ProductCarousel = () => {
     dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 5,
+    slidesToShow: 7,
     slidesToScroll: 1,
     arrows: true,
     autoplay: true,
@@ -66,7 +66,7 @@ const ProductCarousel = () => {
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 4,
+          slidesToShow: 5,
         },
       },
       {
@@ -130,7 +130,9 @@ const ProductCarousel = () => {
 
   return (
     <div className="category-carousels">
-      {Object.entries(productsByCategory).map(([categoryId, { name, products }]) => (
+      {Object.entries(productsByCategory)
+        .sort(([, a], [, b]) => b.products.length - a.products.length)
+        .map(([categoryId, { name, products }]) => (
         <div key={categoryId} className="category-section">
           <h2>{name}</h2>
           <Slider {...settings}>
@@ -142,7 +144,7 @@ const ProductCarousel = () => {
                     <div className="product-info">
                       <h3>{product.name}</h3>
                       <div className="rating">
-                        <FaStar /> {product.rating.toFixed(1)}
+                        <FaStar /> {Number(product.rating).toFixed(1)}
                       </div>
                       <div className="price">{product.price.toFixed(2)} €</div>
                     </div>

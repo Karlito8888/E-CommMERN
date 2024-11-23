@@ -10,7 +10,8 @@
     padding: 0 1rem;
 
     h2 {
-      font-size: $base-font-size * 1.5;
+      font-size: clamp(0.9rem, 0.5364rem + 1.4545vw, 1.7rem);
+      //0.9rem-400px/1.7-1280px
       font-weight: bold;
       margin-bottom: 1rem;
       letter-spacing: $base-letter-spacing;
@@ -35,12 +36,13 @@
 
     .product-card {
       background: $primary-color;
-      border-radius: 0.5rem;
+      border-radius: 0.4rem;
       overflow: hidden;
       transition: $transition-default;
       height: 100%;
       display: flex;
       flex-direction: column;
+      padding: clamp(0.4375rem, 0.2955rem + 0.5682vw, 0.75rem);
       
       &:hover {
         transform: translateY(-5px);
@@ -52,6 +54,7 @@
         width: 100%;
         padding-top: 100%; // Create a 1:1 aspect ratio
         background: #f0f0f0;
+        border-radius: 0.3rem;
         overflow: hidden;
 
         img, .image-placeholder, .image-error, .product-image {
@@ -62,6 +65,9 @@
           height: 100%;
           object-fit: contain; // Changed from cover to contain
           object-position: center;
+          padding: 3px !important;
+           border-radius: 0.3rem;
+        overflow: hidden;
         }
 
         .image-placeholder {
@@ -105,14 +111,15 @@
       }
 
       .product-info {
-        padding: 1rem;
+        width: 100%;
+        padding-top: 1rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
 
         h3 {
-          font-size: $base-font-size;
+          font-size: clamp(0.6rem, 0.4182rem + 0.7273vw, 1rem);
           font-weight: 600;
           margin-bottom: 0.5rem;
           color: $text-color-light;
@@ -128,13 +135,13 @@
           gap: 0.25rem;
           color: #ffd700;
           margin-bottom: 0.5rem;
-          font-size: $base-font-size * 0.9;
+          font-size: clamp(0.6rem, 0.4182rem + 0.7273vw, 1rem);
         }
 
         .price {
           font-weight: bold;
           color: $secondary-color;
-          font-size: $base-font-size * 1.1;
+          font-size: clamp(0.6rem, 0.4182rem + 0.7273vw, 1rem);
           letter-spacing: $base-letter-spacing;
         }
       }
