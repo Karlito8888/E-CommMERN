@@ -16,7 +16,7 @@ const validateCart = async (items) => {
 
   const productIds = items.map(item => item.product);
   const products = await Product.find({ _id: { $in: productIds } })
-    .select('_id name price stock')
+    .select('_id name price countInStock')
     .lean();
 
   const validatedItems = [];
@@ -35,8 +35,8 @@ const validateCart = async (items) => {
       return;
     }
     
-    if (product.stock < item.quantity) {
-      errors.push(`Stock insuffisant pour ${product.name}: ${product.stock} disponible(s)`);
+    if (product.countInStock < item.quantity) {
+      errors.push(`Stock insuffisant pour ${product.name}: ${product.countInStock} disponible(s)`);
       return;
     }
     
@@ -91,7 +91,7 @@ const validateGuestCart = asyncHandler(async (req, res) => {
 // Récupérer le panier (utilisateur connecté)
 const getCart = asyncHandler(async (req, res) => {
   let cart = await Cart.findOne({ user: req.user._id })
-    .populate('items.product', 'name price stock image');
+    .populate('items.product', 'name price countInStock image');
 
   if (!cart) {
     cart = await Cart.create({ user: req.user._id, items: [] });
@@ -107,7 +107,7 @@ const getCart = asyncHandler(async (req, res) => {
       { user: req.user._id },
       { items: validatedItems },
       { new: true }
-    ).populate('items.product', 'name price stock image');
+    ).populate('items.product', 'name price countInStock image');
   }
 
   res.json({
@@ -140,7 +140,7 @@ const syncCart = asyncHandler(async (req, res) => {
         new: true, 
         upsert: true 
       }
-    ).populate('items.product', 'name price stock image');
+    ).populate('items.product', 'name price countInStock image');
 
     res.json(cart);
   } catch (error) {

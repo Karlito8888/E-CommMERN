@@ -1,8 +1,105 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SmallProduct from "./SmallProduct";
-import { useGetTopRatedProductsQuery } from "../../redux/features/productApiSlice";
+import { useGetRelatedProductsQuery } from "../../redux/features/productApiSlice";
 import Rating from "../../components/Rating";
+import StarRating from "../../components/StarRating";
+
+const TabButton = ({ isActive, onClick, children }) => (
+  <button
+    className={`tab-button ${isActive ? "active" : ""}`}
+    onClick={onClick}
+    type="button"
+  >
+    {children}
+  </button>
+);
+
+const ReviewForm = ({ userInfo, onSubmit, rating, setRating, comment, setComment, isLoading }) => {
+  if (!userInfo) {
+    return (
+      <p className="login-prompt">
+        Veuillez <Link to="/login">vous connecter</Link> pour écrire un avis
+      </p>
+    );
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="review-form">
+      <div className="form-group">
+        <label>Votre note</label>
+        <StarRating rating={Number(rating)} onRatingChange={setRating} />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="comment">Commentaire</label>
+        <textarea
+          id="comment"
+          rows="3"
+          required
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+      </div>
+
+      <button type="submit" disabled={isLoading || !rating} className="submit-button">
+        Soumettre
+      </button>
+    </form>
+  );
+};
+
+const ReviewList = ({ reviews = [] }) => {
+  if (!reviews || reviews.length === 0) {
+    return <p className="no-reviews">Aucun avis</p>;
+  }
+
+  return (
+    <div className="reviews-list">
+      {reviews.map((review) => (
+        <article 
+          key={`${review.user}-${review.createdAt}`} 
+          className="review-item"
+        >
+          <header className="review-header">
+            <strong>{review.name}</strong>
+            <time dateTime={review.createdAt}>
+              {review.createdAt.substring(0, 10)}
+            </time>
+          </header>
+          <p className="review-comment">{review.comment}</p>
+          <Rating value={review.rating} />
+        </article>
+      ))}
+    </div>
+  );
+};
+
+const RelatedProducts = ({ product, isLoading }) => {
+  const { data: relatedProducts, isLoading: loadingRelated } = useGetRelatedProductsQuery({
+    productId: product._id,
+    categoryId: product.category._id
+  });
+
+  if (isLoading || loadingRelated) {
+    return <div className="loading">Chargement...</div>;
+  }
+
+  if (!relatedProducts?.length) {
+    return <p>Aucun produit similaire trouvé</p>;
+  }
+
+  return (
+    <section className="related-products">
+      <h3>Produits similaires</h3>
+      <div className="products-grid">
+        {relatedProducts.map((product) => (
+          <SmallProduct key={product._id} product={product} />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 const ProductTabs = ({
   loadingProductReview,
@@ -14,141 +111,49 @@ const ProductTabs = ({
   setComment,
   product,
 }) => {
-  const { data, isLoading } = useGetTopRatedProductsQuery();
   const [activeTab, setActiveTab] = useState(1);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const tabs = [
+    { id: 1, label: "Écrire votre avis" },
+    { id: 2, label: "Tous les avis" },
+    { id: 3, label: "Produits associés" },
+  ];
 
-  const handleTabClick = (tabNumber) => {
-    setActiveTab(tabNumber);
-  };
+  if (!product) return null;
 
   return (
-    <div className="product-tabs">
-      <section className="product-tabs__tabs">
-        <div
-          className={`product-tabs__tabs-item ${
-            activeTab === 1 ? "product-tabs__tabs-item--active" : ""
-          }`}
-          onClick={() => handleTabClick(1)}
-        >
-          Écrire votre avis
-        </div>
-        <div
-          className={`product-tabs__tabs-item ${
-            activeTab === 2 ? "product-tabs__tabs-item--active" : ""
-          }`}
-          onClick={() => handleTabClick(2)}
-        >
-          Tous les avis
-        </div>
-        <div
-          className={`product-tabs__tabs-item ${
-            activeTab === 3 ? "product-tabs__tabs-item--active" : ""
-          }`}
-          onClick={() => handleTabClick(3)}
-        >
-          Produits associés
-        </div>
-      </section>
+    <div className="tabs-container">
+      <nav className="tabs-nav">
+        {tabs.map((tab) => (
+          <TabButton
+            key={tab.id}
+            isActive={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </TabButton>
+        ))}
+      </nav>
 
-      <section>
+      <div className="tab-content">
         {activeTab === 1 && (
-          <div className="product-tabs__form">
-            {userInfo ? (
-              <form onSubmit={submitHandler}>
-                <div className="my-2">
-                  <label htmlFor="rating" className="product-tabs__form-label">
-                    Évaluation
-                  </label>
-                  <select
-                    id="rating"
-                    required
-                    value={rating}
-                    onChange={(e) => setRating(e.target.value)}
-                    className="product-tabs__form-select"
-                  >
-                    <option value="">Sélectionnez</option>
-                    <option value="1">Inférieur</option>
-                    <option value="2">Décent</option>
-                    <option value="3">Génial</option>
-                    <option value="4">Excellent</option>
-                    <option value="5">Exceptionnel</option>
-                  </select>
-                </div>
-
-                <div className="my-2">
-                  <label htmlFor="comment" className="product-tabs__form-label">
-                    Commentaire
-                  </label>
-                  <textarea
-                    id="comment"
-                    rows="3"
-                    required
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="product-tabs__form-textarea"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  disabled={loadingProductReview}
-                  className="product-tabs__form-submit"
-                >
-                  Soumettre
-                </button>
-              </form>
-            ) : (
-              <p>
-                Veuillez <Link to="/login">vous connecter</Link> pour écrire un
-                avis
-              </p>
-            )}
-          </div>
+          <ReviewForm
+            userInfo={userInfo}
+            onSubmit={submitHandler}
+            rating={rating}
+            setRating={setRating}
+            comment={comment}
+            setComment={setComment}
+            isLoading={loadingProductReview}
+          />
         )}
-      </section>
 
-      <section>
-        {activeTab === 2 && (
-          <>
-            <div>{product.reviews.length === 0 && <p>Aucun avis</p>}</div>
-            <div>
-              {product.reviews.map((review) => (
-                <div key={review._id} className="product-tabs__reviews-item">
-                  <div className="flex justify-between">
-                    <strong className="product-tabs__reviews-item-author">
-                      {review.name}
-                    </strong>
-                    <p className="product-tabs__reviews-item-date">
-                      {review.createdAt.substring(0, 10)}
-                    </p>
-                  </div>
-                  <p className="my-4">{review.comment}</p>
-                  <Rating value={review.rating} />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </section>
+        {activeTab === 2 && <ReviewList reviews={product?.reviews} />}
 
-      <section>
         {activeTab === 3 && (
-          <section className="product-tabs__related-products">
-            {!data ? (
-              <div>Loading...</div>
-            ) : (
-              data.map((product) => (
-                <div key={product._id}>
-                  <SmallProduct product={product} />
-                </div>
-              ))
-            )}
-          </section>
+          <RelatedProducts product={product} isLoading={loadingProductReview} />
         )}
-      </section>
+      </div>
     </div>
   );
 };

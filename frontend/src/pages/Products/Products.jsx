@@ -116,7 +116,7 @@ const Product = () => {
                     {product.quantity}
                   </h1>
                   <h1 className="product-info-item">
-                    <FaBox className="icon" /> In Stock: {product.stock}
+                    <FaBox className="icon" /> In Stock: {product.countInStock}
                   </h1>
                 </div>
               </div>
@@ -127,14 +127,14 @@ const Product = () => {
                   text={`${product.numReviews} reviews`}
                 />
 
-                {product.stock > 0 && (
+                {product.countInStock > 0 && (
                   <div className="quantity-selector">
                     <select
                       value={qty}
                       onChange={(e) => setQty(Number(e.target.value))}
                       className="quantity-dropdown"
                     >
-                      {[...Array(product.stock).keys()].map((x) => (
+                      {[...Array(product.countInStock).keys()].map((x) => (
                         <option key={x + 1} value={x + 1}>
                           {x + 1}
                         </option>
@@ -147,7 +147,7 @@ const Product = () => {
               <div className="add-to-cart-btn-container">
                 <button
                   onClick={addToCartHandler}
-                  disabled={product.stock === 0}
+                  disabled={product.countInStock === 0}
                   className="add-to-cart-btn"
                 >
                   Add To Cart

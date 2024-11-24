@@ -126,7 +126,7 @@ productSchema.methods.updateRating = function() {
     this.rating = 0;
     this.numReviews = 0;
   } else {
-    this.rating = reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length;
+    this.rating = Math.round((reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length) * 10) / 10;
     this.numReviews = reviews.length;
   }
 };

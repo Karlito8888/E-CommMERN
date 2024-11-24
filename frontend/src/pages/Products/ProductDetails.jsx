@@ -3,19 +3,15 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Message from "../../components/Message";
-import {
-  FaBox,
-  FaClock,
-  FaShoppingCart,
-  FaStar,
-  FaStore,
-} from "react-icons/fa";
-import moment from "moment";
+import { FaStore, FaStar, FaArrowLeft } from "react-icons/fa";
 import HeartIcon from "./HeartIcon";
-// import Ratings from "./Ratings";
+import Rating from "../../components/Rating";
 import ProductTabs from "./ProductTabs";
 import { addToCart } from "../../redux/features/cart/cartSlice";
-import { useCreateReviewMutation, useGetProductByIdQuery } from "../../redux/features/productApiSlice";
+import {
+  useCreateReviewMutation,
+  useGetProductByIdQuery,
+} from "../../redux/features/productApiSlice";
 
 const ProductDetails = () => {
   const { id: productId } = useParams();
@@ -41,16 +37,37 @@ const ProductDetails = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
+    if (!rating) {
+      toast.error("Veuillez sélectionner une note");
+      return;
+    }
+
+    if (!comment.trim()) {
+      toast.error("Veuillez ajouter un commentaire");
+      return;
+    }
+
     try {
       await createReview({
         productId,
         rating,
-        comment,
+        comment: comment.trim(),
+        name: userInfo.username
       }).unwrap();
+      
+      // Réinitialiser le formulaire
+      setRating(0);
+      setComment("");
+      
       refetch();
-      toast.success("Critique créée avec succès");
-    } catch (error) {
-      toast.error(error?.data || error.message);
+      toast.success("Avis ajouté avec succès");
+    } catch (err) {
+      // Gestion spécifique des erreurs HTTP
+      if (err.data?.message === 'Produit déjà évalué') {
+        toast.info("Vous avez déjà évalué ce produit");
+      } else {
+        toast.error(err?.data?.message || "Une erreur est survenue lors de l'ajout de l'avis");
+      }
     }
   };
 
@@ -61,80 +78,91 @@ const ProductDetails = () => {
 
   return (
     <>
-      <div>
-        <Link to="/" className="btn-back">
-          Retourner
+      <div className="arrow-container">
+        <Link
+          to="/"
+          className="btn-back"
+          aria-label="Retourner à la page d'accueil"
+        >
+          <FaArrowLeft aria-hidden="true" />
         </Link>
       </div>
 
       {isLoading ? (
-        <div>Loading...</div>
+        <div aria-live="polite">Chargement en cours...</div>
       ) : error ? (
-        <Message variant="danger">
+        <Message variant="danger" role="alert">
           {error?.data?.message || error.message}
         </Message>
       ) : (
         <>
-          <div className="product-details">
-            <div>
+          <div className="product-details-container">
+            <section className="image-container" aria-label="Images du produit">
               <img
                 src={product.image}
                 alt={product.name}
                 className="product-image"
                 loading="lazy"
               />
-
               <HeartIcon product={product} />
-            </div>
+            </section>
 
-            <div className="product-info">
-              <h2 className="product-title">{product.name}</h2>
-              <p className="product-description">{product.description}</p>
+            <div className="product-infos-container">
+              <section
+                className="product-info"
+                aria-label="Informations du produit"
+              >
+                  <h1 className="product-title">{product.name}</h1>
+                  <p className="product-description">{product.description}</p>
+                  <p className="product-price" aria-label="Prix">
+                    <span className="visually-hidden">{product.price}€</span>
+                  </p>
+              </section>
 
-              <p className="product-price">€ {product.price}</p>
-
-              <div className="product-meta">
-                <div className="brand-info">
-                  <h1 className="brand">
-                    <FaStore className="icon" /> Marque: {product.brand}
-                  </h1>
-                  <h1 className="added">
-                    <FaClock className="icon" /> Ajouté:{" "}
-                    {moment(product.createAt).fromNow()}
-                  </h1>
-                  <h1 className="reviews">
-                    <FaStar className="icon" /> Avis: {product.numReviews}
-                  </h1>
-                </div>
-
-                <div className="rating-info">
-                  <h1 className="ratings">
-                    <FaStar className="icon" /> Évaluations: {rating}
-                  </h1>
-                  <h1 className="quantity">
-                    <FaShoppingCart className="icon" /> Quantité:{" "}
-                    {product.quantity}
-                  </h1>
-                  <h1 className="stock">
-                    <FaBox className="icon" /> En Stock: {product.stock}
-                  </h1>
-                </div>
-              </div>
-
-              <div className="quantity-selector">
-                {/* <Ratings
-                  value={product.rating}
-                  text={`${product.numReviews} reviews`}
-                /> */}
-
-                {product.stock > 0 && (
+              <section
+                className="product-meta"
+                aria-label="Détails supplémentaires"
+              >
+                <dl className="brand-info">
                   <div>
+                    <dt>
+                      <FaStore className="icon" aria-hidden="true" />
+                    </dt>
+                    <dd>{product.brand}</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      <FaStar className="icon" aria-hidden="true" />
+                    </dt>
+                    <dd>{product.numReviews} avis</dd>
+                  </div>
+                  <div>
+                    <dd>
+                      <Rating
+                        value={product.rating}
+                        className="product-rating"
+                      />
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section
+                className="quantity-selector"
+                aria-label="Sélection de la quantité"
+              >
+                {product.countInStock > 0 && (
+                  <div className="select-wrapper">
+                    <label htmlFor="quantity" className="form-label">
+                      Sélectionner une quantité:
+                    </label>
                     <select
+                      id="quantity"
                       value={qty}
-                      onChange={(e) => setQty(e.target.value)}
+                      onChange={(e) => setQty(Number(e.target.value))}
                       className="qty-select"
                     >
-                      {[...Array(product.stock).keys()].map((x) => (
+                      {[...Array(product.countInStock).keys()].map((x) => (
                         <option key={x + 1} value={x + 1}>
                           {x + 1}
                         </option>
@@ -142,31 +170,38 @@ const ProductDetails = () => {
                     </select>
                   </div>
                 )}
-              </div>
 
-              <div className="btn-container">
                 <button
                   onClick={addToCartHandler}
-                  disabled={product.stock === 0}
+                  disabled={product.countInStock === 0}
                   className="btn-add-to-cart"
+                  aria-label={
+                    product.countInStock === 0
+                      ? "Produit indisponible"
+                      : `Ajouter ${product.name} au panier`
+                  }
                 >
-                  Ajouter au Panier
+                  {product.countInStock === 0
+                    ? "Produit indisponible"
+                    : "Ajouter au Panier"}
                 </button>
-              </div>
+              </section>
             </div>
-
-            <div className="product-tabs-container">
-              <ProductTabs
-                loadingProductReview={loadingProductReview}
-                userInfo={userInfo}
-                submitHandler={submitHandler}
-                rating={rating}
-                setRating={setRating}
-                comment={comment}
-                setComment={setComment}
-                product={product}
-              />
-            </div>
+          </div>
+          <div
+            className="product-tabs-container"
+            aria-label="Avis et commentaires"
+          >
+            <ProductTabs
+              loadingProductReview={loadingProductReview}
+              userInfo={userInfo}
+              submitHandler={submitHandler}
+              rating={rating}
+              setRating={setRating}
+              comment={comment}
+              setComment={setComment}
+              product={product}
+            />
           </div>
         </>
       )}

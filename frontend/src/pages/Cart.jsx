@@ -25,14 +25,12 @@ const Cart = () => {
   };
 
   // Calculer le nombre total d'articles et le prix total
-  const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
-  const totalPrice = cartItems
-    .reduce((acc, item) => acc + item.qty * item.price, 0)
-    ;
+  const totalItems = cartItems?.reduce((acc, item) => acc + item.qty, 0) || 0;
+  const totalPrice = cartItems?.reduce((acc, item) => acc + item.qty * item.price, 0) || 0;
 
   return (
     <div className="cart-container">
-      {cartItems.length === 0 ? (
+      {!cartItems || cartItems.length === 0 ? (
         <div className="text-center">
           <p className="cart__empty-message">Votre panier est vide.</p>
           <Link to="/shop" className="cart__link">
@@ -70,7 +68,7 @@ const Cart = () => {
                       addToCartHandler(item, Number(e.target.value))
                     }
                   >
-                    {[...Array(item.stock).keys()].map((x) => (
+                    {[...Array(item.countInStock).keys()].map((x) => (
                       <option key={`${item._id}-${x + 1}`} value={x + 1}>
                         {x + 1}
                       </option>

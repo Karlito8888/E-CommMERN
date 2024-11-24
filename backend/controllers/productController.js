@@ -3,7 +3,7 @@
 import Product from '../models/productModel.js';
 import { asyncHandler } from '../core/index.js';
 
-const PRODUCT_FIELDS = 'name price description image thumbnail brand category stock rating numReviews';
+const PRODUCT_FIELDS = 'name price description image thumbnail brand category countInStock rating numReviews reviews';
 
 const formatProduct = product => ({
   _id: product._id,
@@ -14,9 +14,10 @@ const formatProduct = product => ({
   thumbnail: product.thumbnail,
   brand: product.brand,
   category: product.category,
-  stock: product.stock,
+  countInStock: product.countInStock,
   rating: product.rating,
-  numReviews: product.numReviews
+  numReviews: product.numReviews,
+  reviews: product.reviews || []
 });
 
 const getProducts = asyncHandler(async (req, res) => {
@@ -27,7 +28,7 @@ const getProducts = asyncHandler(async (req, res) => {
   if (req.query.minPrice) query.price = { $gte: parseFloat(req.query.minPrice) };
   if (req.query.maxPrice) query.price = { ...query.price, $lte: parseFloat(req.query.maxPrice) };
   if (req.query.brand) query.brand = req.query.brand;
-  if (req.query.inStock) query.stock = { $gt: 0 };
+  if (req.query.inStock) query.countInStock = { $gt: 0 };
 
   const products = await Product.find(query)
     .select(PRODUCT_FIELDS)
@@ -74,7 +75,7 @@ const getProductById = asyncHandler(async (req, res) => {
 const getProductsByCategory = asyncHandler(async (req, res) => {
   const products = await Product.find({ 
     category: req.params.categoryId,
-    stock: { $gt: 0 }
+    countInStock: { $gt: 0 }
   })
     .select(PRODUCT_FIELDS)
     .sort('-rating')
@@ -146,7 +147,7 @@ const getAllBrands = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, brand, category, stock } = req.body;
+  const { name, price, description, brand, category, countInStock } = req.body;
 
   if (!name?.trim() || !price || !category) {
     return res.status(400).json({ 
@@ -168,7 +169,7 @@ const createProduct = asyncHandler(async (req, res) => {
     thumbnail: req.processedImage.thumbnail,
     brand,
     category,
-    stock: stock || 0
+    countInStock: countInStock || 0
   });
 
   res.status(201).json(formatProduct(product));
@@ -176,7 +177,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
   const updates = {};
-  const fields = ['name', 'price', 'description', 'brand', 'category', 'stock'];
+  const fields = ['name', 'price', 'description', 'brand', 'category', 'countInStock'];
   
   fields.forEach(field => {
     if (req.body[field] !== undefined) {
@@ -218,6 +219,19 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const createProductReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
 
+  // Validation des données
+  if (!rating || !comment) {
+    return res.status(400).json({ message: 'La note et le commentaire sont requis' });
+  }
+
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'La note doit être comprise entre 1 et 5' });
+  }
+
+  if (comment.trim().length < 3) {
+    return res.status(400).json({ message: 'Le commentaire doit contenir au moins 3 caractères' });
+  }
+
   const product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -233,9 +247,9 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 
   const review = {
-    name: req.user.name,
+    name: req.user.username,
     rating: Number(rating),
-    comment,
+    comment: comment.trim(),
     user: req.user._id,
   };
 
@@ -244,6 +258,22 @@ const createProductReview = asyncHandler(async (req, res) => {
   
   await product.save();
   res.status(201).json({ message: 'Avis ajouté' });
+});
+
+const getRelatedProducts = asyncHandler(async (req, res) => {
+  const { productId, categoryId, limit = 3 } = req.query;
+  
+  const products = await Product.find({ 
+    category: categoryId,
+    _id: { $ne: productId },
+    countInStock: { $gt: 0 }
+  })
+    .select(PRODUCT_FIELDS)
+    .sort('-rating')
+    .limit(parseInt(limit))
+    .lean();
+
+  res.json(products.map(formatProduct));
 });
 
 export {
@@ -257,5 +287,6 @@ export {
   createProduct,
   updateProduct,
   deleteProduct,
-  createProductReview
+  createProductReview,
+  getRelatedProducts
 };

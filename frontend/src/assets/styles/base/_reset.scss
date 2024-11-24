@@ -50,6 +50,7 @@ main {
   //50px-400px/80px-1280px
   padding-right: clamp(0.625rem, -0.2273rem + 3.4091vw, 2.5rem);
   //10px-400px/40px-1280px
+  padding-bottom: 2rem;
 }
 
 ul {
@@ -81,4 +82,37 @@ button {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+.arrow-container {
+  width: 100%;
+  .btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: rgba($text-color-dark, 0.1);
+
+    svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      color: $secondary-color;
+      background: rgba($secondary-color, 0.1);
+
+      svg {
+        transform: translateX(-3px);
+      }
+    }
+  }
 }

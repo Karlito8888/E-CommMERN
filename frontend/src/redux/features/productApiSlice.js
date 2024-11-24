@@ -51,12 +51,22 @@ export const productApiSlice = apiSlice.injectEndpoints({
       keepUnusedDataFor: 30 * 60, // Cache pendant 30 minutes car change rarement
     }),
 
+    getRelatedProducts: builder.query({
+      query: ({ productId, categoryId, limit = 3 }) => ({
+        url: `${PRODUCT_URL}/related`,
+        method: 'GET',
+        params: { productId, categoryId, limit },
+      }),
+      providesTags: ['Product'],
+      keepUnusedDataFor: 5 * 60, // Cache pendant 5 minutes
+    }),
+
     // Endpoints authentifiés
     createReview: builder.mutation({
       query: ({ productId, rating, comment }) => ({
         url: `${PRODUCT_URL}/${productId}/reviews`,
         method: 'POST',
-        body: { rating, comment },
+        body: { rating: Number(rating), comment },
       }),
       invalidatesTags: ['Product'],
     }),
@@ -69,5 +79,6 @@ export const {
   useGetTopRatedProductsQuery,
   useGetFilteredProductsQuery,
   useGetAllBrandsQuery,
+  useGetRelatedProductsQuery,
   useCreateReviewMutation,
 } = productApiSlice;

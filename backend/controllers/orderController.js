@@ -24,6 +24,18 @@ const calcTotals = items => {
   };
 };
 
+// Mise à jour du stock après la création d'une commande
+const updateProductStock = async (orderItems) => {
+  const bulkOps = orderItems.map(item => ({
+    updateOne: {
+      filter: { _id: item.product },
+      update: { $inc: { countInStock: -item.qty } }
+    }
+  }));
+
+  await Product.bulkWrite(bulkOps);
+};
+
 const createOrder = asyncHandler(async (req, res) => {
   const { orderItems, shippingAddress, paymentMethod } = req.body;
 
@@ -33,12 +45,12 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const products = await Product.find({
     _id: { $in: orderItems.map(x => x.product) }
-  }, 'name price priceHT stock').lean();
+  }, 'name price priceHT countInStock').lean();
 
   const items = orderItems.map(item => {
     const product = products.find(p => p._id.toString() === item.product);
     if (!product) throw new Error(`Produit introuvable: ${item.product}`);
-    if (product.stock < item.qty) throw new Error(`Stock insuffisant: ${product.name}`);
+    if (product.countInStock < item.qty) throw new Error(`Stock insuffisant: ${product.name}`);
 
     return {
       product: product._id,
@@ -63,7 +75,9 @@ const createOrder = asyncHandler(async (req, res) => {
     status: ORDER_STATUS.PENDING
   });
 
-  await order.updateProductStock();
+  // Mettre à jour le stock des produits
+  await updateProductStock(items);
+  
   res.status(201).json(order);
 });
 
@@ -103,6 +117,17 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) {
     return res.status(404).json({ message: 'Commande introuvable' });
+  }
+
+  // Si la commande est annulée, remettre les produits en stock
+  if (status === ORDER_STATUS.CANCELLED && order.status !== ORDER_STATUS.CANCELLED) {
+    const bulkOps = order.orderItems.map(item => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { countInStock: item.qty } }
+      }
+    }));
+    await Product.bulkWrite(bulkOps);
   }
 
   order.status = status;

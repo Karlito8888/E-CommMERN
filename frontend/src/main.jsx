@@ -1,6 +1,6 @@
 // frontend/src/main.jsx
 
-import { StrictMode } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { Route, RouterProvider, createRoutesFromElements } from "react-router";
 import { createBrowserRouter } from "react-router-dom";
@@ -30,8 +30,10 @@ import ProductList from "./pages/Admin/ProductList.jsx";
 import ProductUpdate from "./pages/Admin/ProductUpdate.jsx";
 import ProductCreate from "./pages/Admin/ProductCreate.jsx";
 import OrderList from "./pages/Admin/OrderList.jsx";
-import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import Success from "./pages/Orders/Success.jsx";
+
+// Lazy load AdminDashboard
+const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard.jsx"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -54,13 +56,17 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="/admin" element={<AdminRoute />}>
+        <Route path="dashboard" element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <AdminDashboard />
+          </Suspense>
+        } />
         <Route path="userlist" element={<UserList />} />
         <Route path="categorylist" element={<CategoryList />} />
         <Route path="productlist" element={<ProductList />} />
         <Route path="product/create" element={<ProductCreate />} />
         <Route path="product/update/:_id" element={<ProductUpdate />} />
         <Route path="orderlist" element={<OrderList />} />
-        <Route path="dashboard" element={<AdminDashboard />} />
       </Route>
     </Route>
   )

@@ -29,7 +29,7 @@ const ProductUpdate = () => {
     category: "",
     quantity: "",
     brand: "",
-    stock: 0,
+    countInStock: 0,
   });
 
   const [updateProduct] = useUpdateProductMutation();
@@ -46,7 +46,7 @@ const ProductUpdate = () => {
         category: productData.data.category || "",
         quantity: productData.data.quantity || "",
         brand: productData.data.brand || "",
-        stock: productData.data.stock || 0,
+        countInStock: productData.data.countInStock || 0,
       });
     }
   }, [productData]);
@@ -134,7 +134,7 @@ const ProductUpdate = () => {
             onChange={handleInputChange}
           />
         </label>
-        {["name", "price", "quantity", "brand", "description", "stock"].map(
+        {["name", "price", "quantity", "brand", "description", "countInStock"].map(
           (field) => (
             <div className="form-group" key={field}>
               <label htmlFor={field}>
@@ -161,14 +161,14 @@ const ProductUpdate = () => {
                   type={
                     field === "price" ||
                     field === "quantity" ||
-                    field === "stock"
+                    field === "countInStock"
                       ? "number"
                       : "text"
                   }
                   name={field}
                   value={product[field]}
                   onChange={handleInputChange}
-                  readOnly={field === "stock"}
+                  readOnly={field === "countInStock"}
                 />
               )}
             </div>

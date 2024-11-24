@@ -10,6 +10,7 @@ import {
   createProductReview,
   getFilteredProducts,
   getAllBrands,
+  getRelatedProducts
 } from '../controllers/productController.js';
 import { authenticate, authorizeAdmin } from '../core/index.js';
 import { upload, processImage } from './uploadRoutes.js';
@@ -32,6 +33,10 @@ router
 router
   .route('/brands')
   .get(getAllBrands);
+
+router
+  .route('/related')
+  .get(getRelatedProducts);
 
 router
   .route('/:id')

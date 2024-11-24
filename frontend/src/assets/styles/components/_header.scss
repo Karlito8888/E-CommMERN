@@ -93,133 +93,133 @@
     align-items: center;
     gap: 1rem;
 
-      .theme-toggle {
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: transparent;
+      color: $text-color-dark;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba($text-color-dark, 0.1);
+      }
+
+      svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
+    .user-menu {
+      position: relative;
+
+      .user-menu-trigger {
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
         background: transparent;
-        color: var(--text-color);
+        color: $text-color-dark;
         transition: all 0.3s ease;
 
         &:hover {
-          background: var(--bg-hover);
+          background: rgba($text-color-dark, 0.1);
         }
 
         svg {
           width: 1.25rem;
           height: 1.25rem;
         }
+
+        @media (max-width: 460px) {
+          span.username {
+            display: none;
+          }
+          padding: 0.5rem;
+        }
       }
 
-      .user-menu {
-        position: relative;
+      .user-menu-dropdown {
+        position: absolute;
+        top: 120%;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        padding: 0.5rem;
+        min-width: 200px;
+        animation: slideIn 0.2s ease;
 
-        .user-menu-trigger {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          border-radius: 2rem;
-          background: transparent;
-          color: var(--text-color);
-          transition: all 0.3s ease;
+        a {
+          display: block;
+          padding: 0.7rem 1rem;
+          color: $text-color-dark;
+          text-decoration: none;
+          border-radius: 8px;
+          transition: all 0.2s ease;
 
           &:hover {
-            background: var(--bg-hover);
-          }
-
-          svg {
-            width: 1.25rem;
-            height: 1.25rem;
-          }
-
-          @media (max-width: 460px) {
-            span.username {
-              display: none;
-            }
-            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.05);
           }
         }
 
-        .user-menu-dropdown {
-          position: absolute;
-          top: 120%;
-          right: 0;
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-          padding: 0.5rem;
-          min-width: 200px;
-          animation: slideIn 0.2s ease;
-
-          a {
-            display: block;
-            padding: 0.7rem 1rem;
-            color: $text-color-dark;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-
-            &:hover {
-              background: rgba(0, 0, 0, 0.05);
-            }
-          }
-
-          hr {
-            margin: 0.5rem 0;
-            border: none;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-          }
-        }
-      }
-
-      .login-button {
-        padding: 0.5rem 1.2rem;
-        background: $secondary-color;
-        color: white;
-        border-radius: 20px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        font-weight: 500;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
+        hr {
+          margin: 0.5rem 0;
+          border: none;
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
       }
     }
+
+    .login-button {
+      padding: 0.5rem 1.2rem;
+      background: $secondary-color;
+      color: white;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
+      }
+    }
   }
+}
 
 // Dark mode styles
 .dark-mode {
   .header {
-    background: rgba(23, 23, 23, 0.8);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+    background: rgba($background-color-dark, 0.8);
+    border-bottom-color: rgba($text-color-light, 0.1);
 
     &.scrolled {
-      background: rgba(23, 23, 23, 0.9);
+      background: rgba($background-color-dark, 0.9);
     }
 
     .header-left {
       .search-bar {
         input {
-          background: rgba(255, 255, 255, 0.1);
-          color: white;
+          background: rgba($text-color-light, 0.1);
+          color: $text-color-light;
 
           &::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba($text-color-light, 0.5);
           }
 
           &:focus {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba($text-color-light, 0.15);
           }
         }
 
         .search-icon {
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba($text-color-light, 0.5);
         }
       }
     }
@@ -227,37 +227,35 @@
     .header-right {
       .theme-toggle,
       .header-icon-link {
-        svg {
-          color: white;
-        }
+        color: $text-color-light;
 
         &:hover {
-          background-color: rgba(255, 255, 255, 0.1);
+          background: rgba($text-color-light, 0.1);
         }
       }
 
       .user-menu {
         .user-menu-trigger {
-          color: white;
+          color: $text-color-light;
 
           &:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba($text-color-light, 0.1);
           }
         }
 
         .user-menu-dropdown {
-          background: #222;
+          background: $background-color-dark;
 
           a {
-            color: white;
+            color: $text-color-light;
 
             &:hover {
-              background: rgba(255, 255, 255, 0.1);
+              background: rgba($text-color-light, 0.1);
             }
           }
 
           hr {
-            border-top-color: rgba(255, 255, 255, 0.1);
+            border-top-color: rgba($text-color-light, 0.1);
           }
         }
       }

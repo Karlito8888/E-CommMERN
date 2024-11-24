@@ -18,7 +18,7 @@ const checkUndefinedFields = async () => {
       image: 0,
       brand: 0,
       category: 0,
-      stock: 0,
+      countInStock: 0,
       rating: 0,
       numReviews: 0,
       currency: 0
@@ -31,7 +31,7 @@ const checkUndefinedFields = async () => {
       if (!product.image) stats.image++;
       if (!product.brand) stats.brand++;
       if (!product.category) stats.category++;
-      if (!product.stock) stats.stock++;
+      if (product.countInStock === undefined || product.countInStock === null) stats.countInStock++;
       if (!product.rating) stats.rating++;
       if (!product.numReviews) stats.numReviews++;
       if (!product.currency) stats.currency++;
@@ -49,7 +49,7 @@ const checkUndefinedFields = async () => {
     console.log('\nExemples de produits avec des champs manquants :');
     const productsWithMissing = products.filter(p => 
       !p.name || !p.price || !p.description || !p.image || 
-      !p.brand || !p.category || !p.stock || !p.rating || 
+      !p.brand || !p.category || p.countInStock === undefined || p.countInStock === null || !p.rating || 
       !p.numReviews || !p.currency
     ).slice(0, 5);
 
@@ -62,7 +62,7 @@ const checkUndefinedFields = async () => {
       if (!p.image) console.log('- image');
       if (!p.brand) console.log('- brand');
       if (!p.category) console.log('- category');
-      if (!p.stock) console.log('- stock');
+      if (p.countInStock === undefined || p.countInStock === null) console.log('- countInStock');
       if (!p.rating) console.log('- rating');
       if (!p.numReviews) console.log('- numReviews');
       if (!p.currency) console.log('- currency');

@@ -1,14 +1,23 @@
+@use "../../base/variables" as *;
+
 .heart-icon {
   position: absolute;
   top: 0.5rem; // correspond à top-2
   right: 0.5rem; // correspond à right-5
   cursor: pointer;
+  font-size: 1.5rem;
+  z-index: 10;
+  transition: transform 0.2s ease;
 
-  &.favorite {
-    color: #ec4899; // couleur équivalente à text-pink-500
+  &:hover {
+    transform: scale(1.1);
   }
 
-  &.not-favorite {
-    color: #ffffff; // couleur équivalente à text-white
+  .favorite {
+    color: $secondary-color; // couleur équivalente à text-pink-500
+  }
+
+  .not-favorite {
+      color: rgba($secondary-color, 0.7);
   }
 }
