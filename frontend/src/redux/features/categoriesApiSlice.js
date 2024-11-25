@@ -4,20 +4,25 @@ import { CATEGORY_URL } from '../constants';
 
 export const categoriesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Endpoints publics uniquement
+    // Endpoints publics
     getCategories: builder.query({
-      query: () => CATEGORY_URL,
+      query: () => ({
+        url: CATEGORY_URL,
+        method: 'GET'
+      }),
+      transformResponse: (response) => 
+        response.sort((a, b) => a.name.localeCompare(b.name, 'fr-FR')),
       providesTags: ['Category'],
+      keepUnusedDataFor: 30 * 60, // Cache pendant 30 minutes car change rarement
     }),
 
     getCategoryById: builder.query({
-      query: (categoryId) => `${CATEGORY_URL}/id/${categoryId}`,
+      query: (categoryId) => ({
+        url: `${CATEGORY_URL}/${categoryId}`,
+        method: 'GET'
+      }),
       providesTags: ['Category'],
-    }),
-
-    getCategoryBySlug: builder.query({
-      query: (slug) => `${CATEGORY_URL}/slug/${slug}`,
-      providesTags: ['Category'],
+      keepUnusedDataFor: 30 * 60,
     }),
   }),
 });
@@ -25,5 +30,4 @@ export const categoriesApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetCategoriesQuery,
   useGetCategoryByIdQuery,
-  useGetCategoryBySlugQuery,
 } = categoriesApiSlice;

@@ -1,8 +1,8 @@
-import { useGetTopRatedProductsQuery } from "../redux/features/productApiSlice";
 import SmallProduct from "../pages/Products/SmallProduct";
 import Message from "./Message";
 import { FaTrophy, FaMedal, FaAward } from "react-icons/fa";
 import { useState, useEffect } from 'react';
+import { useGetTopRatedProductsQuery } from "../redux/features/productApiSlice";
 
 const PODIUM_ORDER = [1, 0, 2]; // [2ème, 1er, 3ème]
 const RANK_ICONS = {
@@ -105,7 +105,7 @@ const Podium = () => {
                 
                 return (
                   <div 
-                    key={product._id} 
+                    key={`podium-position-${position}`} 
                     className={`podium-position position-${position}`}
                     style={{ 
                       '--podium-height': height,
@@ -116,7 +116,7 @@ const Podium = () => {
                         <RankIcon className="rank-icon" />
                         <span className="rank-label">{label}</span>
                       </div>
-                      <SmallProduct product={product} />
+                      {product && <SmallProduct key={`small-product-${product._id}`} product={product} />}
                     </div>
                   </div>
                 );

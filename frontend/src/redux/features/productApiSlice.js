@@ -40,6 +40,16 @@ export const productApiSlice = apiSlice.injectEndpoints({
         body: filters,
       }),
       providesTags: ['Product'],
+      transformResponse: (response) => ({
+        ...response,
+        products: response.products.map(product => ({
+          ...product,
+          category: {
+            _id: product.category._id,
+            name: product.category.name
+          }
+        }))
+      })
     }),
 
     getAllBrands: builder.query({
@@ -56,6 +66,15 @@ export const productApiSlice = apiSlice.injectEndpoints({
         url: `${PRODUCT_URL}/related`,
         method: 'GET',
         params: { productId, categoryId, limit },
+      }),
+      providesTags: ['Product'],
+      keepUnusedDataFor: 5 * 60, // Cache pendant 5 minutes
+    }),
+
+    getProductsByCategory: builder.query({
+      query: (categoryId) => ({
+        url: `${PRODUCT_URL}/category/${categoryId}`,
+        method: 'GET',
       }),
       providesTags: ['Product'],
       keepUnusedDataFor: 5 * 60, // Cache pendant 5 minutes
@@ -80,5 +99,6 @@ export const {
   useGetFilteredProductsQuery,
   useGetAllBrandsQuery,
   useGetRelatedProductsQuery,
+  useGetProductsByCategoryQuery,
   useCreateReviewMutation,
 } = productApiSlice;

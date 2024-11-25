@@ -71,6 +71,30 @@
   .tab-content {
     min-height: 200px;
 
+    .login-prompt {
+      text-align: center;
+      margin: 2rem 0;
+      
+      a {
+        color: $secondary-color;
+        text-decoration: underline;
+        font-weight: 500;
+        transition: $transition-default;
+
+        &:hover {
+          color: $text-color-dark;
+        }
+
+        .dark-mode & {
+          color: $secondary-color;
+          
+          &:hover {
+            color: $text-color-light;
+          }
+        }
+      }
+    }
+
     .review-form {
       max-width: 600px;
       margin: 0 auto;

@@ -48,10 +48,16 @@ const productSchema = new mongoose.Schema(
       trim: true
     },
     category: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Category",
-      index: true
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        index: true
+      },
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      }
     },
     description: {
       type: String,
@@ -105,8 +111,8 @@ const productSchema = new mongoose.Schema(
 );
 
 // Indexes optimisés
+productSchema.index({ 'category._id': 1 });
 productSchema.index({ name: 'text', brand: 'text', description: 'text' });
-productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ rating: -1 });
 productSchema.index({ createdAt: -1 });

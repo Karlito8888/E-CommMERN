@@ -13,7 +13,10 @@ const formatProduct = product => ({
   image: product.image,
   thumbnail: product.thumbnail,
   brand: product.brand,
-  category: product.category,
+  category: {
+    _id: product.category._id,
+    name: product.category.name
+  },
   countInStock: product.countInStock,
   rating: product.rating,
   numReviews: product.numReviews,
@@ -24,7 +27,7 @@ const getProducts = asyncHandler(async (req, res) => {
   const sort = { [req.query.sort || 'createdAt']: req.query.order === 'asc' ? 1 : -1 };
 
   const query = {};
-  if (req.query.category) query.category = req.query.category;
+  if (req.query.category) query['category._id'] = req.query.category;
   if (req.query.minPrice) query.price = { $gte: parseFloat(req.query.minPrice) };
   if (req.query.maxPrice) query.price = { ...query.price, $lte: parseFloat(req.query.maxPrice) };
   if (req.query.brand) query.brand = req.query.brand;
@@ -62,7 +65,6 @@ const searchProducts = asyncHandler(async (req, res) => {
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
     .select(PRODUCT_FIELDS)
-    .populate('category', 'name')
     .lean();
 
   if (!product) {
@@ -74,7 +76,7 @@ const getProductById = asyncHandler(async (req, res) => {
 
 const getProductsByCategory = asyncHandler(async (req, res) => {
   const products = await Product.find({ 
-    category: req.params.categoryId,
+    'category._id': req.params.categoryId,
     countInStock: { $gt: 0 }
   })
     .select(PRODUCT_FIELDS)
@@ -87,37 +89,9 @@ const getProductsByCategory = asyncHandler(async (req, res) => {
 const getTopRatedProducts = asyncHandler(async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 3, 10);
   
-  const products = await Product.aggregate([
-    { $match: { numReviews: { $gt: 0 } } },
-    {
-      $addFields: {
-        weightedScore: {
-          $multiply: [
-            "$rating",
-            { $divide: ["$numReviews", { $add: ["$numReviews", 10] }] }
-          ]
-        }
-      }
-    },
-    { $sort: { weightedScore: -1 } },
-    { $limit: limit },
-    {
-      $project: {
-        _id: 1,
-        name: 1,
-        price: 1,
-        description: 1,
-        image: 1,
-        thumbnail: 1,
-        brand: 1,
-        category: 1,
-        countInStock: 1,
-        rating: 1,
-        numReviews: 1,
-        reviews: 1
-      }
-    }
-  ]);
+  const products = await Product.find()
+    .sort({ rating: -1 })
+    .limit(limit);
 
   res.json(products);
 });
@@ -128,7 +102,7 @@ const getFilteredProducts = asyncHandler(async (req, res) => {
   const query = {};
   
   if (categories?.length) {
-    query.category = { $in: categories };
+    query['category._id'] = { $in: categories };
   }
   
   if (brands?.length) {
@@ -172,9 +146,9 @@ const getAllBrands = asyncHandler(async (req, res) => {
 const createProduct = asyncHandler(async (req, res) => {
   const { name, price, description, brand, category, countInStock } = req.body;
 
-  if (!name?.trim() || !price || !category) {
+  if (!name?.trim() || !price || !category?._id || !category?.name) {
     return res.status(400).json({ 
-      message: 'Nom, prix et catégorie requis' 
+      message: 'Nom, prix, catégorie (id et nom) requis' 
     });
   }
 
@@ -191,7 +165,10 @@ const createProduct = asyncHandler(async (req, res) => {
     image: req.processedImage.main,
     thumbnail: req.processedImage.thumbnail,
     brand,
-    category,
+    category: {
+      _id: category._id,
+      name: category.name
+    },
     countInStock: countInStock || 0
   });
 
@@ -287,7 +264,7 @@ const getRelatedProducts = asyncHandler(async (req, res) => {
   const { productId, categoryId, limit = 3 } = req.query;
   
   const products = await Product.find({ 
-    category: categoryId,
+    'category._id': categoryId,
     _id: { $ne: productId },
     countInStock: { $gt: 0 }
   })

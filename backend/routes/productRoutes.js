@@ -10,7 +10,8 @@ import {
   createProductReview,
   getFilteredProducts,
   getAllBrands,
-  getRelatedProducts
+  getRelatedProducts,
+  getProductsByCategory
 } from '../controllers/productController.js';
 import { authenticate, authorizeAdmin } from '../core/index.js';
 import { upload, processImage } from './uploadRoutes.js';
@@ -37,6 +38,10 @@ router
 router
   .route('/related')
   .get(getRelatedProducts);
+
+router
+  .route('/category/:categoryId')
+  .get(getProductsByCategory);
 
 router
   .route('/:id')

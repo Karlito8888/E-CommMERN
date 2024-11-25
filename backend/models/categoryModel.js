@@ -4,27 +4,23 @@ import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      auto: true
+    },
     name: {
       type: String,
       trim: true,
       required: true,
       minLength: 2,
-      maxLength: 32,
-      unique: true
-    },
-    slug: {
-      type: String,
-      unique: true,
-      lowercase: true,
-      index: true
+      maxLength: 50
     }
   },
   { 
     timestamps: true,
-    toJSON: { 
-      transform: (_, ret) => {
+    toJSON: {
+      transform(_, ret) {
         ret.id = ret._id;
-        delete ret._id;
         delete ret.__v;
         return ret;
       }
@@ -32,13 +28,7 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-categorySchema.pre('save', function(next) {
-  if (this.isModified('name')) {
-    this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  }
-  next();
-});
-
+// Index pour optimiser les recherches
 categorySchema.index({ name: 1 });
 
 export default mongoose.model("Category", categorySchema);

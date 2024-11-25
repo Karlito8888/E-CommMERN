@@ -7,68 +7,52 @@ import { useGetProductsQuery } from "../../redux/features/productApiSlice";
 import { useGetCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 import { Link } from "react-router-dom";
 import { useState, useCallback, useMemo } from "react";
-
-const ProductImage = ({ src, alt }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-
-  const handleLoad = useCallback(() => {
-    setIsLoading(false);
-  }, []);
-
-  const handleError = useCallback(() => {
-    setIsLoading(false);
-    setHasError(true);
-  }, []);
-
-  return (
-    <div className="image-container">
-      {isLoading && (
-        <div className="image-placeholder">
-          <div className="loading-spinner"></div>
-      </div>
-      )}
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className={`product-image ${isLoading ? 'loading' : 'loaded'}`}
-        onLoad={handleLoad}
-        onError={handleError}
-      />
-      {hasError && (
-        <div className="image-error">
-          <span>Image non disponible</span>
-        </div>
-      )}
-    </div>
-  );
-};
+import ValidatedImage from "../../components/ValidatedImage";
 
 const ProductCarousel = () => {
-  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useGetCategoriesQuery();
-  const { data: productsData, isLoading: productsLoading, error: productsError } = useGetProductsQuery({});
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useGetCategoriesQuery();
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+    error: productsError,
+  } = useGetProductsQuery({});
+  const [validProducts, setValidProducts] = useState({});
 
   const settings = {
     dots: false,
     infinite: true,
-    speed: 500,
+    speed: 800,
     slidesToShow: 7,
     slidesToScroll: 1,
     arrows: true,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 4000,
     pauseOnHover: true,
-    cssEase: "linear",
+    cssEase: "cubic-bezier(0.87, 0, 0.13, 1)",
     swipeToSlide: true,
     centerMode: false,
     focusOnSelect: false,
     accessibility: true,
+    useTransform: true,
+    lazyLoad: "ondemand",
+    waitForAnimate: true,
     responsive: [
+      {
+        breakpoint: 1440,
+        settings: {
+          slidesToShow: 6,
+          speed: 700,
+        },
+      },
       {
         breakpoint: 1024,
         settings: {
           slidesToShow: 5,
+          speed: 600,
         },
       },
       {
@@ -76,6 +60,7 @@ const ProductCarousel = () => {
         settings: {
           slidesToShow: 3,
           arrows: false,
+          speed: 500,
         },
       },
       {
@@ -83,6 +68,7 @@ const ProductCarousel = () => {
         settings: {
           slidesToShow: 2,
           arrows: false,
+          speed: 400,
         },
       },
     ],
@@ -92,72 +78,122 @@ const ProductCarousel = () => {
     if (products.length === 0) return [];
     const duplicates = [];
     while (duplicates.length < minCount) {
-      duplicates.push(...products.map(product => ({
-        ...product,
-        _id: `${product._id}_${Math.floor(duplicates.length / products.length)}`
-      })));
+      duplicates.push(
+        ...products.map((product) => ({
+          ...product,
+          _id: `${product._id}_${Math.floor(
+            duplicates.length / products.length
+          )}`,
+        }))
+      );
     }
     return duplicates;
   }, []);
 
+  const handleImageValidation = useCallback((productId, isValid) => {
+    setValidProducts((prev) => ({
+      ...prev,
+      [productId]: isValid,
+    }));
+  }, []);
+
   const productsByCategory = useMemo(() => {
-    if (!categories || !productsData) return {};
+    if (!categories || !productsData || !productsData.products) return {};
 
     return categories.reduce((acc, category) => {
       const categoryProducts = productsData.products
-        .filter(product => product.category === category._id)
+        .filter(
+          (product) => product.category && product.category._id === category._id
+        )
+        .filter((product) => validProducts[product._id] !== false)
         .sort((a, b) => b.rating - a.rating);
-      
-      if (categoryProducts.length > 0) {
-        // Dupliquer les produits pour avoir au moins 10 éléments (2 rotations complètes pour 5 slides)
+
+      if (categoryProducts && categoryProducts.length > 0) {
         const duplicatedProducts = duplicateProducts(categoryProducts, 10);
         acc[category._id] = {
           name: category.name,
-          products: duplicatedProducts
+          products: duplicatedProducts,
         };
       }
       return acc;
-    }, []);
-  }, [categories, productsData, duplicateProducts]);
+    }, {});
+  }, [categories, productsData, duplicateProducts, validProducts]);
 
   if (categoriesLoading || productsLoading) return <div>Chargement...</div>;
-  
+
   if (categoriesError || productsError) {
     return (
       <Message variant="danger">
-        {categoriesError?.data?.message || productsError?.data?.message || "Une erreur est survenue"}
+        {categoriesError?.data?.message ||
+          productsError?.data?.message ||
+          "Une erreur est survenue"}
       </Message>
     );
   }
 
+  const sortedCategories = Object.entries(productsByCategory)
+    .filter(
+      ([, category]) =>
+        category && category.products && category.products.length > 0
+    )
+    .sort(
+      ([, a], [, b]) =>
+        (b.products ? b.products.length : 0) -
+        (a.products ? a.products.length : 0)
+    );
+
+  if (sortedCategories.length === 0) {
+    return <Message>Aucun produit disponible</Message>;
+  }
+
   return (
     <div className="category-carousels">
-      {Object.entries(productsByCategory)
-        .sort(([, a], [, b]) => b.products.length - a.products.length)
-        .map(([categoryId, { name, products }]) => (
+      {sortedCategories.map(([categoryId, { name, products }]) => (
         <div key={categoryId} className="category-section">
           <h2>{name}</h2>
           <Slider {...settings}>
-            {products.map((product) => (
-              <div key={product._id} className="carousel-product">
-                <Link 
-                  to={`/product/${product._id.split('_')[0]}`}
-                  className="product-link"
-                  aria-label={`Voir le produit ${product.name}, Prix: ${product.price.toFixed(2)} euros, Note: ${Number(product.rating).toFixed(1)} sur 5`}
-                >
-                  <div className="product-card">
-                    <ProductImage src={product.image} alt={product.name} />
-                    <div className="product-info">
-                      <h3>{product.name}</h3>
-                      <div className="rating">
-                        <FaStar /> <span>{Number(product.rating).toFixed(1)}</span>
-                      </div>
-                      <div className="price">{product.price.toFixed(2)}€</div>
+            {products.map(
+              (product) =>
+                validProducts[product._id] !== false && (
+                  <div key={product._id} className="carousel-product">
+                    <div className="product-card">
+                      <Link
+                        to={`/product/${product._id.split("_")[0]}`}
+                        className="product-link"
+                        aria-label={`Voir le produit ${
+                          product.name
+                        }, Prix: ${product.price.toFixed(
+                          2
+                        )} euros, Note: ${Number(product.rating).toFixed(
+                          1
+                        )} sur 5`}
+                        tabIndex={0}
+                      >
+                        <div className="image-container">
+                          <ValidatedImage
+                            src={product.image}
+                            alt={product.name}
+                            className="product-image"
+                            onValidation={(isValid) =>
+                              handleImageValidation(product._id, isValid)
+                            }
+                          />
+                        </div>
+                        <div className="product-info">
+                          <h3>{product.name}</h3>
+                          <div className="rating">
+                            <FaStar />{" "}
+                            <span>{Number(product.rating).toFixed(1)}</span>
+                          </div>
+                          <div className="price">
+                            {product.price.toFixed(2)}€
+                          </div>
+                        </div>
+                      </Link>
                     </div>
                   </div>
-                </Link>
-              </div>
-            ))}
+                )
+            )}
           </Slider>
         </div>
       ))}

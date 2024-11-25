@@ -49,6 +49,17 @@ const ReviewForm = ({ userInfo, onSubmit, rating, setRating, comment, setComment
   );
 };
 
+const formatDateToFrench = (dateString) => {
+  const options = { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  return new Date(dateString).toLocaleDateString('fr-FR', options).replace(',', ' à');
+};
+
 const ReviewList = ({ reviews = [] }) => {
   if (!reviews || reviews.length === 0) {
     return <p className="no-reviews">Aucun avis</p>;
@@ -64,7 +75,7 @@ const ReviewList = ({ reviews = [] }) => {
           <header className="review-header">
             <strong>{review.name}</strong>
             <time dateTime={review.createdAt}>
-              {review.createdAt.substring(0, 10)}
+              {formatDateToFrench(review.createdAt)}
             </time>
           </header>
           <p className="review-comment">{review.comment}</p>
