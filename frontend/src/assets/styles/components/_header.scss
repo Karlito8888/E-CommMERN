@@ -4,22 +4,17 @@
 
 .header {
   width: 100%;
-  padding: 1rem 2rem;
+  padding: 0.7rem 2rem;
   position: fixed;
   top: 0;
   left: $nav-width-collapsed;
   right: 0;
   z-index: 900;
   transition: all $nav-transition-duration $nav-transition-timing;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-
-  &.scrolled {
-    padding: 0.7rem 2rem;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-  }
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 
   .header-content {
     width: 95%;
@@ -175,33 +170,15 @@
         }
       }
     }
-
-    .login-button {
-      padding: 0.5rem 1.2rem;
-      background: $secondary-color;
-      color: white;
-      border-radius: 20px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      font-weight: 500;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
-      }
-    }
   }
 }
 
 // Dark mode styles
 .dark-mode {
   .header {
-    background: rgba($background-color-dark, 0.8);
+    background: rgba($background-color-dark, 0.95);
     border-bottom-color: rgba($text-color-light, 0.1);
-
-    &.scrolled {
-      background: rgba($background-color-dark, 0.9);
-    }
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
 
     .header-left {
       .search-bar {
@@ -225,8 +202,7 @@
     }
 
     .header-right {
-      .theme-toggle,
-      .header-icon-link {
+      .theme-toggle {
         color: $text-color-light;
 
         &:hover {
@@ -298,8 +274,7 @@
     .header-right {
       gap: 0.8rem;
 
-      .theme-toggle,
-      .header-icon-link {
+      .theme-toggle {
         padding: 6px;
       }
 

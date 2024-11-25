@@ -6,21 +6,11 @@ import '../assets/styles/components/_header.scss';
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem('darkMode');
     return savedTheme ? JSON.parse(savedTheme) : false;
   });
   const [showUserMenu, setShowUserMenu] = useState(false);
-
-  // Gérer le scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Gérer le thème
   useEffect(() => {
@@ -33,7 +23,7 @@ const Header = () => {
   }, [isDarkMode]);
 
   return (
-    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
+    <header className="header">
       <div className="header-content">
         <div className="header-left">
           <Link to="/" className="logo">

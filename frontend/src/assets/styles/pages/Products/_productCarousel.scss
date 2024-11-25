@@ -6,20 +6,33 @@
   font-family: $base-font-family;
 
   .category-section {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     padding: 0 1rem;
 
     h2 {
       font-size: clamp(0.9rem, 0.5364rem + 1.4545vw, 1.7rem);
       //0.9rem-400px/1.7-1280px
       font-weight: bold;
-      margin-bottom: 1rem;
+      // margin-bottom: .5rem;
       letter-spacing: $base-letter-spacing;
-      color: $text-color-light;
+      color: $text-color-dark;
+      padding-left: 5%;
+
+      .dark-mode & {
+        color: $text-color-light;
+      }
     }
 
     .slick-slider {
       margin: 0 -0.5rem;
+      
+      .slick-prev,
+      .slick-next {
+        &::before {
+          color: $text-color-dark;
+          opacity: 1;
+        }
+      }
 
       .slick-prev {
         left: -25px;
@@ -32,17 +45,18 @@
   }
 
   .carousel-product {
-    padding: 0 0.5rem;
+    padding: 0.5rem;
 
     .product-card {
       background: $primary-color;
       border-radius: 0.4rem;
-      overflow: hidden;
+      // overflow: hidden;
       transition: $transition-default;
       height: 100%;
       display: flex;
       flex-direction: column;
       padding: clamp(0.4375rem, 0.2955rem + 0.5682vw, 0.75rem);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       
       &:hover {
         transform: translateY(-5px);
@@ -122,20 +136,29 @@
           font-size: clamp(0.6rem, 0.4182rem + 0.7273vw, 1rem);
           font-weight: 600;
           margin-bottom: 0.5rem;
-          color: $text-color-light;
+          color: $text-color-dark;
           letter-spacing: $base-letter-spacing;
+          line-height: 1;
+          white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          white-space: nowrap;
+          max-width: 100%;
         }
 
         .rating {
           display: flex;
           align-items: center;
           gap: 0.25rem;
-          color: #ffd700;
           margin-bottom: 0.5rem;
           font-size: clamp(0.6rem, 0.4182rem + 0.7273vw, 1rem);
+          align-items: flex-start;
+          
+          svg {
+            color: #ffd700;
+          }
+          span {
+            color: $text-color-dark;
+          }
         }
 
         .price {
@@ -146,6 +169,30 @@
         }
       }
     }
+  }
+}
+
+.dark-mode {
+  .category-carousels {
+    .slick-slider {
+      .slick-prev,
+      .slick-next {
+        &::before {
+          color: $text-color-light;
+          opacity: 1;
+        }
+      }
+    }
+    .carousel-product {
+    .product-info {
+      h3 {
+        color: $text-color-light;
+      }
+
+      .rating span {
+        color: $text-color-light;
+      }
+    }}
   }
 }
 

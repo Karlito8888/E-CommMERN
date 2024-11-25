@@ -36,7 +36,7 @@ const ProductCard = ({ p }) => {
         <div className="flex justify-between">
           <h5 className="product-name">{p?.name}</h5>
           <p className="product-price">
-            {p?.price?.toLocaleString("en-US", {
+            {p?.price?.toLocaleString("fr-FR", {
               style: "currency",
               currency: "EUR",
             })}

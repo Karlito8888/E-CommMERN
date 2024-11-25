@@ -87,16 +87,39 @@ const getProductsByCategory = asyncHandler(async (req, res) => {
 const getTopRatedProducts = asyncHandler(async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 3, 10);
   
-  const products = await Product.find({ 
-    rating: { $gt: 4 },
-    numReviews: { $gt: 0 }
-  })
-    .select(PRODUCT_FIELDS)
-    .sort('-rating')
-    .limit(limit)
-    .lean();
+  const products = await Product.aggregate([
+    { $match: { numReviews: { $gt: 0 } } },
+    {
+      $addFields: {
+        weightedScore: {
+          $multiply: [
+            "$rating",
+            { $divide: ["$numReviews", { $add: ["$numReviews", 10] }] }
+          ]
+        }
+      }
+    },
+    { $sort: { weightedScore: -1 } },
+    { $limit: limit },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        price: 1,
+        description: 1,
+        image: 1,
+        thumbnail: 1,
+        brand: 1,
+        category: 1,
+        countInStock: 1,
+        rating: 1,
+        numReviews: 1,
+        reviews: 1
+      }
+    }
+  ]);
 
-  res.json(products.map(formatProduct));
+  res.json(products);
 });
 
 const getFilteredProducts = asyncHandler(async (req, res) => {

@@ -52,9 +52,8 @@ const store = configureStore({
   preloadedState: loadInitialState(),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PERSIST']
-      }
+      serializableCheck: process.env.NODE_ENV === 'production',
+      immutableCheck: process.env.NODE_ENV === 'production'
     })
     .concat(apiSlice.middleware)
     .concat(paymentApiSlice.middleware),

@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Message from "../../components/Message";
-import { FaStore, FaStar, FaArrowLeft } from "react-icons/fa";
+import { FaStore, FaPen, FaArrowLeft } from "react-icons/fa";
 import HeartIcon from "./HeartIcon";
 import Rating from "../../components/Rating";
 import ProductTabs from "./ProductTabs";
@@ -132,7 +132,7 @@ const ProductDetails = () => {
                   </div>
                   <div>
                     <dt>
-                      <FaStar className="icon" aria-hidden="true" />
+                      <FaPen className="icon" aria-hidden="true" />
                     </dt>
                     <dd>{product.numReviews} avis</dd>
                   </div>
@@ -142,6 +142,9 @@ const ProductDetails = () => {
                         value={product.rating}
                         className="product-rating"
                       />
+                      <span className="rating-value">
+                        {Number(product.rating).toFixed(1)}
+                      </span>
                     </dd>
                   </div>
                 </dl>

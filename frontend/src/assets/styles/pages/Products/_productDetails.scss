@@ -106,20 +106,36 @@
           justify-content: flex-start;
           align-items: center;
           gap: 0.5rem;
+          width: 100%;
+          min-width: 0;
 
           .icon {
             color: $secondary-color;
             font-size: 1rem;
+            flex-shrink: 0;
           }
 
           dt {
             font-weight: 600;
             color: inherit;
+            flex-shrink: 0;
           }
 
           dd {
             color: rgba($text-color-dark, 0.8);
-            // padding-top: 2px;
+            line-height: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+            display: flex;
+
+            .rating-value {
+              margin-left: 0.5rem;
+              color: $text-color-dark;
+              padding-top: 6px;
+            }
           }
         }
       }
@@ -247,6 +263,16 @@
           div {
             dd {
               color: rgba($text-color-light, 0.9);
+              line-height: 1;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 200px;
+
+              .rating-value {
+                margin-left: 0.5rem;
+                color: $text-color-light;
+              }
             }
           }
         }

@@ -62,6 +62,8 @@ const ProductCarousel = () => {
     cssEase: "linear",
     swipeToSlide: true,
     centerMode: false,
+    focusOnSelect: false,
+    accessibility: true,
     responsive: [
       {
         breakpoint: 1024,
@@ -138,15 +140,19 @@ const ProductCarousel = () => {
           <Slider {...settings}>
             {products.map((product) => (
               <div key={product._id} className="carousel-product">
-                <Link to={`/product/${product._id.split('_')[0]}`}>
+                <Link 
+                  to={`/product/${product._id.split('_')[0]}`}
+                  className="product-link"
+                  aria-label={`Voir le produit ${product.name}, Prix: ${product.price.toFixed(2)} euros, Note: ${Number(product.rating).toFixed(1)} sur 5`}
+                >
                   <div className="product-card">
                     <ProductImage src={product.image} alt={product.name} />
                     <div className="product-info">
                       <h3>{product.name}</h3>
                       <div className="rating">
-                        <FaStar /> {Number(product.rating).toFixed(1)}
+                        <FaStar /> <span>{Number(product.rating).toFixed(1)}</span>
                       </div>
-                      <div className="price">{product.price.toFixed(2)} €</div>
+                      <div className="price">{product.price.toFixed(2)}€</div>
                     </div>
                   </div>
                 </Link>

@@ -14,7 +14,12 @@ const SmallProduct = ({ product }) => {
           <span className="product-price">{product.price}€</span>
         </h2>
         <div className="product-stats">
-          <Rating value={product.rating} className="product-rating" />
+          <div className="rating-container">
+            <Rating value={product.rating} className="product-rating" />
+            <span className="rating-value">
+              {Number(product.rating).toFixed(1)}
+            </span>
+          </div>
           <div className="reviews-count">
             {product.numReviews} {product.numReviews > 1 ? "avis" : "avis"}
           </div>
