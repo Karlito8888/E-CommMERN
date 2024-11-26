@@ -1,40 +1,45 @@
-import { useEffect } from "react";
-import { FaHeart, FaRegHeart, FaVaadin } from "react-icons/fa";
+import { memo, useCallback, useEffect } from "react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { addToFavorites, removeFromFavorites, setFavorites } from "../../redux/features/favorites/favoriteSlice";
-import { addFavoriteToLocalStorage, getFavoritesFromLocalStorage, removeFavoriteFromLocalStorage } from "../../Utils/localStorage";
+import { 
+  toggleFavorite,
+  selectIsFavorite,
+  initializeFavorites
+} from "../../redux/features/favorites/favoriteSlice";
 
-const HeartIcon = ({ product }) => {
+const HeartIcon = ({ 
+  product, 
+  size = "medium",
+  withAnimation = true,
+  className = "" 
+}) => {
   const dispatch = useDispatch();
-  const favorites = useSelector((state) => state.favorites);
-  const isFavorite = Array.isArray(favorites) && favorites.some((p) => p._id === product._id);
+  const isFavorite = useSelector(state => selectIsFavorite(state, product._id));
 
   useEffect(() => {
-    const favoritesFromLocalStorage = getFavoritesFromLocalStorage();
-    if (favoritesFromLocalStorage) {
-      dispatch(setFavorites(favoritesFromLocalStorage));
-    }
+    dispatch(initializeFavorites());
   }, [dispatch]);
 
-  const toggleFavorites = () => {
-    if (isFavorite) {
-      dispatch(removeFromFavorites(product));
-      removeFavoriteFromLocalStorage(product._id);
-    } else {
-      dispatch(addToFavorites(product));
-      addFavoriteToLocalStorage(product);
-    }
-  };
+  const handleToggleFavorite = useCallback((e) => {
+    e.stopPropagation();
+    dispatch(toggleFavorite(product));
+  }, [dispatch, product]);
 
   return (
-    <div className="heart-icon" onClick={toggleFavorites}>
+    <button
+      type="button"
+      className={`heart-icon ${size} ${withAnimation ? 'animated' : ''} ${className}`}
+      onClick={handleToggleFavorite}
+      aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+    >
       {isFavorite ? (
         <FaHeart className="favorite" />
       ) : (
         <FaRegHeart className="not-favorite" />
       )}
-    </div>
+    </button>
   );
 };
 
-export default HeartIcon;
+export default memo(HeartIcon);

@@ -31,6 +31,8 @@ export const productApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ['Product'],
       keepUnusedDataFor: 10 * 60, // Cache pendant 10 minutes car change moins souvent
+      transformResponse: (response) => 
+        Array.isArray(response) ? response : []
     }),
 
     getFilteredProducts: builder.query({

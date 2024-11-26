@@ -6,17 +6,6 @@
   flex-direction: column;
   align-items: center;
 
-  h2 {
-    width: 100%;
-    font-style: italic;
-    font-size: clamp(0.9rem, 0.5364rem + 1.4545vw, 1.7rem);
-    //0.9rem-400px/1.7-1280px
-    margin-bottom: 1rem;
-    color: $text-color-dark;
-    text-align: left;
-    padding-left: 5%;
-  }
-
   // Styles pour le skeleton loading
   &.loading {
     .podium-container {
@@ -217,9 +206,9 @@
 // Mode sombre
 .dark-mode {
   .podium-section {
-    h2 {
-      color: $text-color-light;
-    }
+    // h2 {
+    //   color: $text-color-light;
+    // }
 
     &.loading {
       .podium-container {

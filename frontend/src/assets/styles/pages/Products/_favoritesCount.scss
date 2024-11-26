@@ -1,16 +1,90 @@
-.compteur-favoris-container {
-  position: absolute;
-  left: 0.5rem;  // Valeur de left-2
-  top: 2rem;     // Valeur de top-8
+@use "../../base/variables" as *;
 
-  .compteur-favoris {
-    padding-left: 0.25rem;   // Valeur de px-1
-    padding-right: 0.25rem;  // Valeur de px-1
-    padding-top: 0;          // Valeur de py-0
-    padding-bottom: 0;       // Valeur de py-0
-    font-size: 0.875rem;     // Taille de police text-sm
-    color: white;            // Couleur de texte white
-    background-color: #ec4899; // Couleur de fond bg-pink-500
-    border-radius: 9999px;   // Valeur de rounded-full
+.favorites-count-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  text-decoration: none;
+  color: $text-color-dark;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    color: $secondary-color;
+    transform: translateY(-1px);
+
+    .favorites-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  .favorites-icon {
+    color: $secondary-color;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .favorites-count {
+    font-size: 0.9rem;
+    font-weight: bold;
+    min-width: 1.2rem;
+    text-align: center;
+    background: $secondary-color;
+    color: white;
+    border-radius: 1rem;
+    padding: 0.5rem 0.3rem 0.1rem 0.3rem;
+    display: flex;
+    line-height: 1.2;
+  }
+
+  // Style spécifique pour la navigation
+  &.nav-favorites-count {
+    padding: 0;
+    
+    .favorites-count {
+      font-size: 0.8rem;
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+      min-width: 1rem;
+      height: 1rem;
+      padding: 0.5rem 0.3rem 0.1rem 0.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // Dark mode
+  .dark-mode & {
+    color: $text-color-light;
+
+    &:hover {
+      color: lighten($secondary-color, 10%);
+    }
+
+    .favorites-count {
+      background: lighten($secondary-color, 5%);
+    }
+  }
+
+  // Animation d'entrée
+  @keyframes countIn {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .favorites-count {
+    animation: countIn 0.3s ease-out;
   }
 }

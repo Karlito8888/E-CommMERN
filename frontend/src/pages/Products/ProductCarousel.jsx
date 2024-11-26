@@ -36,10 +36,9 @@ const ProductCarousel = () => {
     swipeToSlide: true,
     centerMode: false,
     focusOnSelect: false,
-    accessibility: true,
     useTransform: true,
-    lazyLoad: "ondemand",
     waitForAnimate: true,
+    accessibility: false,
     responsive: [
       {
         breakpoint: 1440,
@@ -113,10 +112,11 @@ const ProductCarousel = () => {
         acc[category._id] = {
           name: category.name,
           products: duplicatedProducts,
+          totalUniqueProducts: categoryProducts.length
         };
       }
       return acc;
-    }, {});
+    }, []);
   }, [categories, productsData, duplicateProducts, validProducts]);
 
   if (categoriesLoading || productsLoading) return <div>Chargement...</div>;
@@ -148,26 +148,24 @@ const ProductCarousel = () => {
 
   return (
     <div className="category-carousels">
-      {sortedCategories.map(([categoryId, { name, products }]) => (
+      {sortedCategories.map(([categoryId, { name, products, totalUniqueProducts }]) => (
         <div key={categoryId} className="category-section">
-          <h2>{name}</h2>
+          <h2>
+            {name} <span className="product-count">({totalUniqueProducts})</span>
+          </h2>
           <Slider {...settings}>
             {products.map(
               (product) =>
                 validProducts[product._id] !== false && (
-                  <div key={product._id} className="carousel-product">
+                  <div 
+                    key={product._id} 
+                    className="carousel-product"
+                  >
                     <div className="product-card">
                       <Link
                         to={`/product/${product._id.split("_")[0]}`}
                         className="product-link"
-                        aria-label={`Voir le produit ${
-                          product.name
-                        }, Prix: ${product.price.toFixed(
-                          2
-                        )} euros, Note: ${Number(product.rating).toFixed(
-                          1
-                        )} sur 5`}
-                        tabIndex={0}
+                        role="link"
                       >
                         <div className="image-container">
                           <ValidatedImage
@@ -181,12 +179,14 @@ const ProductCarousel = () => {
                         </div>
                         <div className="product-info">
                           <h3>{product.name}</h3>
-                          <div className="rating">
-                            <FaStar />{" "}
-                            <span>{Number(product.rating).toFixed(1)}</span>
-                          </div>
-                          <div className="price">
-                            {product.price.toFixed(2)}€
+                          <div className="product-info-bottom">
+                            <div className="rating">
+                              <FaStar /> 
+                              <span>{Number(product.rating).toFixed(1)}</span>
+                            </div>
+                            <div className="price">
+                              {product.price.toFixed(2)}€
+                            </div>
                           </div>
                         </div>
                       </Link>

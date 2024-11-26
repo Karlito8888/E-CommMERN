@@ -1,5 +1,13 @@
 @use "variables" as *;
 
+@font-face {
+  font-family: "Caveat";
+  src: url("../fonts/Caveat-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -51,6 +59,36 @@ main {
   padding-right: clamp(0.625rem, -0.2273rem + 3.4091vw, 2.5rem);
   //10px-400px/40px-1280px
   padding-bottom: 2rem;
+}
+
+h2 {
+  width: 100%;
+  font-style: italic;
+  font-size: clamp(1.5rem, 0.8182rem + 2.7273vw, 3rem);
+  font-family: "Caveat", sans-serif !important;
+  color: $text-color-dark;
+  padding-left: 5%;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px !important;
+  text-shadow: 2px 2px 4px rgba(251, 39, 163, 0.2),
+               -1px -1px 0 rgba(251, 39, 163, 0.1);
+
+  .dark-mode & {
+    color: $text-color-light;
+  }
+}
+
+h3 {
+  font-family: "Caveat", sans-serif !important;
+  font-size: clamp(1.1rem, 0.9182rem + 0.7273vw, 1.5rem);
+  color: $text-color-dark;
+  .dark-mode & {
+    color: $text-color-light;
+  }
+}
+
+.product-image {
+  position: relative !important;
 }
 
 ul {

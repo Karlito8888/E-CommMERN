@@ -20,12 +20,19 @@ import {
   Users,
 } from "./icons";
 
+import FavoritesCount from "../Products/FavoritesCount";
+
 // Navigation items configuration
 const mainNavItems = [
   { to: "/", icon: Home, label: "Accueil" },
   { to: "/shop", icon: Shopping, label: "Shop" },
   { to: "/cart", icon: Cart, label: "Panier", showBadge: true },
-  { to: "/favorite", icon: Heart, label: "Mes favoris" },
+  { 
+    to: "/favorites", 
+    icon: Heart, 
+    label: "Favoris",
+    badge: <FavoritesCount showIcon={false} className="nav-favorites-count" asLink={false} /> 
+  },
 ];
 
 const adminNavItems = [
@@ -46,7 +53,7 @@ const guestNavItems = [
 ];
 
 // NavItem Component
-const NavItem = ({ to, icon, label, onClick, children, className }) => {
+const NavItem = ({ to, icon, label, onClick, children, className, badge }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   const navItemClass = `nav-item ${className || ''} ${isActive ? 'active' : ''}`.trim();
@@ -60,6 +67,7 @@ const NavItem = ({ to, icon, label, onClick, children, className }) => {
         loading="lazy" 
       />
       <span className={isActive ? 'active' : ''}>{label}</span>
+      {badge}
       {children}
     </>
   );
@@ -112,8 +120,8 @@ const Navigation = () => {
 
   const renderMainNav = () => (
     <ul className="main-nav" role="menubar">
-      {mainNavItems.map(({ to, icon, label, showBadge }) => (
-        <NavItem key={to} to={to} icon={icon} label={label}>
+      {mainNavItems.map(({ to, icon, label, showBadge, badge }) => (
+        <NavItem key={to} to={to} icon={icon} label={label} badge={badge}>
           {showBadge && <CartBadge quantity={totalCartItems} />}
         </NavItem>
       ))}

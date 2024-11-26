@@ -20,7 +20,7 @@
     height: 100% !important;
     border-radius: 20px;
     overflow: hidden;
-    background: rgba($text-color-dark, 0.05);
+    background: #fff !important;
     transition: all 0.3s ease;
     position: relative;
     display: flex;
@@ -30,7 +30,7 @@
     img {
       width: 100%;
       height: auto;
-      object-fit: cover;
+      object-fit: contain;
       border-radius: 12px;
     }
 

@@ -90,10 +90,12 @@ const getTopRatedProducts = asyncHandler(async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 3, 10);
   
   const products = await Product.find()
+    .select(PRODUCT_FIELDS)
     .sort({ rating: -1 })
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
-  res.json(products);
+  res.json(products.map(formatProduct));
 });
 
 const getFilteredProducts = asyncHandler(async (req, res) => {
