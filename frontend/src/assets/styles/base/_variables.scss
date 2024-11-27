@@ -13,13 +13,23 @@ $base-letter-spacing: 1px;
 
 // Layout
 $max-width: 1920px;
+
+// Navigation
 $nav-width-collapsed: 40px;
-$nav-width-expanded: 250px;
+$nav-width-expanded: 200px;
+$nav-item-height: 40px;
+$nav-icon-size: 22px;
 $main-padding-left: 260px;
 $nav-padding: 10px;
 $nav-margin: 10px;
+$nav-background-color: #333333;
+$nav-text-color: #ffffff;
+$nav-hover-background-color: #444444;
+$nav-hover-text-color: #ffffff;
+$nav-active-background-color: #555555;
+$nav-active-text-color: #ffffff;
 
 // Transitions
-$nav-transition-duration: 0.3s;
-$nav-transition-timing: ease;
-$transition-default: 0.3s ease;
+$nav-transition-duration: 0.25s;
+$nav-transition-timing: ease-in-out;
+$transition-default: 0.25s ease-in-out;

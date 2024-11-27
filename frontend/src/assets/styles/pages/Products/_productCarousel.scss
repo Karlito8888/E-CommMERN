@@ -13,6 +13,10 @@
     padding: clamp(1rem, 0.5455rem + 1.8182vw, 2rem);
     border-radius: 12px;
 
+    .dark-mode & {
+      background: #292929;
+    }
+
     &.hidden {
       display: none;
       opacity: 0;
@@ -22,6 +26,11 @@
       font-size: clamp(0.9rem, 0.5364rem + 1.4545vw, 1.7rem);
       margin: 1rem 0;
       font-weight: 500;
+      color: $text-color-dark;
+
+      .dark-mode & {
+        color: $text-color-light;
+      }
 
       .product-count {
         font-size: 0.85em;
@@ -34,6 +43,11 @@
       font-size: clamp(0.8rem, 0.4364rem + 1.2545vw, 1.4rem);
       margin: 1rem 0;
       font-weight: 500;
+      color: $text-color-dark;
+
+      .dark-mode & {
+        color: $text-color-light;
+      }
     }
 
     .slick-slider {
@@ -59,12 +73,16 @@
   .carousel-product {
     padding: 0.3rem;
     outline: none;
-    
+
     .product-card {
       border-radius: 8px;
       height: 100%;
       background-color: #f5f5f5;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      .dark-mode & {
+        background-color: #333;
+      }
 
       &:hover {
         transform: translateY(-5px);
@@ -91,10 +109,17 @@
         border: 1px solid rgba(128, 128, 128, 0.12);
         background-color: #ffffff;
 
+        .brand-tag {
+          position: absolute;
+          bottom: 0;
+          left: 0.5rem;
+          color: #333333;
+          font-size: clamp(0.7rem, 0.5636rem + 0.5455vw, 1rem);
+          font-family: "Caveat";
+        }
+
         .dark-mode & {
           border-color: rgba(255, 255, 255, 0.08);
-          background-color: #ffffff;
-
         }
 
         img {
@@ -134,25 +159,36 @@
       }
 
       .product-info {
-        padding-top: 1rem;
+        padding: .3rem;
         text-align: center;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
 
+
+        // .heart-and-cart {
+        //   display: flex;
+        //   justify-content: center;
+        //   gap: 0.5rem;
+        //   margin-bottom: 0.5rem;
+        // }
+
         h3 {
           font-size: 0.9rem;
           margin-bottom: 1rem;
           overflow: hidden;
           text-overflow: ellipsis;
-          display: -webkit-box;
-          line-clamp: 2;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          white-space: normal;
-          height: 2.4em;
+          white-space: nowrap;
+          width: 100%;
+          display: block;
           line-height: 1.2;
+          color: $text-color-dark;
+          text-align: left;
+
+          .dark-mode & {
+            color: $text-color-light;
+          }
         }
 
         .product-info-bottom {
@@ -164,7 +200,7 @@
             color: $secondary-color;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 0.25rem;
             margin-top: auto;
             font-size: clamp(0.7rem, 0.5636rem + 0.5455vw, 1rem);
@@ -172,6 +208,10 @@
             span {
               padding-top: 7px;
               color: $text-color-dark;
+
+              .dark-mode & {
+                color: $text-color-light;
+              }
             }
           }
 
@@ -188,56 +228,11 @@
   }
 }
 
-.dark-mode {
-  .category-carousels {
-    .category-section {
-      background: #292929;
-
-      h2 {
-        color: $text-color-light;
-      }
-
-      h3 {
-        color: $text-color-light;
-      }
-    }
-
-    .carousel-product {
-      .product-card {
-        background: linear-gradient(45deg, #404040, #333333, #444444);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-
-        &:hover {
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .product-info {
-          h3 {
-            color: $text-color-light;
-          }
-
-          .product-info-bottom {
-            .rating span {
-              color: $text-color-light;
-            }
-          }
-        }
-      }
-    }
-
-    .slick-slider {
-      .slick-prev,
-      .slick-next {
-        &::before {
-          color: $text-color-light;
-        }
-      }
-    }
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-

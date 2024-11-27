@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { selectFavoriteProducts } from "../../redux/features/favorites/favoriteSlice";
-import Product from "./Product";
+// import Product from "./Product";
 import { Link } from "react-router-dom";
 import HeartIcon from "./HeartIcon";
 

@@ -24,6 +24,7 @@ html {
 body {
   height: 100%;
   width: 100%;
+  // width: 100vw;
   max-width: $max-width;
   margin-inline: auto;
   font-size: $base-font-size;
@@ -87,18 +88,12 @@ h3 {
   }
 }
 
-.product-image {
-  position: relative !important;
-}
-
 ul {
   list-style-type: none;
 }
 
 a {
   text-decoration: none;
-  transition: color $transition-default;
-  color: $text-color-light;
 }
 
 span {

@@ -1,270 +1,315 @@
 @use "../../base/variables" as *;
 
-.tabs-container {
-  padding: clamp(0.5rem, -0.1818rem + 2.7273vw, 2rem);
+.product-tabs-container {
   margin-top: 3rem;
-  background: rgba($background-color-light, 0.5);
-  border-radius: 20px;
-  transition: all 0.3s ease;
-
-  .dark-mode & {
-    background: rgba($text-color-light, 0.05);
-  }
-
-  .tabs-nav {
-    display: flex;
-    gap: clamp(0.5rem, 0.2727rem + 0.9091vw, 1rem);
-    margin-bottom: 2rem;
-    border-bottom: 2px solid rgba($text-color-dark, 0.1);
-    padding-bottom: 1rem;
+  .tabs-container {
+    padding: clamp(0.5rem, -0.1818rem + 2.7273vw, 2rem);
+    background: rgba($background-color-light, 0.5);
+    border-radius: 20px;
+    transition: all 0.3s ease;
 
     .dark-mode & {
-      border-bottom-color: rgba($text-color-light, 0.1);
+      background: rgba($text-color-light, 0.05);
     }
 
-    .tab-button {
-      padding-block: 0.5rem;
-      padding-inline: clamp(0.5rem, 0.2727rem + 0.9091vw, 1rem);
-      border: none;
-      background: none;
-      color: rgba($text-color-dark, 0.7);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-
-      &::after {
-        content: "";
-        position: absolute;
-        bottom: -1rem;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: $secondary-color;
-        transform: scaleX(0);
-        transition: transform 0.3s ease;
-      }
-
-      &.active {
-        color: $secondary-color;
-        font-weight: 600;
-
-        &::after {
-          transform: scaleX(1);
-        }
-      }
-
-      &:hover:not(.active) {
-        color: rgba($text-color-dark, 0.9);
-      }
+    // Navigation des onglets
+    .tabs-nav {
+      display: flex;
+      gap: clamp(0.5rem, 0.2727rem + 0.9091vw, 1rem);
+      margin-bottom: 2rem;
+      border-bottom: 2px solid rgba($text-color-dark, 0.1);
+      padding-bottom: 1rem;
 
       .dark-mode & {
-        color: rgba($text-color-light, 0.7);
-
-        &:hover:not(.active) {
-          color: rgba($text-color-light, 0.9);
-        }
+        border-bottom-color: rgba($text-color-light, 0.1);
       }
-    }
-  }
 
-  .tab-content {
-    min-height: 200px;
-
-    .login-prompt {
-      text-align: center;
-      margin: 2rem 0;
-      
-      a {
-        color: $secondary-color;
-        text-decoration: underline;
+      // Composant TabButton
+      .tab-button {
+        padding-block: 0.5rem;
+        padding-inline: clamp(0.5rem, 0.2727rem + 0.9091vw, 1rem);
+        border: none;
+        background: none;
+        color: rgba($text-color-dark, 0.7);
         font-weight: 500;
-        transition: $transition-default;
-
-        &:hover {
-          color: $text-color-dark;
-        }
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
 
         .dark-mode & {
+          color: rgba($text-color-light, 0.7);
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: -1rem;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: $secondary-color;
+          transform: scaleX(0);
+          transition: transform 0.3s ease;
+        }
+
+        &.active {
           color: $secondary-color;
-          
-          &:hover {
-            color: $text-color-light;
+          font-weight: 600;
+
+          &::after {
+            transform: scaleX(1);
+          }
+        }
+
+        &:hover:not(.active) {
+          color: rgba($text-color-dark, 0.9);
+
+          .dark-mode & {
+            color: rgba($text-color-light, 0.9);
           }
         }
       }
     }
 
-    .review-form {
-      max-width: 600px;
-      margin: 0 auto;
+    // Contenu des onglets
+    .tab-content {
+      min-height: 200px;
 
-      .form-group {
-        margin-bottom: 1.5rem;
+      // Composant ReviewForm
+      .review-form {
+        max-width: 600px;
+        margin: 0 auto;
 
-        label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-        }
-
-        .star-rating {
-          display: flex;
-          gap: 0.5rem;
-          padding: 0.5rem 0;
+        .form-group {
+          margin-bottom: 1.5rem;
 
           label {
-            margin: 0;
-            cursor: pointer;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+          }
 
-            input {
-              display: none;
-            }
+          .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
 
-            .star {
-              font-size: 1.5rem;
-              color: rgba($text-color-dark, 0.2);
-              transition: all 0.2s ease;
+            label {
+              margin: 0;
+              cursor: pointer;
 
-              &.active {
-                color: $secondary-color;
+              input {
+                display: none;
               }
 
-              .dark-mode & {
-                color: rgba($text-color-light, 0.2);
+              .star {
+                font-size: 1.5rem;
+                color: rgba($text-color-dark, 0.2);
+                transition: all 0.2s ease;
+
+                .dark-mode & {
+                  color: rgba($text-color-light, 0.2);
+                }
 
                 &.active {
                   color: $secondary-color;
                 }
+
+                &:hover {
+                  transform: scale(1.1);
+                }
               }
             }
+          }
 
-            &:hover {
-              transform: scale(1.1);
+          textarea {
+            width: 100%;
+            padding: 0.75rem;
+            color: $text-color-dark;
+            border: 1px solid rgba($text-color-dark, 0.2);
+            border-radius: 8px;
+            background: rgba($background-color-light, 0.5);
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 100px;
+
+            .dark-mode & {
+              background: rgba($background-color-dark, 0.5);
+              border-color: rgba($text-color-light, 0.2);
+              color: $text-color-light;
+            }
+
+            &:focus {
+              outline: none;
+              border-color: $primary-color;
+              box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
             }
           }
         }
 
-        select,
-        textarea {
+        .submit-button {
           width: 100%;
           padding: 0.75rem;
-          color: $text-color-dark;
-          border: 1px solid rgba($text-color-dark, 0.2);
+          background: $secondary-color;
+          color: $text-color-light;
+          border: none;
           border-radius: 8px;
-          background: rgba($background-color-light, 0.5);
+          font-weight: 600;
+          cursor: pointer;
           transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba($text-color-dark, 0.1);
 
-          &:focus {
-            outline: none;
-            border-color: $primary-color;
-            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+          &:hover:not(:disabled) {
+            background: #ff8fa3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba($text-color-dark, 0.15);
           }
 
+          &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            background: rgba($text-color-dark, 0.2);
+            color: rgba($text-color-dark, 0.5);
+
+            .dark-mode & {
+              background: rgba($text-color-light, 0.1);
+              color: rgba($text-color-light, 0.5);
+            }
+          }
+        }
+      }
+
+      // Message de connexion
+      .login-prompt {
+        text-align: center;
+        margin: 2rem 0;
+
+        a {
+          color: $secondary-color;
+          text-decoration: underline;
+          font-weight: 500;
+          transition: all 0.3s ease;
+
+          &:hover {
+            color: $text-color-dark;
+
+            .dark-mode & {
+              color: $text-color-light;
+            }
+          }
+        }
+      }
+
+      // Composant ReviewList
+      .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .no-reviews {
+          text-align: center;
+          color: rgba($text-color-dark, 0.7);
+
           .dark-mode & {
-            background: rgba($background-color-dark, 0.5);
-            border-color: rgba($text-color-light, 0.2);
             color: rgba($text-color-light, 0.7);
           }
         }
 
-        textarea {
-          resize: vertical;
-          min-height: 100px;
-        }
-      }
+        .review-item {
+          padding: clamp(0.7rem, 0.3364rem + 1.4545vw, 1.5rem);
+          background: rgba($background-color-light, 0.5);
+          border-radius: 12px;
+          transition: all 0.3s ease;
 
-      .submit-button {
-        width: 100%;
-        padding: 0.75rem;
-        background: $secondary-color;
-        color: $text-color-light;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba($text-color-dark, 0.1);
-
-        &:hover:not(:disabled) {
-          background: $primary-color;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba($text-color-dark, 0.15);
-        }
-
-        &:disabled {
-          background: rgba($text-color-dark, 0.2);
-          color: rgba($text-color-dark, 0.5);
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none;
-          box-shadow: none;
-        }
-
-        .dark-mode & {
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-          &:hover:not(:disabled) {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+          .dark-mode & {
+            background: rgba($background-color-dark, 0.5);
           }
 
-          &:disabled {
-            background: rgba($text-color-light, 0.1);
-            color: rgba($text-color-light, 0.5);
-          }
-        }
-      }
-    }
+          .review-header {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: clamp(0.7rem, 0.5636rem + 0.5455vw, 1rem);
 
-    .reviews-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+            strong {
+              font-weight: 600;
+            }
 
-      .review-item {
-        padding: 1.5rem;
-        background: rgba($background-color-light, 0.5);
-        border-radius: 12px;
-        transition: all 0.3s ease;
+            time {
+              color: rgba($text-color-dark, 0.6);
+              // font-size: 0.9rem;
 
-        .dark-mode & {
-          background: rgba($background-color-dark, 0.5);
-        }
+              .dark-mode & {
+                color: rgba($text-color-light, 0.6);
+              }
+            }
 
-        .review-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-
-          time {
-            color: rgba($text-color-dark, 0.6);
-
-            .dark-mode & {
-              color: rgba($text-color-light, 0.6);
+            @media (max-width: 480px) {
+              display: grid;
             }
           }
-        }
 
-        .review-comment {
-          margin-bottom: 1rem;
-          line-height: 1.6;
+          .review-comment {
+            margin-bottom: 1rem;
+            line-height: clamp(
+              1.4,
+              calc(1.4 + (1.6 - 1.4) * ((100vw - 320px) / (1200 - 320))),
+              1.6
+            );
+          }
         }
       }
-    }
 
-    .related-products {
-      display: grid;
+      // Composant RelatedProducts
+      .related-products {
+        h3 {
+          font-size: clamp(1.1rem, 0.9727rem + 0.5091vw, 1.4rem);
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          color: $text-color-dark;
 
-      .products-grid {
-        margin-top: 1rem;
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2rem;
+          .dark-mode & {
+            color: $text-color-light;
+          }
+        }
 
-        @media screen and (max-width: 768px) {
-          grid-template-columns: 1fr;
+        .loading {
+          text-align: center;
+          color: rgba($text-color-dark, 0.7);
+          padding: 2rem;
+
+          .dark-mode & {
+            color: rgba($text-color-light, 0.7);
+          }
+        }
+
+        .products-grid {
+          display: grid;
+          gap: clamp(1rem, 0.5455rem + 1.8182vw, 2rem);
+          width: 100%;
+          grid-template-columns: repeat(
+            3,
+            minmax(0, 1fr)
+          ); // 3 colonnes par défaut
+
+          @media (min-width: 1200px) {
+            grid-template-columns: repeat(
+              6,
+              minmax(0, 1fr)
+            ); // 6 colonnes sur grand écran
+          }
+
+          @media (max-width: 900px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr)); // 2 colonnes
+          }
+
+          @media (max-width: 768px) {
+            grid-template-columns: minmax(0, 1fr); // 1 colonne
+          }
         }
       }
     }

@@ -1,7 +1,10 @@
+@use "../base/variables" as *;
+
 .rating {
+  width: 100%;
   display: inline-flex;
   align-items: center;
-  gap: 1px;
+  // gap: 1px;
 
   .star-container {
     position: relative;
@@ -9,9 +12,10 @@
 
   .star-svg {
     display: block;
-    width: clamp(16px, 4vw, 24px);
-    height: clamp(16px, 4vw, 24px);
-    transition: width 0.3s ease, height 0.3s ease;
+    width: 0.5rem;
+    height: 0.5rem;
+    // font-size: clamp(16px, 4vw, 24px);
+    transition: all 0.3s ease;
   }
 
   .star-background {
@@ -21,16 +25,5 @@
   .star-filled {
     position: relative;
     transition: clip-path 0.3s ease;
-  }
-
-  // Variantes de taille si nécessaire
-  &.rating-sm .star-svg {
-    width: clamp(12px, 3vw, 16px);
-    height: clamp(12px, 3vw, 16px);
-  }
-
-  &.rating-lg .star-svg {
-    width: clamp(24px, 5vw, 32px);
-    height: clamp(24px, 5vw, 32px);
   }
 }

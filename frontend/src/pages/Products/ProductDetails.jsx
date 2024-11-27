@@ -52,21 +52,24 @@ const ProductDetails = () => {
         productId,
         rating,
         comment: comment.trim(),
-        name: userInfo.username
+        name: userInfo.username,
       }).unwrap();
-      
+
       // Réinitialiser le formulaire
       setRating(0);
       setComment("");
-      
+
       refetch();
       toast.success("Avis ajouté avec succès");
     } catch (err) {
       // Gestion spécifique des erreurs HTTP
-      if (err.data?.message === 'Produit déjà évalué') {
+      if (err.data?.message === "Produit déjà évalué") {
         toast.info("Vous avez déjà évalué ce produit");
       } else {
-        toast.error(err?.data?.message || "Une erreur est survenue lors de l'ajout de l'avis");
+        toast.error(
+          err?.data?.message ||
+            "Une erreur est survenue lors de l'ajout de l'avis"
+        );
       }
     }
   };
@@ -104,7 +107,7 @@ const ProductDetails = () => {
                 className="product-image"
                 loading="lazy"
               />
-              <HeartIcon product={product} />
+              {product.brand && <p className="brand-tag">{product.brand}</p>}
             </section>
 
             <div className="product-infos-container">
@@ -112,42 +115,22 @@ const ProductDetails = () => {
                 className="product-info"
                 aria-label="Informations du produit"
               >
-                  <h1 className="product-title">{product.name}</h1>
-                  <p className="product-description">{product.description}</p>
-                  <p className="product-price" aria-label="Prix">
-                    <span className="visually-hidden">{product.price}€</span>
-                  </p>
+                <h2 className="product-title">{product.name}</h2>
+                <h3 className="product-brand">{product.brand}</h3>
+                <p className="product-description">{product.description}</p>
+                <p className="product-price" aria-label="Prix">
+                  <span className="visually-hidden">{product.price}€</span>
+                </p>
               </section>
 
               <section
                 className="product-meta"
                 aria-label="Détails supplémentaires"
               >
-                <dl className="brand-info">
-                  <div>
-                    <dt>
-                      <FaStore className="icon" aria-hidden="true" />
-                    </dt>
-                    <dd>{product.brand}</dd>
-                  </div>
-                  <div>
-                    <dt>
-                      <FaPen className="icon" aria-hidden="true" />
-                    </dt>
-                    <dd>{product.numReviews} avis</dd>
-                  </div>
-                  <div>
-                    <dd>
-                      <Rating
-                        value={product.rating}
-                        className="product-rating"
-                      />
-                      <span className="rating-value">
-                        {Number(product.rating).toFixed(1)}
-                      </span>
-                    </dd>
-                  </div>
-                </dl>
+                <Rating value={product.rating} className="product-rating" />
+                <span className="rating-value">
+                  {Number(product.rating).toFixed(1)}
+                </span>
               </section>
 
               <section

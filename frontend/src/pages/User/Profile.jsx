@@ -6,12 +6,11 @@ import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "../../redux/features/usersApiSlice";
-import InputField from "../../components/auth/InputField";
-import SubmitButton from "../../components/auth/SubmitButton";
+import InputField from "../../components/InputField";
+import SubmitButton from "../../components/SubmitButton";
 
 const Profile = () => {
-  const { data: userProfile, isLoading: loadingProfile } =
-    useGetProfileQuery();
+  const { data: userProfile, isLoading: loadingProfile } = useGetProfileQuery();
   // console.log("userProfile:", userProfile);
   const [username, setUserName] = useState(userProfile?.user?.username || "");
   const [email, setEmail] = useState(userProfile?.user?.email || "");

@@ -9,7 +9,6 @@ import {
 
 const HeartIcon = ({ 
   product, 
-  size = "medium",
   withAnimation = true,
   className = "" 
 }) => {
@@ -28,7 +27,7 @@ const HeartIcon = ({
   return (
     <button
       type="button"
-      className={`heart-icon ${size} ${withAnimation ? 'animated' : ''} ${className}`}
+      className={`heart-icon ${withAnimation ? 'animated' : ''} ${className}`}
       onClick={handleToggleFavorite}
       aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
       title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}

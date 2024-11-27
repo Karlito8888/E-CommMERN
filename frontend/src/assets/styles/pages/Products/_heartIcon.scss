@@ -1,43 +1,21 @@
-@use "../../base/variables" as *;
+@use '../../base/variables' as *;
+@use '../../base/mixins' as mix;
 
 .heart-icon {
-  position: absolute;
-  top: clamp(-0.25rem, -0.7898rem + 2.1591vw, 0.9375rem);
-  right: clamp(-0.25rem, -0.7898rem + 2.1591vw, 0.9375rem);
-  z-index: 10;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
+  @include mix.action-button;
+  @include mix.focus-state;
   border-radius: 50%;
+  
   
   &:hover {
     background: rgba($secondary-color, 0.1);
   }
 
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba($secondary-color, 0.3);
-  }
-
-  // Tailles
-  &.small {
-    font-size: 1rem;
-    padding: 0.3rem;
-  }
-
-  &.medium {
-    font-size: 1.2rem;
-    padding: 0.5rem;
-  }
-
-  &.large {
-    font-size: 1.5rem;
-    padding: 0.7rem;
+  svg {
+    width: clamp(1rem, 0.7727rem + 0.9091vw, 1.5rem);
+    height: auto;
+    aspect-ratio: 1/1;
+    // fill: currentColor;
   }
 
   // États
@@ -46,10 +24,10 @@
   }
 
   .not-favorite {
-    color: #fb27a3;
+    color: $secondary-color;
 
     .dark-mode & {
-      color: #fb27a3;
+      color: $secondary-color;
     }
   }
 
@@ -70,7 +48,7 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.3);
+    transform: scale(1.2);
   }
   100% {
     transform: scale(1);

@@ -1,25 +1,3 @@
-@use "../../base/variables" as *;
-
-// Variables spécifiques à la navigation
-$nav-width-collapsed: 40px;
-$nav-width-expanded: 200px;
-$nav-transition-duration: 0.3s;
-$nav-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
-$nav-item-height: 40px;
-$nav-icon-size: 22px;
-
-// Mixins
-@mixin flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-@mixin nav-item-hover {
-  background-color: $primary-color;
-  opacity: 1;
-  transform: translateX(4px);
-}
-
 // Base de la navigation
 aside {
   position: fixed;
@@ -27,12 +5,13 @@ aside {
   top: 0;
   height: 100vh;
   background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
-  width: $nav-width-collapsed;
-  transition: all $nav-transition-duration $nav-transition-timing;
+  width: 40px;
+  transition: width 0.3s ease;
   overflow-x: hidden;
   overflow-y: auto;
   z-index: 1000;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  will-change: width;
 
   &::-webkit-scrollbar {
     width: 0;
@@ -40,7 +19,8 @@ aside {
 
   // État déplié
   &:hover {
-    width: $nav-width-expanded;
+    width: 200px;
+    transition: width 0.3s ease;
 
     .nav-link {
       padding: 0.75rem 1rem;
@@ -49,14 +29,14 @@ aside {
         display: inline;
         opacity: 1;
         margin-left: 0;
-        padding-top: 7px;
+        transform: translateX(0);
+        transition: all 0.3s ease;
       }
     }
 
     .user-name {
-      display: block;
       opacity: 0.8;
-      padding-left: 1rem;
+      transform: translateX(0);
     }
   }
 
@@ -67,21 +47,19 @@ aside {
 
   // Navigation principale
   nav {
-    @include flex-column;
+    display: flex;
+    flex-direction: column;
     height: 100%;
     padding-block: 1.5rem;
 
-    // Sections principales
-    .main-nav,
-    .user-nav .guest-nav {
-      @include flex-column;
+    // Section principale
+    .main-nav {
+      display: flex;
+      flex-direction: column;
       gap: 0.75rem;
       list-style: none;
       align-items: flex-start;
       width: 100%;
-    }
-
-    .main-nav {
       margin-bottom: 2rem;
     }
 
@@ -96,17 +74,18 @@ aside {
         .user-name {
           display: none;
           opacity: 0;
-          color: $text-color-light;
+          color: #ffffff;
           font-size: 0.9rem;
           margin-bottom: 1.5rem;
           white-space: nowrap;
           font-weight: 500;
-          transition: opacity 0.5s ease;
+          transition: opacity 0.3s ease;
           text-align: left;
         }
 
         .user-menu {
-          @include flex-column;
+          display: flex;
+          flex-direction: column;
           gap: 0.75rem;
           width: 100%;
           align-items: flex-start;
@@ -120,10 +99,12 @@ aside {
       }
 
       .guest-nav {
-        @include flex-column;
+        display: flex;
+        flex-direction: column;
         gap: 0.75rem;
-        width: 100%;
+        list-style: none;
         align-items: flex-start;
+        width: 100%;
       }
     }
   }
@@ -142,21 +123,23 @@ aside {
     gap: 1rem;
     padding: 0.75rem 0.5rem;
     width: 100%;
-    color: $text-color-light;
+    color: #ffffff;
     text-decoration: none;
     border-radius: 12px;
-    transition: all $nav-transition-duration $nav-transition-timing;
+    transition: all 0.3s ease;
     white-space: nowrap;
     border: none;
     background: none;
     cursor: pointer;
     font-size: 0.9rem;
     opacity: 0.8;
+    will-change: transform, background-color;
 
     .nav-icon {
-      width: 24px;
-      height: 24px;
-      transition: all 0.3s ease;
+      width: 22px;
+      height: 22px;
+      transition: transform 0.3s ease;
+      will-change: transform;
 
       &.active {
         filter: invert(73%) sepia(40%) saturate(7075%) hue-rotate(308deg) brightness(101%) contrast(97%);
@@ -164,18 +147,18 @@ aside {
     }
 
     span {
-      display: none;
+      display: inline;
       opacity: 0;
-      margin-left: 1rem;
-      transition: all 0.3s ease;
-
-      // &.active {
-      //   color: $secondary-color;
-      // }
+      margin-left: -20px;
+      transform: translateX(-10px);
+      transition: all 0s;
+      will-change: transform, opacity;
     }
 
     &:hover {
-      @include nav-item-hover;
+      background-color: #ffffff34;
+      opacity: 1;
+      transform: translateX(4px);
 
       .nav-icon {
         transform: scale(1.1);
@@ -183,8 +166,7 @@ aside {
     }
   }
 
-  // Styles pour le hover et l'état actif
-  &:hover{
+  &:hover {
     .nav-link {
       background-color: rgba(255, 255, 255, 0.1);
     }
@@ -200,16 +182,15 @@ aside {
     position: absolute;
     top: -6px;
     right: -6px;
-    background-color: $secondary-color;
-    color: #fff;
+    background-color: #fb27a3;
+    color: white;
     border-radius: 50%;
     width: 18px;
     height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 0.7rem;
+    font-weight: bold;
   }
 }

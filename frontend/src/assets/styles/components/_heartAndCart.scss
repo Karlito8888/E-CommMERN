@@ -1,0 +1,30 @@
+@use '../base/variables' as *;    // Pour utiliser les variables directement
+@use '../base/mixins' as mix;    // Pour utiliser les mixins avec mix.*
+
+.heart-and-cart {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-icon-btn {
+  @include mix.action-button;
+  @include mix.interactive-animation;
+  @include mix.disabled-state;
+
+  .cart-icon {
+    width: clamp(1rem, 0.7727rem + 0.9091vw, 1.5rem);
+    height: auto;
+    aspect-ratio: 1/1;
+    filter: brightness(0) saturate(100%);
+
+    body:not(.dark-mode) & {
+      filter: brightness(0) saturate(100%) invert(20%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(96%) contrast(94%);
+    }
+
+    body.dark-mode & {
+      filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    }
+  }
+}

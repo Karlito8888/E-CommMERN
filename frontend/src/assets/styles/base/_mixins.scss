@@ -1,0 +1,53 @@
+@use './variables' as *;
+
+// Layout Mixins
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Navigation Mixins
+@mixin nav-item-hover {
+  background-color: $primary-color;
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+// Mixin pour les boutons d'action
+@mixin action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+// Mixin pour les effets d'animation
+@mixin interactive-animation {
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &.animated:active {
+    transform: scale(0.95);
+  }
+}
+
+// Mixin pour les états désactivés
+@mixin disabled-state {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Mixin pour le focus
+@mixin focus-state($color: $secondary-color) {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($color, 0.3);
+  }
+}

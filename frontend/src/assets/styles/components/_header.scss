@@ -37,10 +37,12 @@
 
       h1 {
         color: $text-color-dark;
+        font-family: "Caveat";
+        height: 24px;
         font-size: 1.5rem;
         font-weight: 700;
         line-height: 1;
-        padding-top: 10px;
+        // padding-top: 10px;
         background: linear-gradient(
           90deg,
           $secondary-color,
@@ -173,14 +175,24 @@
 
       .search-result-info {
         flex: 1;
-      }
 
-      .search-result-price {
-        font-weight: 600;
-        color: $secondary-color;
+        .search-result-name {
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+          color: $text-color-dark;
 
-        .dark-mode & {
-          color: $text-color-light;
+          .dark-mode & {
+            color: $text-color-light;
+          }
+        }
+
+        .search-result-price {
+          font-weight: 600;
+          color: $secondary-color;
+
+          .dark-mode & {
+            color: $text-color-light;
+          }
         }
       }
     }
@@ -197,18 +209,29 @@
       justify-content: center;
       width: 2.5rem;
       height: 2.5rem;
+      padding: 0.5rem;
       border-radius: 50%;
-      background: transparent;
+      background: none;
+      border: none;
+      cursor: pointer;
       color: $text-color-dark;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
 
       &:hover {
-        background: rgba($text-color-dark, 0.1);
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .dark-mode & {
+        color: $text-color-light;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
       }
 
       svg {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: 1.2rem;
+        height: 1.2rem;
       }
     }
 
@@ -219,50 +242,69 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 2rem;
-        background: transparent;
+        padding: 0.5rem;
+        background: none;
+        border: none;
+        cursor: pointer;
         color: $text-color-dark;
-        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
 
         &:hover {
-          background: rgba($text-color-dark, 0.1);
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode & {
+          color: $text-color-light;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+        }
+
+        .username {
+          font-weight: 500;
         }
 
         svg {
-          width: 1.25rem;
-          height: 1.25rem;
-        }
-
-        @media (max-width: 460px) {
-          span.username {
-            display: none;
-          }
-          padding: 0.5rem;
+          width: 1.2rem;
+          height: 1.2rem;
         }
       }
 
       .user-menu-dropdown {
         position: absolute;
-        top: 120%;
+        top: 100%;
         right: 0;
+        margin-top: 0.5rem;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        padding: 0.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         min-width: 200px;
-        animation: slideIn 0.2s ease;
+        z-index: 1000;
+
+        .dark-mode & {
+          background: #2b2b2b;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
 
         a {
           display: block;
-          padding: 0.7rem 1rem;
+          padding: 0.75rem 1rem;
           color: $text-color-dark;
           text-decoration: none;
-          border-radius: 8px;
-          transition: all 0.2s ease;
+          transition: background-color 0.2s;
 
           &:hover {
-            background: rgba(0, 0, 0, 0.05);
+            background-color: rgba(0, 0, 0, 0.05);
+          }
+
+          .dark-mode & {
+            color: $text-color-light;
+
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.1);
+            }
           }
         }
 
@@ -270,15 +312,16 @@
           margin: 0.5rem 0;
           border: none;
           border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+          .dark-mode & {
+            border-top-color: rgba(255, 255, 255, 0.1);
+          }
         }
       }
     }
   }
-}
 
-// Dark mode styles
-.dark-mode {
-  .header {
+  .dark-mode & {
     background: rgba($background-color-dark, 0.95);
     border-bottom-color: rgba($text-color-light, 0.1);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
@@ -297,42 +340,6 @@
             &:focus {
               background: rgba($text-color-light, 0.15);
             }
-          }
-        }
-      }
-    }
-
-    .header-right {
-      .theme-toggle {
-        color: $text-color-light;
-
-        &:hover {
-          background: rgba($text-color-light, 0.1);
-        }
-      }
-
-      .user-menu {
-        .user-menu-trigger {
-          color: $text-color-light;
-
-          &:hover {
-            background: rgba($text-color-light, 0.1);
-          }
-        }
-
-        .user-menu-dropdown {
-          background: $background-color-dark;
-
-          a {
-            color: $text-color-light;
-
-            &:hover {
-              background: rgba($text-color-light, 0.1);
-            }
-          }
-
-          hr {
-            border-top-color: rgba($text-color-light, 0.1);
           }
         }
       }
@@ -363,9 +370,9 @@
     }
 
     .header-left {
-      .logo h1 {
-        font-size: 1.2rem;
-      }
+      // .logo h1 {
+      //   font-size: 1.2rem;
+      // }
 
       .search-container {
         display: none;

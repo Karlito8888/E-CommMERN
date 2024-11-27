@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Rating from "../../components/Rating";
 import ValidatedImage from "../../components/ValidatedImage";
-import HeartIcon from "./HeartIcon";
+import HeartAndCart from "../../components/HeartAndCart";
 import { useState } from "react";
 
 const SmallProduct = ({ product }) => {
@@ -18,9 +18,15 @@ const SmallProduct = ({ product }) => {
             alt={product.name}
             onValidation={setIsImageValid}
           />
-            <HeartIcon product={product} size="small" />
+          {product.brand && (
+            <div className="brand-tag">
+              {product.brand}
+            </div>
+          )}
         </div>
-
+      </Link>
+      <div className="small-cart-bottom">
+        <HeartAndCart product={product} />
         <div className="product-info">
           <h3 className="product-header">
             <div>{product.name}</div>
@@ -38,7 +44,7 @@ const SmallProduct = ({ product }) => {
             </div>
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 };

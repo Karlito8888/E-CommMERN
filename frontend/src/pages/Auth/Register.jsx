@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useRegisterMutation } from "../../redux/features/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice.js";
-import InputField from "../../components/auth/InputField.jsx";
-import SubmitButton from "../../components/auth/SubmitButton.jsx";
+import InputField from "../../components/InputField.jsx";
+import SubmitButton from "../../components/SubmitButton.jsx";
 
 const Register = () => {
   // État du formulaire
@@ -13,12 +13,12 @@ const Register = () => {
     username: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
-  
+
   // État des erreurs de validation
   const [validationErrors, setValidationErrors] = useState({});
-  
+
   // Hooks Redux et Router
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,16 +37,16 @@ const Register = () => {
   // Gestion des changements de champs
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [id]: value
+      [id]: value,
     }));
-    
+
     // Effacer l'erreur lors de la modification
     if (validationErrors[id]) {
-      setValidationErrors(prev => ({
+      setValidationErrors((prev) => ({
         ...prev,
-        [id]: ""
+        [id]: "",
       }));
     }
   };
@@ -60,7 +60,8 @@ const Register = () => {
     if (!username.trim()) {
       errors.username = "Le nom d'utilisateur est requis";
     } else if (username.length < 3) {
-      errors.username = "Le nom d'utilisateur doit contenir au moins 3 caractères";
+      errors.username =
+        "Le nom d'utilisateur doit contenir au moins 3 caractères";
     }
 
     // Validation de l'email
@@ -91,7 +92,7 @@ const Register = () => {
   // Soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -102,22 +103,22 @@ const Register = () => {
     try {
       const { username, email, password } = formData;
       const res = await register({ username, email, password }).unwrap();
-      
+
       // Mise à jour du state Redux
       dispatch(setCredentials({ ...res }));
-      
+
       // Notification et redirection
       toast.success("Compte créé avec succès! ");
       navigate(redirect);
     } catch (err) {
       const message = err?.data?.message || "Une erreur est survenue";
       toast.error(`Erreur d'inscription: ${message} `);
-      
+
       // Gestion des erreurs spécifiques
       if (err?.data?.field) {
-        setValidationErrors(prev => ({
+        setValidationErrors((prev) => ({
           ...prev,
-          [err.data.field]: err.data.message
+          [err.data.field]: err.data.message,
         }));
       }
     }
@@ -127,7 +128,7 @@ const Register = () => {
     <section className="register-section">
       <div className="register-container">
         <h1 className="register-title">Créez un compte</h1>
-        
+
         <form onSubmit={handleSubmit} className="register-form" noValidate>
           <InputField
             id="username"
@@ -185,9 +186,9 @@ const Register = () => {
             <p className="error-message">{validationErrors.confirmPassword}</p>
           )}
 
-          <SubmitButton 
-            isLoading={isLoading} 
-            text={isLoading ? "Création en cours..." : "Créer mon compte"} 
+          <SubmitButton
+            isLoading={isLoading}
+            text={isLoading ? "Création en cours..." : "Créer mon compte"}
           />
         </form>
 
@@ -203,7 +204,7 @@ const Register = () => {
           </p>
         </div>
       </div>
-      
+
       <img
         src="https://images.unsplash.com/photo-1576502200916-3808e07386a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2065&q=80"
         alt="Décoration"

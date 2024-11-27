@@ -89,7 +89,8 @@ const ReviewList = ({ reviews = [] }) => {
 const RelatedProducts = ({ product, isLoading }) => {
   const { data: relatedProducts, isLoading: loadingRelated } = useGetRelatedProductsQuery({
     productId: product._id,
-    categoryId: product.category._id
+    categoryId: product.category._id,
+    limit: 6
   });
 
   if (isLoading || loadingRelated) {

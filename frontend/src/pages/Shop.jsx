@@ -6,7 +6,6 @@ import {
   setChecked,
   setRadio,
 } from "../redux/features/shop/shopSlice";
-import ProductCard from "./Products/ProductCard";
 import { useGetCategoriesQuery } from "../redux/features/categoriesApiSlice";
 import { 
   useGetFilteredProductsQuery, 
@@ -14,6 +13,7 @@ import {
   useGetAllBrandsQuery
 } from "../redux/features/productApiSlice";
 import Message from "../components/Message";
+import SmallProduct from "./Products/SmallProduct";
 
 const Shop = () => {
   const dispatch = useDispatch();
@@ -100,23 +100,10 @@ const Shop = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Calcul du nombre total de pages
-  const totalPages = Math.ceil((productsData?.total || 0) / productsPerPage);
-
-  if (categoriesQuery.error || error || brandsQuery.error) {
-    return (
-      <Message variant="danger">
-        Une erreur est survenue lors du chargement des produits.
-      </Message>
-    );
-  }
-
   return (
-    <div className="shop-container">
-      {/* Filtres */}
-      <div className="filters-container">
-        <h2 className="text-xl font-bold mb-4">Filtres</h2>
-        
+    <div className="shop">
+      {/* Shop filters */}
+      <div className="shop-filters">
         {/* Prix */}
         <div className="filter-section">
           <h3 className="font-semibold mb-2">Prix</h3>
@@ -169,33 +156,49 @@ const Shop = () => {
         </button>
       </div>
 
-      {/* Liste des produits */}
-      <div className="products-section">
-        <div className="products-grid">
-          {productsData?.products?.length > 0 ? (
-            productsData.products.map((product) => (
-              <ProductCard key={product._id} p={product} />
-            ))
-          ) : (
-            <Message variant="info">Aucun produit trouvé</Message>
-          )}
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="pagination">
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`pagination-button ${
-                  currentPage === index + 1 ? "active" : ""
-                }`}
-              >
-                {index + 1}
-              </button>
+      {/* Shop content */}
+      <div className="shop-content">
+        {error ? (
+          <Message type="error">{error.data?.message || "Une erreur est survenue"}</Message>
+        ) : isLoading ? (
+          <div className="products-grid">
+            {[...Array(8)].map((_, index) => (
+              <div key={index} className="product-skeleton">
+                <div className="image-skeleton"></div>
+                <div className="content-skeleton">
+                  <div className="title-skeleton"></div>
+                  <div className="price-skeleton"></div>
+                </div>
+              </div>
             ))}
           </div>
+        ) : productsData?.products?.length === 0 ? (
+          <Message>Aucun produit trouvé</Message>
+        ) : (
+          <>
+            <div className="products-grid">
+              {productsData?.products.map((product) => (
+                <div key={product._id} className="small-product-container">
+                  <SmallProduct product={product} />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {Math.ceil((productsData?.total || 0) / productsPerPage) > 1 && (
+              <div className="pagination">
+                {[...Array(Math.ceil((productsData?.total || 0) / productsPerPage))].map((_, index) => (
+                  <button
+                    key={index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={currentPage === index + 1 ? "active" : ""}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

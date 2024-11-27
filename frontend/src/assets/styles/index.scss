@@ -1,14 +1,12 @@
-// Base styles
-@use "./base/variables" as *;
-@use "./base/reset";
-@use "./base/animations";
-@use "./settings";
+// Base styles - Import dans cet ordre pour la bonne cascade des styles
+@use './base/reset';  
 
 // Components
-@use "./components/auth/inputField";
-@use "./components/auth/submitButton";
+@use "./components/inputField";
+@use "./components/submitButton";
 @use "./components/categoryForm";
 @use "./components/header";
+@use "./components/heartAndCart";
 @use "./components/loader";
 @use "./components/message";
 @use "./components/modal";
@@ -45,11 +43,8 @@
 @use "./pages/Products/favorites";
 @use "./pages/Products/favoritesCount";
 @use "./pages/Products/heartIcon";
-@use "./pages/Products/product";
-@use "./pages/Products/productCard";
 @use "./pages/Products/productCarousel";
 @use "./pages/Products/productDetails";
-@use "./pages/Products/products";
 @use "./pages/Products/productTabs";
 @use "./pages/Products/smallProduct";
 

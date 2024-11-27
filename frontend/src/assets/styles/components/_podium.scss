@@ -93,10 +93,6 @@
         max-width: clamp(200px, 25vw, 300px);
         transition: transform 0.3s ease;
 
-        &:hover {
-          transform: translateY(-10px);
-        }
-
         .product-rank {
           width: 100%;
           background: white;
@@ -238,32 +234,26 @@
           color: #ffffff;
         }
 
-        &:hover {
-          .product-rank {
-            background: #404040;
-          }
-        }
-      }
+        .product-stats {
+          .product-rating {
+            .star {
+              &.filled {
+                color: #fbbf24; // Orange plus clair pour meilleur contraste
+              }
 
-      .product-stats {
-        .product-rating {
-          .star {
-            &.filled {
-              color: #fbbf24; // Orange plus clair pour meilleur contraste
-            }
+              &.half {
+                color: #fbbf24; // Orange plus clair pour meilleur contraste
+              }
 
-            &.half {
-              color: #fbbf24; // Orange plus clair pour meilleur contraste
-            }
-
-            &.empty {
-              color: transparent;
+              &.empty {
+                color: transparent;
+              }
             }
           }
-        }
 
-        .reviews-count {
-          color: #9ca3af; // Gris plus clair
+          .reviews-count {
+            color: #9ca3af; // Gris plus clair
+          }
         }
       }
     }

@@ -61,11 +61,11 @@
     color: $text-color-light;
 
     &:hover {
-      color: lighten($secondary-color, 10%);
+      color: #ff6b8b; // Équivalent de lighten($secondary-color, 10%)
     }
 
     .favorites-count {
-      background: lighten($secondary-color, 5%);
+      background: #ff4d73; // Équivalent de lighten($secondary-color, 5%)
     }
   }
 

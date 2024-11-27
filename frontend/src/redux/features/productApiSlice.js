@@ -64,7 +64,7 @@ export const productApiSlice = apiSlice.injectEndpoints({
     }),
 
     getRelatedProducts: builder.query({
-      query: ({ productId, categoryId, limit = 3 }) => ({
+      query: ({ productId, categoryId, limit = 6 }) => ({
         url: `${PRODUCT_URL}/related`,
         method: 'GET',
         params: { productId, categoryId, limit },

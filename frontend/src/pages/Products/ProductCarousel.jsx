@@ -8,6 +8,7 @@ import { useGetCategoriesQuery } from "../../redux/features/categoriesApiSlice";
 import { Link } from "react-router-dom";
 import { useState, useCallback, useMemo } from "react";
 import ValidatedImage from "../../components/ValidatedImage";
+import HeartAndCart from "../../components/HeartAndCart";
 
 const ProductCarousel = () => {
   const {
@@ -176,8 +177,15 @@ const ProductCarousel = () => {
                               handleImageValidation(product._id, isValid)
                             }
                           />
+                          {product.brand && (
+                            <div className="brand-tag">
+                              {product.brand}
+                            </div>
+                          )}
                         </div>
+                      </Link>
                         <div className="product-info">
+                          <HeartAndCart product={product} />
                           <h3>{product.name}</h3>
                           <div className="product-info-bottom">
                             <div className="rating">
@@ -189,7 +197,6 @@ const ProductCarousel = () => {
                             </div>
                           </div>
                         </div>
-                      </Link>
                     </div>
                   </div>
                 )

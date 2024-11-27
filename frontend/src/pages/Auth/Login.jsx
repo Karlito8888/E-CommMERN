@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLoginMutation } from '../../redux/features/usersApiSlice';
-import { setCredentials } from '../../redux/features/auth/authSlice';
-import { toast } from 'react-toastify';
-import InputField from '../../components/auth/InputField';
-import SubmitButton from '../../components/auth/SubmitButton';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLoginMutation } from "../../redux/features/usersApiSlice";
+import { setCredentials } from "../../redux/features/auth/authSlice";
+import { toast } from "react-toastify";
+import InputField from "../../components/InputField";
+import SubmitButton from "../../components/SubmitButton";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Login = () => {
 
   const { search } = useLocation();
   const sp = new URLSearchParams(search);
-  const redirect = sp.get('redirect') || '/';
+  const redirect = sp.get("redirect") || "/";
 
   useEffect(() => {
     if (userInfo) {
@@ -34,7 +34,7 @@ const Login = () => {
       const res = await login({ email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
       navigate(redirect);
-      toast.success('Connexion réussie');
+      toast.success("Connexion réussie");
     } catch (err) {
       toast.error(err?.data?.message || err.error);
     }
@@ -45,7 +45,7 @@ const Login = () => {
       <div className="login-container">
         <div className="login-content">
           <h1>Connexion</h1>
-          
+
           <form onSubmit={handleSubmit} className="login-form">
             <InputField
               id="email"
@@ -69,14 +69,14 @@ const Login = () => {
               ariaInvalid={false}
             />
 
-            <SubmitButton 
-              isLoading={isLoading} 
-              text="Se connecter"
-            />
+            <SubmitButton isLoading={isLoading} text="Se connecter" />
           </form>
 
           <div className="login-links">
-            <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="register-link">
+            <Link
+              to={redirect ? `/register?redirect=${redirect}` : "/register"}
+              className="register-link"
+            >
               Pas encore de compte ? S'inscrire
             </Link>
             <Link to="/forgot-password" className="forgot-password-link">
@@ -86,11 +86,7 @@ const Login = () => {
         </div>
 
         <div className="login-image">
-          <img
-            src="/images/login-image.jpg"
-            alt="Connexion"
-            loading="lazy"
-          />
+          <img src="/images/login-image.jpg" alt="Connexion" loading="lazy" />
         </div>
       </div>
     </section>
